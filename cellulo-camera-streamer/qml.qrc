@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>src/main.qml</file>
+        <file>src/DisposableBluetoothSocket.qml</file>
+        <file>src/Button.qml</file>
+        <file>src/CelluloRobot.qml</file>
+    </qresource>
+</RCC>
