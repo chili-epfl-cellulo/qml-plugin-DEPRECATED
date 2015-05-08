@@ -4,5 +4,6 @@
         <file>src/DisposableBluetoothSocket.qml</file>
         <file>src/Button.qml</file>
         <file>src/CelluloRobot.qml</file>
+        <file>src/CelluloComm.qml</file>
     </qresource>
 </RCC>

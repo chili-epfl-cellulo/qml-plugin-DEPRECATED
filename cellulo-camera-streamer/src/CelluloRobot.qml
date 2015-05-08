@@ -10,6 +10,11 @@ Rectangle{
     property var socket
     property bool ready
 
+    property bool pixelBufferReady: comm.pixelBufferReady
+    property var pixelBuffer: comm.pixelBuffer
+
+    signal frameArrived()
+
     function connectToDevice(){
         ready = false;
         color = "red";
@@ -18,14 +23,34 @@ Rectangle{
         socket = socketComponent.createObject(this, {"macAddress":macAddress, "connected": true});
         socket.destroying.connect(connectToDevice); //Reconnect everytime we are destroyed, this is the only way to reconnect when dropped
         socket.connected_.connect(initTimer.start); //Workaround for first command waiting
+
+        //Initialize communications
+        socket.dataReceived.connect(comm.processIncoming);
+        comm.frameArrived.connect(frameArrived);
+        comm.expectCamStream = false;
     }
 
     function sendData(str){
         socket.stringData = str;
     }
 
+    function ping(){
+        console.log("Sending to robot: PING_\\n");
+        sendData("PING_\n");
+    }
+
+    function getCamSnapshot(){
+        comm.initCamStream();
+        console.log("Sending to robot: FRAME\\n");
+        sendData("FRAME\n");
+    }
+
     onMacAddressChanged: {
         connectToDevice();
+    }
+
+    CelluloComm{
+        id: comm
     }
 
     Timer{

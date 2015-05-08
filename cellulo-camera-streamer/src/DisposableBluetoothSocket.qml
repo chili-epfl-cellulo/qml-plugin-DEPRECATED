@@ -4,9 +4,9 @@ import QtBluetooth 5.2
 BluetoothSocket{
     property string macAddress
 
-    signal dataReceived(string data);
-    signal destroying();
-    signal connected_(); //There is already a property called 'connected'
+    signal dataReceived(string data)
+    signal destroying()
+    signal connected_() //There is already a property called 'connected'
 
     service: BluetoothService{
         deviceAddress: macAddress
@@ -24,5 +24,5 @@ BluetoothSocket{
             connected_();
     }
 
-    onStringDataChanged: console.log(stringData)
+    onStringDataChanged: dataReceived(stringData)
 }
