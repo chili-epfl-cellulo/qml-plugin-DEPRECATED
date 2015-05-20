@@ -27,10 +27,37 @@
 
 #include<QBluetoothDeviceInfo>
 
+const char* CelluloBluetooth::commandStrings[] = {
+    "P", //(P)ing
+    "F", //Request (f)rame
+    "B", //Query (b)attery state
+    "V", //Set (v)isual state
+    "E", //Set (e)ffect
+    "R", //(R)eset
+    "S"  //(S)hutdown
+};
+
+const char* CelluloBluetooth::receiveStrings[] = {
+    "O", //B(o)ot finished
+    "H", //Wake up finished ((H)ello)
+    "D", //All keys long touched; shutting (d)own
+    "W", //Battery lo(w), shutting down
+    "B", //(B)attery state changed
+    "T", //(T)ouch began
+    "L", //(L)ong touch
+    "R", //Touch (r)eleased
+    "P", //(P)ose changed
+    "K", //Robot (k)idnapped or unkidnapped
+    "A", //(A)cknowledged
+    "N"  //(N)ot acknowledged
+};
+
 CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     QQuickItem(parent)
 {
     socket = NULL;
+    commandTimeout.setSingleShot(true);
+    connect(&commandTimeout, SIGNAL(timeout()), this, SLOT(serverTimeout()));
 }
 
 CelluloBluetooth::~CelluloBluetooth(){ }
@@ -46,16 +73,14 @@ void CelluloBluetooth::setMacAddr(QString macAddr){
     reconnectToServer();
 }
 
-void CelluloBluetooth::socketDataArrived(){
-    qDebug() << socket->readAll();
-}
-
 void CelluloBluetooth::socketConnected(){
-    qDebug() << "Connected.";
+    qDebug() << "Connected to " << macAddr;
+    if(!commands.empty())
+        sendCommand();
 }
 
 void CelluloBluetooth::socketDisconnected(){
-    qDebug() << "Disconnected, will try to reconnect.";
+    qDebug() << "Disconnected from " << macAddr << ", will try to reconnect";
     reconnectToServer();
 }
 
@@ -68,4 +93,115 @@ void CelluloBluetooth::reconnectToServer(){
                 QBluetoothUuid(QString("00001101-0000-1000-8000-00805F9B34FB"))); //Connect to the Serial Protocol Profile
     }
 }
+
+void CelluloBluetooth::socketDataArrived(){
+    QByteArray message = socket->readAll();
+    for(int i=0;i<message.length();i++)
+
+        //End of transmission
+        if(message[i] == '\n')
+            processResponse();
+
+        //Transmission continues
+        else
+            receiveBuffer += message[i];
+}
+
+void CelluloBluetooth::processResponse(){
+    qDebug() << macAddr << " has sent: " << receiveBuffer;
+
+    switch(getReceivedMessage()){
+        case BOOT_COMPLETE:
+
+            break;
+
+        case WAKE_UP:
+
+            break;
+
+        case SHUTTING_DOWN:
+
+            break;
+
+        case LOW_BATTERY:
+
+            break;
+
+        case BATTERY_STATE_CHANGED:
+
+            break;
+
+        case TOUCH_BEGIN:
+
+            break;
+
+        case TOUCH_LONG_PRESSED:
+
+            break;
+
+        case TOUCH_RELEASED:
+
+            break;
+
+        case POSE_CHANGED:
+
+            break;
+
+        case KIDNAP:
+
+            break;
+
+        case ACKNOWLEDGED:
+
+            //Send next command if exists
+            if(!commands.empty())
+                commands.dequeue();
+            sendCommand();
+            break;
+
+        case NOT_ACKNOWLEDGED:
+        default:
+
+            //Invalid message might be corrupted ACK; send last command if exists
+            sendCommand();
+            break;
+    }
+
+    receiveBuffer.clear();
+}
+
+CelluloBluetooth::RECEIVE_MESSAGES CelluloBluetooth::getReceivedMessage(){
+    for(int i=0;i<(int)RECEIVE_MESSAGES::NUM_RECEIVE_MESSAGES;i++)
+        if(receiveStrings[i][0] == receiveBuffer[0])
+            return (RECEIVE_MESSAGES)i;
+    return RECEIVE_MESSAGES::INVALID_MESSAGE;
+}
+
+void CelluloBluetooth::serverTimeout(){
+    qDebug() << macAddr << " timed out in responding to command";
+    sendCommand();
+}
+
+void CelluloBluetooth::sendCommand(){
+    commandTimeout.stop();
+
+    if(!commands.empty() && socket != NULL){
+        qDebug() << "Sending command to " << macAddr << ": " << commands.head();
+        socket->write(commands.head());
+
+        commandTimeout.start(COMMAND_TIMEOUT_MILLIS);
+    }
+}
+
+void CelluloBluetooth::ping(){
+    QByteArray command(commandStrings[COMMAND::PING]);
+    command.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1){
+        sendCommand();
+    }
+}
+
 
