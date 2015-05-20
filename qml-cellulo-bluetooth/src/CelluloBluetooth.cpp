@@ -29,23 +29,21 @@
 
 CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     QQuickItem(parent)
-{ }
+{
+    socket = NULL;
+}
 
 CelluloBluetooth::~CelluloBluetooth(){ }
 
 void CelluloBluetooth::setMacAddr(QString macAddr){
-    QBluetoothServiceInfo service;
-    service.setServiceUuid(QBluetoothUuid(QString("00001101-0000-1000-8000-00805F9B34FB"))); //Serial port profile
-    service.setDevice(QBluetoothDeviceInfo(QBluetoothAddress(QString("00:06:66:74:41:04")),QString(""),0));
-
-    qDebug("CONNECTING");
-
+    this->macAddr = macAddr;
     socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
-    socket->connectToService(service);
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(socketDataArrived()));
     connect(socket, SIGNAL(connected()), this, SLOT(socketConnected()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+
+    reconnectToServer();
 }
 
 void CelluloBluetooth::socketDataArrived(){
@@ -53,10 +51,21 @@ void CelluloBluetooth::socketDataArrived(){
 }
 
 void CelluloBluetooth::socketConnected(){
-    qDebug() << "CONNECTED";
+    qDebug() << "Connected.";
 }
 
 void CelluloBluetooth::socketDisconnected(){
-    qDebug() << "DISCONNECTED";
+    qDebug() << "Disconnected, will try to reconnect.";
+    reconnectToServer();
+}
+
+void CelluloBluetooth::reconnectToServer(){
+    if(socket != NULL){
+        qDebug() << "Connecting to " << macAddr << "...";
+
+        socket->connectToService(
+                QBluetoothAddress(macAddr),
+                QBluetoothUuid(QString("00001101-0000-1000-8000-00805F9B34FB"))); //Connect to the Serial Protocol Profile
+    }
 }
 

@@ -74,68 +74,18 @@ public slots:
      */
     void setMacAddr(QString macAddr);
 
-    /**
-     * @brief Gets the detected tags
-     *
-     * @return Most recent detected tags
-     */
-  //  QVariantMap getTags() const;
-
-    /**
-     * @brief Gets the transform matrix that projects the pose onto the camera image
-     *
-     * @return Transform matrix that project the pose onto the camera image
-     */
-//    QMatrix4x4 getProjectionMatrix() const;
-
-    /**
-     * @brief Sets the detection trigger
-     *
-     * @param trigger The new detection trigger
-     */
-//    void setDetectionTrigger(DetectionTrigger trigger);
-
-    /**
-     * @brief Pushes a new image to be processed
-     *
-     * @param sourceImage Must contain a cv::Mat that is e.g the latest camera image
-     */
-//    void setSourceImage(QVariant sourceImage);
-
-    /**
-     * @brief Reads a Chilitags tag configuration from the given qrc file
-     *
-     * @param tagConfigurationFile The qrc file, must begin with :/
-     */
-//    void setTagConfigurationFile(QString tagConfigurationFile);
-
-    /**
-     * @brief Sets the IMU object that has displacement getter/resetter callbacks
-     *
-     * @param imu Imu object of type IMU
-     */
-//    void setIMU(QObject* imu);
-
-    /**
-     * @brief Sets the persistence of tags against being discarded when not detected for a while
-     *
-     * @param persistence Roughly corresponds to number of undetected frames
-     */
-//    void setPersistence(qreal persistence);
-
 signals:
 
-    /**
-     * @brief Emitted when a new image is processed
-     *
-     * @param tags The new set of tags
-     */
-//    void tagsChanged(QVariantMap tags);
-
-//    void projectionMatrixChanged();
 
 private:
-    QBluetoothSocket* socket; ///< Bluetooth socket connected to the server
+
+    QBluetoothSocket* socket;   ///< Bluetooth socket connected to the server
+    QString macAddr;            ///< Bluetooth MAC address of the server
+
+    /**
+     * @brief Connects or reconnects to the server if not already connected
+     */
+    void reconnectToServer();
 
 };
 
