@@ -30,6 +30,7 @@
 #include<QQueue>
 #include<QQuickItem>
 #include<QBluetoothSocket>
+#include<QColor>
 
 /**
  * @brief Bluetooth communicator for a Cellulo robot
@@ -37,13 +38,6 @@
 class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
     Q_PROPERTY(QString macAddr WRITE setMacAddr)
-    //Q_PROPERTY(DetectionTrigger detectionTrigger WRITE setDetectionTrigger)
-    //Q_PROPERTY(QVariant sourceImage WRITE setSourceImage)
-    //Q_PROPERTY(QVariantMap tags READ getTags NOTIFY tagsChanged) //TODO: would a QMap<QString,QMatrix> do ?
-    //Q_PROPERTY(QMatrix4x4 projectionMatrix READ getProjectionMatrix NOTIFY projectionMatrixChanged)
-    //Q_PROPERTY(QString tagConfigurationFile WRITE setTagConfigurationFile)
-    //Q_PROPERTY(QObject* imu WRITE setIMU)
-    //Q_PROPERTY(qreal persistence WRITE setPersistence)
 
 public:
 
@@ -125,9 +119,39 @@ public slots:
     void ping();
 
     /**
+     * @brief Requests a camera frame to be sent
+     */
+    void requestFrame();
+
+    /**
      * @brief Sends a battery state query
      */
     void queryBatteryState();
+
+    /**
+     * @brief Sets the visual state, i.e the visual response of the robot to touches
+     *
+     * @param state The visual state
+     */
+    void setVisualState(int state);
+
+    /**
+     * @brief Sets the visual effect on the robot, changing LED illumination
+     *
+     * @param effect The effect ordinal
+     * @param colorAndValue Color, alpha is used to indicate the value that is possibly meaningful for the effect
+     */
+    void setVisualEffect(int effect, QColor colorAndValue);
+
+    /**
+     * @brief Initiates a software reset on the robot
+     */
+    void reset();
+
+    /**
+     * @brief Initiates sleep on the robot
+     */
+    void shutdown();
 
 signals:
 

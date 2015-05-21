@@ -292,11 +292,86 @@ void CelluloBluetooth::ping(){
         sendCommand();
 }
 
+void CelluloBluetooth::requestFrame(){
+    QueuedCommand command;
+
+    command.type = COMMAND_TYPE::FRAME_REQUEST;
+    command.message = commandStrings[COMMAND_TYPE::FRAME_REQUEST];
+    command.message.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1)
+        sendCommand();
+}
+
 void CelluloBluetooth::queryBatteryState(){
     QueuedCommand command;
 
     command.type = COMMAND_TYPE::BATTERY_STATE_REQUEST;
     command.message = commandStrings[COMMAND_TYPE::BATTERY_STATE_REQUEST];
+    command.message.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1)
+        sendCommand();
+}
+
+void CelluloBluetooth::setVisualState(int state){
+    QueuedCommand command;
+
+    command.type = COMMAND_TYPE::SET_VISUAL_STATE;
+    command.message = commandStrings[COMMAND_TYPE::SET_VISUAL_STATE];
+    command.message.append((char)(state + 48));
+    command.message.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1)
+        sendCommand();
+}
+
+void CelluloBluetooth::setVisualEffect(int effect, QColor colorAndValue){
+    QueuedCommand command;
+    QString colorName = colorAndValue.name(QColor::NameFormat::HexArgb); //In the form '#aarrggbb'
+    colorName = colorName.toUpper();
+    QString value;
+    value.append(colorName[1]);
+    value.append(colorName[2]);
+    colorName.remove(0,3);
+
+    command.type = COMMAND_TYPE::SET_VISUAL_EFFECT;
+    command.message = commandStrings[COMMAND_TYPE::SET_VISUAL_EFFECT];
+    command.message.append((char)(effect + 48));
+    command.message.append(colorName);
+    command.message.append(value);
+    command.message.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1)
+        sendCommand();
+}
+
+void CelluloBluetooth::reset(){
+    QueuedCommand command;
+
+    command.type = COMMAND_TYPE::RESET;
+    command.message = commandStrings[COMMAND_TYPE::RESET];
+    command.message.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1)
+        sendCommand();
+}
+
+void CelluloBluetooth::shutdown(){
+    QueuedCommand command;
+
+    command.type = COMMAND_TYPE::SHUTDOWN;
+    command.message = commandStrings[COMMAND_TYPE::SHUTDOWN];
     command.message.append('\n');
 
     commands.enqueue(command);
