@@ -113,56 +113,142 @@ void CelluloBluetooth::processResponse(){
     switch(getReceivedMessage()){
         case BOOT_COMPLETE:
 
+            //Correct message length
+            if(receiveBuffer.length() == 1)
+                emit bootCompleted();
             break;
 
         case WAKE_UP:
 
+            //Correct message length
+            if(receiveBuffer.length() == 1)
+                emit wokeUp();
             break;
 
         case SHUTTING_DOWN:
 
+            //Correct message length
+            if(receiveBuffer.length() == 1)
+                emit shuttingDown();
             break;
 
         case LOW_BATTERY:
 
+            //Correct message length
+            if(receiveBuffer.length() == 1)
+                emit lowBattery();
             break;
 
         case BATTERY_STATE_CHANGED:
 
+            //Correct message length
+            if(receiveBuffer.length() == 2){
+
+                int newState = (int)(receiveBuffer[1] - 48);
+                if(newState >= 0 && newState <= 4){
+                    emit batteryStateChanged(newState);
+
+                    //If we received this as a reply to the command we sent, it is complete
+                    if(!commands.empty() && commands.head().type == COMMAND_TYPE::BATTERY_STATE_REQUEST){
+                        commands.dequeue();
+                        sendCommand();
+                    }
+                }
+                else{
+
+                    //If we received this as a reply to the command we sent, resend to get a proper response
+                    if(!commands.empty() && commands.head().type == COMMAND_TYPE::BATTERY_STATE_REQUEST)
+                        sendCommand();
+
+                    //If this was a spontaneous event and we got a corrupted response, ask explicitly
+                    else
+                        queryBatteryState();
+                }
+            }
+            else{
+
+                //If we received this as a reply to the command we sent, resend to get a proper response
+                if(!commands.empty() && commands.head().type == COMMAND_TYPE::BATTERY_STATE_REQUEST)
+                    sendCommand();
+
+                //If this was a spontaneous event and we got a corrupted response, ask explicitly
+                else
+                    queryBatteryState();
+            }
             break;
 
         case TOUCH_BEGIN:
 
+            //Correct message length
+            if(receiveBuffer.length() == 2){
+
+                int key = (int)(receiveBuffer[1] - 48);
+                if(key >= 0 && key <= 5)
+                    emit touchBegan(key);
+            }
             break;
 
         case TOUCH_LONG_PRESSED:
 
+            //Correct message length
+            if(receiveBuffer.length() == 2){
+
+                int key = (int)(receiveBuffer[1] - 48);
+                if(key >= 0 && key <= 5)
+                    emit longTouch(key);
+            }
             break;
 
         case TOUCH_RELEASED:
 
+            //Correct message length
+            if(receiveBuffer.length() == 2){
+
+                int key = (int)(receiveBuffer[1] - 48);
+                if(key >= 0 && key <= 5)
+                    emit touchReleased(key);
+            }
             break;
 
         case POSE_CHANGED:
+
+            //TODO
 
             break;
 
         case KIDNAP:
 
+            //TODO
+
             break;
 
         case ACKNOWLEDGED:
 
-            //Send next command if exists
-            if(!commands.empty())
-                commands.dequeue();
-            sendCommand();
+            //Correct message length
+            if(receiveBuffer.length() == 1){
+
+                //This command transaction is complete, send next command if exists
+                if(!commands.empty())
+                    commands.dequeue();
+                sendCommand();
+            }
+
+            //Incorrect message length, take as nack and send last message again
+            else
+                sendCommand();
+
             break;
 
         case NOT_ACKNOWLEDGED:
+
+            //Probably our message did not reach properly, send last command if exists
+            sendCommand();
+
+            break;
+
         default:
 
-            //Invalid message might be corrupted ACK; send last command if exists
+            //Invalid message might be corrupted ack; send last command if exists
             sendCommand();
             break;
     }
@@ -186,22 +272,36 @@ void CelluloBluetooth::sendCommand(){
     commandTimeout.stop();
 
     if(!commands.empty() && socket != NULL){
-        qDebug() << "Sending command to " << macAddr << ": " << commands.head();
-        socket->write(commands.head());
+        qDebug() << "Sending command to " << macAddr << ": " << commands.head().message;
+        socket->write(commands.head().message);
 
         commandTimeout.start(COMMAND_TIMEOUT_MILLIS);
     }
 }
 
 void CelluloBluetooth::ping(){
-    QByteArray command(commandStrings[COMMAND::PING]);
-    command.append('\n');
+    QueuedCommand command;
+
+    command.type = COMMAND_TYPE::PING;
+    command.message = commandStrings[COMMAND_TYPE::PING];
+    command.message.append('\n');
 
     commands.enqueue(command);
 
-    if(commands.count() == 1){
+    if(commands.count() == 1)
         sendCommand();
-    }
 }
 
+void CelluloBluetooth::queryBatteryState(){
+    QueuedCommand command;
+
+    command.type = COMMAND_TYPE::BATTERY_STATE_REQUEST;
+    command.message = commandStrings[COMMAND_TYPE::BATTERY_STATE_REQUEST];
+    command.message.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1)
+        sendCommand();
+}
 

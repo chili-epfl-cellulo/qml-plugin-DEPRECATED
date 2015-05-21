@@ -47,7 +47,7 @@ Q_OBJECT
 
 public:
 
-    enum COMMAND{
+    enum COMMAND_TYPE{
         PING = 0,
         FRAME_REQUEST,
         BATTERY_STATE_REQUEST,
@@ -124,14 +124,81 @@ public slots:
      */
     void ping();
 
+    /**
+     * @brief Sends a battery state query
+     */
+    void queryBatteryState();
+
+signals:
+
+    /**
+     * @brief Emitted when the robot is ready after a power up or a reset
+     */
+    void bootCompleted();
+
+    /**
+     * @brief Emitted when the robot wakes up from sleep (off-state)
+     */
+    void wokeUp();
+
+    /**
+     * @brief Emitted when the robot is about to sleep (shutdown) due to the user command via touch keys
+     */
+    void shuttingDown();
+
+    /**
+     * @brief Emitted when the robot is about to sleep (shutdown) due to low battery
+     */
+    void lowBattery();
+
+    /**
+     * @brief Emitted when the battery state changes
+     *
+     * @param batteryState New battery state
+     */
+    void batteryStateChanged(int batteryState);
+
+    /**
+     * @brief Emitted when a key is touched
+     *
+     * @param key The key that is touched
+     */
+    void touchBegan(int key);
+
+    /**
+     * @brief Emitted when a key is touched for more than the long touch time
+     *
+     * @param key The key that is touched
+     */
+    void longTouch(int key);
+
+    /**
+     * @brief Emitted when a key is released
+     *
+     * @param key The key that is released
+     */
+    void touchReleased(int key);
+
+    //void poseChanged(int x, int y, int theta);
+
+    //void kidnapChanged(bool kidnapped);
+
 private:
+
+    /**
+     * @brief Packs information of a command so that it can be sent over Bluetooth and its reply parsed
+     */
+    typedef struct{
+        COMMAND_TYPE type;
+        QByteArray message;
+    } QueuedCommand;
 
     static const char* commandStrings[];    ///< Strings sent over Bluetooth to give commands
     static const char* receiveStrings[];    ///< Strings received over Bluetooth as response or event
 
     QBluetoothSocket* socket;               ///< Bluetooth socket connected to the server
     QString macAddr;                        ///< Bluetooth MAC address of the server
-    QQueue<QByteArray> commands;            ///< Commands to be sent over Bluetooth
+    QQueue<QueuedCommand> commands;            ///< Commands to be sent over Bluetooth
     QTimer commandTimeout;                  ///< When this timer runs out, command is resent if not already acknowledged
     QByteArray receiveBuffer;               ///< Receive buffer until the current response/event message is complete
 
