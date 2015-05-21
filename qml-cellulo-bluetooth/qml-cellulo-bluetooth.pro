@@ -11,10 +11,12 @@ uri = CelluloBluetooth
 
 HEADERS += \
     src/CelluloBluetooth.h \
+    src/CameraFrameImageProvider.h \
     src/CelluloBluetoothPlugin.h
 
 SOURCES += \
     src/CelluloBluetooth.cpp \
+    src/CameraFrameImageProvider.cpp \
     src/CelluloBluetoothPlugin.cpp
 
 OTHER_FILES += qmldir

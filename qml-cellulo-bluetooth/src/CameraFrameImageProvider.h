@@ -16,24 +16,35 @@
  */
 
 /**
- * @file CelluloBluetoothPlugin.cpp
- * @brief Source for exposing Cellulo Bluetooth communication as a QML object
+ * @file CameraFrameImageProvider.h
+ * @brief Header for converting the camera image in QByteBuffer to QImage
  * @author Ayberk Özgür
  * @version 1.0
- * @date 2015-05-20
+ * @date 2015-05-21
  */
 
-#include "CelluloBluetoothPlugin.h"
+#ifndef CAMERAFRAMEIMAGEPROVIDER_H
+#define CAMERAFRAMEIMAGEPROVIDER_H
 
-#include<QQmlEngine>
+#include"CelluloBluetooth.h"
 
-#include"CameraFrameImageProvider.h"
+#include<QQuickImageProvider>
 
-void CelluloBluetoothPlugin::registerTypes(const char *uri){
-    qmlRegisterType<CelluloBluetooth>(uri, 1, 0, "CelluloBluetooth");
-}
+/**
+ * @brief QImage provider from QByteArray
+ */
+class CameraFrameImageProvider : public QQuickImageProvider {
 
-void CelluloBluetoothPlugin::initializeEngine(QQmlEngine *engine, const char *uri){
-    engine->addImageProvider("cameraFrame", new CameraFrameImageProvider());
-}
+public:
 
+    CameraFrameImageProvider();
+
+    QImage requestImage(QString const& id, QSize* size, QSize const& requestedSize);
+
+private:
+
+    unsigned char frameCharBuffer[CelluloBluetooth::IMG_WIDTH*CelluloBluetooth::IMG_HEIGHT*4];
+
+};
+
+#endif // CAMERAFRAMEIMAGEPROVIDER_H

@@ -69,6 +69,12 @@ public:
     };
 
     static const int COMMAND_TIMEOUT_MILLIS = 500;   ///< Will wait this many millis for a response before resending command
+    static const int FRAME_TIMEOUT_MILLIS = 5000;    ///< Will wait this many millis for a camera frame to complete
+
+    static const int IMG_WIDTH = 752/2;              ///< Image width of the robot's camera
+    static const int IMG_HEIGHT = 480/2;             ///< Image height of the robot's camera
+
+    static QByteArray frameBuffer;                   ///< Container for the received camera frame data
 
     /**
      * @brief Creates a new Cellulo robot communicator
@@ -81,6 +87,13 @@ public:
      * @brief Destroys this Cellulo robot communicator
      */
     virtual ~CelluloBluetooth();
+
+    /**
+     * @brief Gets the latest camera frame
+     *
+     * @return The latest camera frame; IMG_WIDTH*IMG_HEIGHT many ints in grayscale, 0 to 255
+     */
+    QVariantList getFrame() const;
 
 private slots:
 
@@ -103,6 +116,11 @@ private slots:
      * @brief Called when server did not respond to command within the timeout interval
      */
     void serverTimeout();
+
+    /**
+     * @brief Called when the server did not complete the camera frame in time
+     */
+    void frameTimeout();
 
 public slots:
 
@@ -207,6 +225,11 @@ signals:
 
     //void kidnapChanged(bool kidnapped);
 
+    /**
+     * @brief Emitted when a camera frame from the robot is ready to read
+     */
+    void frameReady();
+
 private:
 
     /**
@@ -222,9 +245,13 @@ private:
 
     QBluetoothSocket* socket;               ///< Bluetooth socket connected to the server
     QString macAddr;                        ///< Bluetooth MAC address of the server
-    QQueue<QueuedCommand> commands;            ///< Commands to be sent over Bluetooth
+    QQueue<QueuedCommand> commands;         ///< Commands to be sent over Bluetooth
     QTimer commandTimeout;                  ///< When this timer runs out, command is resent if not already acknowledged
+    QTimer frameTimeoutTimer;               ///< When this timer runs out, frame is completed even if it is not complete
     QByteArray receiveBuffer;               ///< Receive buffer until the current response/event message is complete
+    QByteArray frameLineEndSequence;        ///< Extra sequence that ends each line in a received camera frame
+    bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
+    unsigned int currentLine;               ///< Current line in the camera frame being received
 
     /**
      * @brief Connects or reconnects to the server if not already connected

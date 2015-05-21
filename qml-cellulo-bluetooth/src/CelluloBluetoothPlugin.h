@@ -41,6 +41,7 @@ Q_OBJECT
 
 public:
     void registerTypes(const char *uri);
+    void initializeEngine(QQmlEngine *engine, const char *uri);
 };
 
 #endif // CELLULOBLUETOOTHPLUGIN_H
