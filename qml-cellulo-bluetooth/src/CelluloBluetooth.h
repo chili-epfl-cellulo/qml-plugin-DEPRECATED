@@ -157,9 +157,10 @@ public slots:
      * @brief Sets the visual effect on the robot, changing LED illumination
      *
      * @param effect The effect ordinal
-     * @param colorAndValue Color, alpha is used to indicate the value that is possibly meaningful for the effect
+     * @param color Color
+     * @param value A value possibly meaningful for the effect
      */
-    void setVisualEffect(int effect, QColor colorAndValue);
+    void setVisualEffect(int effect, QColor color, unsigned char value);
 
     /**
      * @brief Initiates a software reset on the robot
