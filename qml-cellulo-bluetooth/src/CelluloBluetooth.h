@@ -69,7 +69,7 @@ public:
     };
 
     static const int COMMAND_TIMEOUT_MILLIS = 500;   ///< Will wait this many millis for a response before resending command
-    static const int FRAME_TIMEOUT_MILLIS = 5000;    ///< Will wait this many millis for a camera frame to complete
+    static const int FRAME_TIMEOUT_MILLIS = 11000;   ///< Will wait this many millis for a camera frame to complete
 
     static const int IMG_WIDTH = 752/2;              ///< Image width of the robot's camera
     static const int IMG_HEIGHT = 480/2;             ///< Image height of the robot's camera
