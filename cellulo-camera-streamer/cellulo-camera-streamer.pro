@@ -12,6 +12,9 @@ android {
     INSTALLS += target
     export(INSTALLS)
 
+    ANDROID_EXTRA_LIBS = \
+        $$[QT_INSTALL_QML]/CelluloBluetooth/libcellulobluetoothplugin.so
+
     ANDROID_PERMISSIONS += \
         android.permission.BLUETOOTH
 }

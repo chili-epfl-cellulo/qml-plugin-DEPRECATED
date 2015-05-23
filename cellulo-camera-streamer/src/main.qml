@@ -7,7 +7,7 @@ import CelluloBluetooth 1.0
 Window {
     id: window
     visible: true
-    height: 300
+    height: 240
     width: 500
 
     Image{
@@ -39,9 +39,7 @@ Window {
 
     CelluloBluetooth{
         id: robotComm
-        macAddr: "00:06:66:74:43:00"
-        onFrameReady:{
-            cameraFrameImage.reload();
-        }
+        macAddr: "00:06:66:74:41:04" //"00:06:66:74:41:14"
+        onFrameReady: cameraFrameImage.reload();
     }
 }
