@@ -38,6 +38,10 @@
 class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
     Q_PROPERTY(QString macAddr WRITE setMacAddr)
+    Q_PROPERTY(float x READ getX NOTIFY poseChanged)
+    Q_PROPERTY(float y READ getY NOTIFY poseChanged)
+    Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
+    Q_PROPERTY(bool kidnapped READ getKidnapped NOTIFY kidnappedChanged)
 
 public:
 
@@ -94,6 +98,34 @@ public:
      * @return The latest camera frame; IMG_WIDTH*IMG_HEIGHT many ints in grayscale, 0 to 255
      */
     QVariantList getFrame() const;
+
+    /**
+     * @brief Gets the latest x position
+     *
+     * @return Latest x position in grid coordinates
+     */
+    float getX(){ return x; }
+
+    /**
+     * @brief Gets the latest y position
+     *
+     * @return Latest y position in grid coordinates
+     */
+    float getY(){ return y; }
+
+    /**
+     * @brief Gets the latest orientation
+     *
+     * @return Latest orientation in degrees
+     */
+    float getTheta(){ return theta; }
+
+    /**
+     * @brief Gets the latest kidnapped state
+     *
+     * @return Whether kidnapped or on encoded paper
+     */
+    bool getKidnapped(){ return kidnapped; }
 
 private slots:
 
@@ -222,9 +254,15 @@ signals:
      */
     void touchReleased(int key);
 
-    //void poseChanged(int x, int y, int theta);
+    /**
+     * @brief Emitted when the pose of the robot changes
+     */
+    void poseChanged();
 
-    //void kidnapChanged(bool kidnapped);
+    /**
+     * @brief Emitted when the kidnap state of the robot changes
+     */
+    void kidnappedChanged();
 
     /**
      * @brief Emitted when a camera frame from the robot is ready to read
@@ -254,6 +292,11 @@ private:
     bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
     unsigned int currentLine;               ///< Current line in the camera frame being received
 
+    float x;                                ///< Current x position in grid coordinates
+    float y;                                ///< Current y position in grid coordinates
+    float theta;                            ///< Current orientation in degrees
+    bool kidnapped;                         ///< Whether currently kidnapped
+
     /**
      * @brief Connects or reconnects to the server if not already connected
      */
@@ -275,6 +318,28 @@ private:
      * @return Received message ordinal in the RECEIVE_MESSAGES enum
      */
     RECEIVE_MESSAGES getReceivedMessage();
+
+    /**
+     * @brief Calculates the 4-bit even parity of the given pose
+     *
+     * @param x X position
+     * @param y Y position
+     * @param theta Angle
+     *
+     * @return (How many 1's are in the x, y and theta)'s least significant 4 bits
+     */
+    int calculateChecksum(int x, int y, int theta);
+
+    /**
+     * @brief Calculates the integer value from an uppercase hex string
+     *
+     * @param array Array containing the hex string
+     * @param begin Index of most significant digit
+     * @param end Index of least significant digit
+     *
+     * @return The value
+     */
+    int hexToInt(QByteArray const& array, int begin, int end);
 };
 
 #endif // CELLULOBLUETOOTH_H

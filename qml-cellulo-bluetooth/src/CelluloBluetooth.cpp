@@ -71,6 +71,11 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     frameLineEndSequence.append((char)255);
     frameLineEndSequence.append((char)0);
     frameLineEndSequence.append((char)255);
+
+    x = 0;
+    y = 0;
+    theta = 0;
+    kidnapped = true;
 }
 
 CelluloBluetooth::~CelluloBluetooth(){ }
@@ -267,14 +272,39 @@ void CelluloBluetooth::processResponse(){
 
         case POSE_CHANGED:
 
-            //TODO
+            //Correct message length
+            if(receiveBuffer.length() == 22){
+                int receivedParity = (int)receiveBuffer[21] >= 65 ? (int)receiveBuffer[21] - 65 + 10 : (int)receiveBuffer[21] - 48;
 
+                int x = hexToInt(receiveBuffer, 1, 8);
+                int y = hexToInt(receiveBuffer, 9, 16);
+                int theta = hexToInt(receiveBuffer, 17, 20);
+
+                if(receivedParity != calculateChecksum(x,y,theta))
+                    qDebug() << "PARITY CHECK FAILED";
+                else{
+                    this->x = x/100.0f;
+                    this->y = y/100.0f;
+                    this->theta = theta/100.0f;
+                    emit poseChanged();
+                    if(kidnapped){
+                        kidnapped = false;
+                        emit kidnappedChanged();
+                    }
+                }
+            }
             break;
 
         case KIDNAP:
 
-            //TODO
-
+            //Correct message length
+            if(receiveBuffer.length() == 2){
+                int newKidnapped = (int)(receiveBuffer[1] - 48);
+                if(newKidnapped == 0 && newKidnapped == 1)
+                    if((bool)newKidnapped != kidnapped)
+                        kidnapped = newKidnapped;
+                        emit kidnappedChanged();
+                    }
             break;
 
         case ACKNOWLEDGED:
@@ -472,5 +502,33 @@ void CelluloBluetooth::shutdown(){
 
     if(commands.count() == 1)
         sendCommand();
+}
+
+int CelluloBluetooth::calculateChecksum(int x, int y, int theta){
+    unsigned int i;
+    unsigned int result = 0;
+    for(i=0;i<32;i++){
+        if(x % 2)
+            result++;
+        x >>= 1;
+
+        if(y % 2)
+            result++;
+        y >>= 1;
+
+        if(theta % 2)
+            result++;
+        theta >>= 1;
+    }
+    return result % 16;
+}
+
+int CelluloBluetooth::hexToInt(QByteArray const& array, int begin, int end){
+    int result = 0;
+    for(int i=begin;i<=end;i++){
+        result <<= 4;
+        result += (int)array[i] >= 65 ? (int)array[i] - 65 + 10 : (int)array[i] - 48;
+    }
+    return result;
 }
 
