@@ -72,6 +72,7 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     frameLineEndSequence.append((char)0);
     frameLineEndSequence.append((char)255);
 
+    batteryState = 4; //Beginning with shutdown is a good idea
     x = 0;
     y = 0;
     theta = 0;
@@ -206,7 +207,10 @@ void CelluloBluetooth::processResponse(){
 
                 int newState = (int)(receiveBuffer[1] - 48);
                 if(newState >= 0 && newState <= 4){
-                    emit batteryStateChanged(newState);
+                    if(batteryState != newState){
+                        batteryState = newState;
+                        emit batteryStateChanged();
+                    }
 
                     //If we received this as a reply to the command we sent, it is complete
                     if(!commands.empty() && commands.head().type == COMMAND_TYPE::BATTERY_STATE_REQUEST){
@@ -300,7 +304,7 @@ void CelluloBluetooth::processResponse(){
             //Correct message length
             if(receiveBuffer.length() == 2){
                 int newKidnapped = (int)(receiveBuffer[1] - 48);
-                if(newKidnapped == 0 && newKidnapped == 1)
+                if(newKidnapped == 0 || newKidnapped == 1)
                     if((bool)newKidnapped != kidnapped)
                         kidnapped = newKidnapped;
                         emit kidnappedChanged();

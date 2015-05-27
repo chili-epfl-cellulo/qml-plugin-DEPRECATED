@@ -38,6 +38,7 @@
 class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
     Q_PROPERTY(QString macAddr WRITE setMacAddr)
+    Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
     Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
@@ -98,6 +99,13 @@ public:
      * @return The latest camera frame; IMG_WIDTH*IMG_HEIGHT many ints in grayscale, 0 to 255
      */
     QVariantList getFrame() const;
+
+    /**
+     * @brief Gets the latest battery state
+     *
+     * @return Battery state as described by the BATTERY_STATE enumeration
+     */
+    int getBatteryState(){ return batteryState; }
 
     /**
      * @brief Gets the latest x position
@@ -228,10 +236,8 @@ signals:
 
     /**
      * @brief Emitted when the battery state changes
-     *
-     * @param batteryState New battery state
      */
-    void batteryStateChanged(int batteryState);
+    void batteryStateChanged();
 
     /**
      * @brief Emitted when a key is touched
@@ -292,6 +298,7 @@ private:
     bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
     unsigned int currentLine;               ///< Current line in the camera frame being received
 
+    int batteryState;                       ///< Current battery state
     float x;                                ///< Current x position in grid coordinates
     float y;                                ///< Current y position in grid coordinates
     float theta;                            ///< Current orientation in degrees
