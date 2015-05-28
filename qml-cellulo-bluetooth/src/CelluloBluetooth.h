@@ -38,6 +38,7 @@
 class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
     Q_PROPERTY(QString macAddr WRITE setMacAddr)
+    Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
@@ -76,8 +77,8 @@ public:
     static const int COMMAND_TIMEOUT_MILLIS = 500;   ///< Will wait this many millis for a response before resending command
     static const int FRAME_TIMEOUT_MILLIS = 11000;   ///< Will wait this many millis for a camera frame to complete
 
-    static const int IMG_WIDTH = 752/2;              ///< Image width of the robot's camera
-    static const int IMG_HEIGHT = 480/2;             ///< Image height of the robot's camera
+    static const int IMG_WIDTH = 752/4;              ///< Image width of the robot's camera
+    static const int IMG_HEIGHT = 480/4;             ///< Image height of the robot's camera
 
     static QByteArray frameBuffer;                   ///< Container for the received camera frame data
 
@@ -99,6 +100,13 @@ public:
      * @return The latest camera frame; IMG_WIDTH*IMG_HEIGHT many ints in grayscale, 0 to 255
      */
     QVariantList getFrame() const;
+
+    /**
+     * @brief Gets whether currently connected over Bluetooth
+     *
+     * @return Whether currently connected over Bluetooth
+     */
+    bool getConnected(){ return connected; }
 
     /**
      * @brief Gets the latest battery state
@@ -215,6 +223,11 @@ public slots:
 signals:
 
     /**
+     * @brief Emitted when Bluetooth connection state changes
+     */
+    void connectedChanged();
+
+    /**
      * @brief Emitted when the robot is ready after a power up or a reset
      */
     void bootCompleted();
@@ -298,6 +311,7 @@ private:
     bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
     unsigned int currentLine;               ///< Current line in the camera frame being received
 
+    bool connected;                         ///< Whether Bluetooth is connected now
     int batteryState;                       ///< Current battery state
     float x;                                ///< Current x position in grid coordinates
     float y;                                ///< Current y position in grid coordinates

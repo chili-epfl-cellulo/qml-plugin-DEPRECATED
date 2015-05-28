@@ -72,6 +72,7 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     frameLineEndSequence.append((char)0);
     frameLineEndSequence.append((char)255);
 
+    connected = false;
     batteryState = 4; //Beginning with shutdown is a good idea
     x = 0;
     y = 0;
@@ -105,10 +106,18 @@ void CelluloBluetooth::socketConnected(){
     qDebug() << "Connected to " << macAddr;
     if(!commands.empty())
         sendCommand();
+    if(!connected){
+        connected = true;
+        emit connectedChanged();
+    }
 }
 
 void CelluloBluetooth::socketDisconnected(){
     qDebug() << "Disconnected from " << macAddr << ", will try to reconnect";
+    if(connected){
+        connected = false;
+        emit connectedChanged();
+    }
     reconnectToServer();
 }
 
