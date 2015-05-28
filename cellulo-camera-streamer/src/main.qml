@@ -7,7 +7,7 @@ import CelluloBluetooth 1.0
 Window {
     id: window
     visible: true
-    height: 240
+    height: 510
     width: 500
 
     Image{
@@ -18,6 +18,26 @@ Window {
             var oldSource = source;
             source = "";
             source = oldSource;
+        }
+    }
+
+    Rectangle{
+        id: paper
+        anchors.top: cameraFrameImage.bottom
+        width: 210
+        height: 270
+        color: "white"
+        border.color: "black"
+        border.width: 2
+        Rectangle{
+            id: robotDummy
+            width: 20
+            height: 20
+            radius: 5
+            x: robotComm.x*0.5 - 10
+            y: robotComm.y*0.5 - 10
+            rotation: 360 - robotComm.theta
+            color: robotComm.kidnapped ? "red" : "green"
         }
     }
 
@@ -34,12 +54,27 @@ Window {
             onClicked: robotComm.reset();
         }
 
+        Button {
+            text: "Test color high"
+            onClicked: robotComm.setVisualEffect(0,"#FFFFFFFF",0);
+        }
+
+        Button {
+            text: "Test color mid"
+            onClicked: robotComm.setVisualEffect(0,"#FF808080",0);
+        }
+
+        Button {
+            text: "Test color low"
+            onClicked: robotComm.setVisualEffect(0,"#FF000000",0);
+        }
+
         anchors.left: cameraFrameImage.right
     }
 
     CelluloBluetooth{
         id: robotComm
-        macAddr: "00:06:66:74:41:04" //"00:06:66:74:41:14"
+        macAddr: "00:06:66:74:43:00"
         onFrameReady: cameraFrameImage.reload();
     }
 }
