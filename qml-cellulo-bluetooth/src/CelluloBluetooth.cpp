@@ -459,9 +459,14 @@ void CelluloBluetooth::setVisualState(int state){
         sendCommand();
 }
 
-void CelluloBluetooth::setVisualEffect(int effect, QColor color, unsigned char value){
+void CelluloBluetooth::setVisualEffect(int effect, QColor color, int value){
     if(expectingFrame)
         return;
+
+    if(value > 255)
+        value = 255;
+    else if(value < 0)
+        value = 0;
 
     QueuedCommand command;
 
@@ -469,8 +474,8 @@ void CelluloBluetooth::setVisualEffect(int effect, QColor color, unsigned char v
     colorName = colorName.toUpper();
     colorName.remove(0,3); //Remove # and alpha
     QString valueString;
-    valueString.append((char)(value/16 >= 10 ? value/16 + 65 : value/16 + 48));
-    valueString.append((char)(value%16 >= 10 ? value%16 + 65 : value%16 + 48));
+    valueString.append((char)(value/16 >= 10 ? value/16 + 65 - 10 : value/16 + 48));
+    valueString.append((char)(value%16 >= 10 ? value%16 + 65 - 10 : value%16 + 48));
 
     command.type = COMMAND_TYPE::SET_VISUAL_EFFECT;
     command.message = commandStrings[COMMAND_TYPE::SET_VISUAL_EFFECT];

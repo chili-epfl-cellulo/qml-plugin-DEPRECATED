@@ -206,9 +206,9 @@ public slots:
      *
      * @param effect The effect ordinal
      * @param color Color
-     * @param value A value possibly meaningful for the effect
+     * @param value A value possibly meaningful for the effect (between 0 and 255)
      */
-    void setVisualEffect(int effect, QColor color, unsigned char value);
+    void setVisualEffect(int effect, QColor color, int value);
 
     /**
      * @brief Initiates a software reset on the robot
