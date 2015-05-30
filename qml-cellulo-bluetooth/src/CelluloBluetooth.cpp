@@ -178,7 +178,7 @@ void CelluloBluetooth::socketDataArrived(){
 }
 
 void CelluloBluetooth::processResponse(){
-    qDebug() << macAddr << " has sent: " << receiveBuffer;
+    //qDebug() << macAddr << " has sent: " << receiveBuffer;
 
     switch(getReceivedMessage()){
         case BOOT_COMPLETE:
@@ -376,7 +376,7 @@ void CelluloBluetooth::sendCommand(){
     commandTimeout.stop();
 
     if(!commands.empty() && socket != NULL){
-        qDebug() << "Sending command to " << macAddr << ": " << commands.head().message;
+        //qDebug() << "Sending command to " << macAddr << ": " << commands.head().message;
 
         if(commands.head().type == COMMAND_TYPE::FRAME_REQUEST){
             frameTimeoutTimer.start(FRAME_TIMEOUT_MILLIS);
