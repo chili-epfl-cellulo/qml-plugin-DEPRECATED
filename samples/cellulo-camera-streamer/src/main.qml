@@ -2,7 +2,7 @@ import QtQuick 2.2
 import QtQuick.Window 2.1
 import QtQuick.Controls 1.2
 import QtBluetooth 5.2
-import CelluloBluetooth 1.0
+import Cellulo 1.0
 
 Window {
     id: window
