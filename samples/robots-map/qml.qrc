@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>Cellulo.qml</file>
+        <file>Pad.qml</file>
+        <file>cellulo-simulator-toolkit.js</file>
+        <file>assets/playground.png</file>
+    </qresource>
+</RCC>
