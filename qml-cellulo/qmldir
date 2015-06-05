@@ -1,0 +1,5 @@
+module Cellulo
+CelluloToolkit 1.0 cellulo-toolkit.js
+CelluloRobot 1.0 CelluloRobot.qml
+plugin celluloplugin
+

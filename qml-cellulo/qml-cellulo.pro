@@ -1,5 +1,7 @@
+#Building of native code
+
 TEMPLATE = lib
-TARGET = cellulobluetoothplugin
+TARGET = celluloplugin
 
 CONFIG += qt plugin c++11 nostrip
 CONFIG -= android_install
@@ -7,7 +9,7 @@ CONFIG -= android_install
 QT += qml quick bluetooth
 
 TARGET = $$qtLibraryTarget($$TARGET)
-uri = CelluloBluetooth
+uri = Cellulo
 
 HEADERS += \
     src/CelluloBluetooth.h \
@@ -19,14 +21,20 @@ SOURCES += \
     src/CameraFrameImageProvider.cpp \
     src/CelluloBluetoothPlugin.cpp
 
-OTHER_FILES += qmldir
+#File installation
 
-#Install plugin library, qmldir
 qmldir.files = qmldir
+javascript.files = src/cellulo-toolkit.js
+qml.files = src/CelluloRobot.qml
+
+OTHER_FILES += qmldir.files javascript.files qml.files
+
 unix {
     installPath = $$[QT_INSTALL_QML]/$$replace(uri, \\., /)
     qmldir.path = $$installPath
+    javascript.path = $$installPath
+    qml.path = $$installPath
     target.path = $$installPath
-    INSTALLS += target qmldir
+    INSTALLS += target qmldir javascript qml
 }
 
