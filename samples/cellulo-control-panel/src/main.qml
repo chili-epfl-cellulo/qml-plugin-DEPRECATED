@@ -151,51 +151,61 @@ ApplicationWindow {
         id: statusBox
         title: "Status"
         anchors.top: powerBox.bottom
-        Row{
+
+        Column{
             spacing: 5
-            Text{
-                text: "Connected?"
-                color: robotComm.connected ? "green" : "red"
+
+            Row{
+                spacing: 5
+
+                Text{
+                    text: "Connected?"
+                    color: robotComm.connected ? "green" : "red"
+                }
+                Text{
+                    text: "Battery State: " + robotComm.batteryState
+                }
+                Text{
+                    id: k0
+                    text: "K0"
+                    color: "black"
+                }
+                Text{
+                    id: k1
+                    text: "K1"
+                    color: "black"
+                }
+                Text{
+                    id: k2
+                    text: "K2"
+                    color: "black"
+                }
+                Text{
+                    id: k3
+                    text: "K3"
+                    color: "black"
+                }
+                Text{
+                    id: k4
+                    text: "K4"
+                    color: "black"
+                }
+                Text{
+                    id: k5
+                    text: "K5"
+                    color: "black"
+                }
             }
-            Text{
-                text: "Battery State: " + robotComm.batteryState
-            }
-            Text{
-                id: k0
-                text: "K0"
-                color: "black"
-            }
-            Text{
-                id: k1
-                text: "K1"
-                color: "black"
-            }
-            Text{
-                id: k2
-                text: "K2"
-                color: "black"
-            }
-            Text{
-                id: k3
-                text: "K3"
-                color: "black"
-            }
-            Text{
-                id: k4
-                text: "K4"
-                color: "black"
-            }
-            Text{
-                id: k5
-                text: "K5"
-                color: "black"
-            }
-            Text{
-                text: "Kidnapped?"
-                color: robotComm.kidnapped ? "red" : "green"
-            }
-            Text{
-                text: "X=" + robotComm.x + " Y=" + robotComm.y + " Theta=" + robotComm.theta
+            Row{
+                spacing: 5
+
+                Text{
+                    text: "Kidnapped?"
+                    color: robotComm.kidnapped ? "red" : "green"
+                }
+                Text{
+                    text: "X=" + robotComm.x + " Y=" + robotComm.y + " Theta=" + robotComm.theta
+                }
             }
         }
     }
