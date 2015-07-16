@@ -22,8 +22,6 @@ ApplicationWindow {
     property real yStdev: 1
     property real xRobotZero: 0
     property real yRobotZero: 0
-    property real xCNC: xCNCField.value
-    property real yCNC: yCNCField.value
 
     Component.onCompleted: {
         var temp = new Array(0);
@@ -71,33 +69,6 @@ ApplicationWindow {
         Row{
             spacing: 5
 
-            Text{
-                text: "CNC Coordinates:"
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            SpinBox{
-                id: xCNCField
-                value: 0
-                stepSize: 1
-                minimumValue: 0
-                maximumValue: 300
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            SpinBox{
-                id: yCNCField
-                value: 0
-                stepSize: 1
-                minimumValue: 0
-                maximumValue: 300
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
-
-        Row{
-            spacing: 5
-
             Button {
                 text: "Measure"
                 anchors.verticalCenter: parent.verticalCenter
@@ -106,13 +77,6 @@ ApplicationWindow {
                     coordsReady = false;
                     collecting = true;
                 }
-            }
-
-            CheckBox{
-                id: autoincrementCNCY
-                anchors.verticalCenter: parent.verticalCenter
-                checked: false
-                text: "Autoincrement CNC y after measurement"
             }
         }
 
@@ -123,7 +87,7 @@ ApplicationWindow {
         }
 
         Text{
-            text: robotComm.x + " " + robotComm.y
+            text: robotComm.x*robotComm.gridSpacing + " " + robotComm.y*robotComm.gridSpacing
         }
     }
 
@@ -165,11 +129,12 @@ ApplicationWindow {
                     xStdev = Math.sqrt(xStdev/(numSamples - 1));
                     yStdev = Math.sqrt(yStdev/(numSamples - 1));
 
+                    //Record data
+                    console.log((xMean - xRobotZero) + " " + xStdev + " " + (yMean - yRobotZero) + " " + yStdev);
+
                     collecting = false;
                     ready.color = "green";
                     coordsReady = true;
-                    if(autoincrementCNCY)
-                        xCNCField.__increment();
                 }
             }
 
