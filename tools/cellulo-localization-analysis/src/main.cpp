@@ -13,8 +13,7 @@ QFile logFile;
 void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg){
     Q_UNUSED(context);
 
-    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt = QString("%1 ").arg(dt);
+    QString txt = QString("%1 ").arg(QDateTime::currentMSecsSinceEpoch());
 
     switch (type)
     {
@@ -51,7 +50,7 @@ int main(int argc, char *argv[])
     path += "/cellulo_localization_analysis.log";
     logFile.setFileName(path);
     qWarning() << QString("Logging everything to %1").arg(path);
-    //qInstallMessageHandler(customMessageHandler);
+    qInstallMessageHandler(customMessageHandler);
 
     QQmlApplicationEngine engine;
 

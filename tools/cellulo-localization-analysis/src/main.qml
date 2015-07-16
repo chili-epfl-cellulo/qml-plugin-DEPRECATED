@@ -12,10 +12,11 @@ ApplicationWindow {
     minimumHeight: height
     minimumWidth: width
 
-    property real numSamples: 100
+    property real numSamples: 20
     property variant coords: []
     property bool coordsReady: false
     property bool collecting: false
+    property bool zeroWhenFinished: false
     property real xMean: 0
     property real yMean: 0
     property real xStdev: 1
@@ -78,6 +79,24 @@ ApplicationWindow {
                     collecting = true;
                 }
             }
+
+            Button {
+                text: "Measure and Zero"
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: {
+                    ready.color = "red";
+                    coordsReady = false;
+                    collecting = true;
+                    zeroWhenFinished = true;
+                }
+            }
+
+            CheckBox{
+                id: logEverything
+                checked: false
+                text: "Log every pose"
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
 
         Text{
@@ -101,6 +120,9 @@ ApplicationWindow {
 
         onPoseChanged: {
             coords[currentIndex] = Qt.vector2d(x*gridSpacing, y*gridSpacing);
+
+            if(logEverything.checked)
+                console.log((coords[currentIndex].x - xRobotZero) + " " + (coords[currentIndex].y - yRobotZero));
 
             if(collecting){
                 if(collectStartIndex < 0)
@@ -132,7 +154,13 @@ ApplicationWindow {
                     //Record data
                     console.log((xMean - xRobotZero) + " " + xStdev + " " + (yMean - yRobotZero) + " " + yStdev);
 
+                    if(zeroWhenFinished){
+                        xRobotZero = xMean;
+                        yRobotZero = yMean;
+                    }
+
                     collecting = false;
+                    zeroWhenFinished = false;
                     ready.color = "green";
                     coordsReady = true;
                 }
