@@ -19,15 +19,18 @@ ApplicationWindow {
     property bool zeroWhenFinished: false
     property real xMean: 0
     property real yMean: 0
+    property real thetaMean: 0
     property real xStdev: 1
     property real yStdev: 1
+    property real thetaStdev: 1
     property real xRobotZero: 0
     property real yRobotZero: 0
+    property real thetaRobotZero: 0
 
     Component.onCompleted: {
         var temp = new Array(0);
         for(var i=0;i<numSamples;i++)
-            temp.push(Qt.vector2d(0,0));
+            temp.push(Qt.vector3d(0,0,0));
         coords = temp;
     }
 
@@ -48,6 +51,7 @@ ApplicationWindow {
                     if(coordsReady){
                         xRobotZero = xMean;
                         yRobotZero = yMean;
+                        thetaRobotZero = thetaMean;
                     }
                 }
             }
@@ -62,6 +66,13 @@ ApplicationWindow {
             TextField{
                 id: yRobotZeroField
                 text: yRobotZero
+                readOnly: true
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            TextField{
+                id: thetaRobotZeroField
+                text: thetaRobotZero
                 readOnly: true
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -97,6 +108,27 @@ ApplicationWindow {
                 text: "Log every pose"
                 anchors.verticalCenter: parent.verticalCenter
             }
+
+            CheckBox{
+                id: logX
+                checked: true
+                text: "Log X"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            CheckBox{
+                id: logY
+                checked: true
+                text: "Log Y"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            CheckBox{
+                id: logTheta
+                checked: true
+                text: "Log Theta"
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
 
         Text{
@@ -106,7 +138,7 @@ ApplicationWindow {
         }
 
         Text{
-            text: robotComm.x*robotComm.gridSpacing + " " + robotComm.y*robotComm.gridSpacing
+            text: robotComm.x*robotComm.gridSpacing + " " + robotComm.y*robotComm.gridSpacing + " " + robotComm.theta
         }
     }
 
@@ -119,10 +151,14 @@ ApplicationWindow {
         macAddr: "00:06:66:74:48:A7"
 
         onPoseChanged: {
-            coords[currentIndex] = Qt.vector2d(x*gridSpacing, y*gridSpacing);
+            coords[currentIndex] = Qt.vector3d(x*gridSpacing, y*gridSpacing, theta);
 
             if(logEverything.checked)
-                console.log((coords[currentIndex].x - xRobotZero) + " " + (coords[currentIndex].y - yRobotZero));
+                console.log(
+                            (logX.checked ? (coords[currentIndex].x - xRobotZero) + " " : " ") +
+                            (logY.checked ? (coords[currentIndex].y - yRobotZero) + " " : " ") +
+                            (logTheta.checked ? (coords[currentIndex].z - thetaRobotZero) : " ")
+                            );
 
             if(collecting){
                 if(collectStartIndex < 0)
@@ -134,29 +170,40 @@ ApplicationWindow {
                     //Means
                     xMean = 0;
                     yMean = 0;
+                    thetaMean = 0;
                     for(var i=0;i<numSamples;i++){
                         xMean += coords[i].x;
                         yMean += coords[i].y;
+                        thetaMean += coords[i].z;
                     }
                     xMean /= numSamples;
                     yMean /= numSamples;
+                    thetaMean /= numSamples;
 
                     //Stdevs
                     xStdev = 0;
                     yStdev = 0;
+                    thetaStdev = 0;
                     for(var i=0;i<numSamples;i++){
                         xStdev += Math.pow(xMean - coords[i].x, 2);
                         yStdev += Math.pow(yMean - coords[i].y, 2);
+                        thetaStdev += Math.pow(thetaMean - coords[i].z, 2);
                     }
                     xStdev = Math.sqrt(xStdev/(numSamples - 1));
                     yStdev = Math.sqrt(yStdev/(numSamples - 1));
+                    thetaStdev = Math.sqrt(thetaStdev/(numSamples - 1));
 
                     //Record data
-                    console.log((xMean - xRobotZero) + " " + xStdev + " " + (yMean - yRobotZero) + " " + yStdev);
+                    console.log(
+                                (logX.checked ? (xMean - xRobotZero) + " " + xStdev + " " : " ") +
+                                (logY.checked ? (yMean - yRobotZero) + " " + yStdev + " " : " ") +
+                                (logTheta.checked ? (thetaMean - thetaRobotZero) + " " + thetaStdev : " ")
+                                );
 
                     if(zeroWhenFinished){
                         xRobotZero = xMean;
                         yRobotZero = yMean;
+                        thetaRobotZero = thetaMean;
                     }
 
                     collecting = false;
