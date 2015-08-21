@@ -42,10 +42,13 @@ ApplicationWindow {
         id: page
         anchors.top: addressBox.bottom
         anchors.left: parent.left
-        anchors.margins: 40
+        anchors.margins: robotHalf
 
-        width: 210
-        height: 297
+        property real scaleCoeff: Math.min((Screen.width*0.8)/210, (Screen.height*0.8 - addressBox.height)/297)
+        property real robotHalf: 60*scaleCoeff/2
+
+        width: 210*scaleCoeff
+        height: 297*scaleCoeff
         color: "#EEEEEE"
         border.color: "black"
         border.width: 2
@@ -56,16 +59,21 @@ ApplicationWindow {
 
             source: robotComm.kidnapped ? "../assets/redHexagon.svg" : "../assets/greenHexagon.svg"
             rotation: -robotComm.theta //QML wants clockwise angle for some reason
-            x: robotComm.x*gridSpacing - width/2
-            y: robotComm.y*gridSpacing - height/2
-            sourceSize.width:55
-            sourceSize.height:60
+            x: robotComm.x*gridSpacing*parent.scaleCoeff - width/2
+            y: robotComm.y*gridSpacing*parent.scaleCoeff - height/2
+            sourceSize.width: 55*parent.scaleCoeff
+            sourceSize.height: 60*parent.scaleCoeff
         }
     }
 
     Item{ //Dummy item to provide margin for bottom
         anchors.top: page.bottom
-        anchors.margins: 40
+        anchors.margins: page.robotHalf
+    }
+
+    Item{ //Dummy item to provide margin for right
+        anchors.left: page.right
+        anchors.margins: page.robotHalf
     }
 
     CelluloBluetooth{
