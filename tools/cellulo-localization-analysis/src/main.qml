@@ -26,12 +26,21 @@ ApplicationWindow {
     property real xRobotZero: 0
     property real yRobotZero: 0
     property real thetaRobotZero: 0
+    property real numCountingSamples: 0
 
     Component.onCompleted: {
         var temp = new Array(0);
         for(var i=0;i<numSamples;i++)
             temp.push(Qt.vector3d(0,0,0));
         coords = temp;
+    }
+
+    Timer {
+        id: numSampleTimer
+        interval: 1000*10
+        running: false
+        repeat: false
+        onTriggered: console.log("Number of samples collected in 10 seconds:"+numCountingSamples);
     }
 
     Column{
@@ -44,6 +53,15 @@ ApplicationWindow {
 
         Row{
             spacing: 5
+
+            Button {
+                text: "Start counting samples"
+                onClicked: {
+                    numCountingSamples = 0;
+                    numSampleTimer.start();
+                    console.log("Started counting samples...");
+                }
+            }
 
             Button {
                 text: "Zero robot coords"
@@ -152,6 +170,8 @@ ApplicationWindow {
 
         onPoseChanged: {
             coords[currentIndex] = Qt.vector3d(x*gridSpacing, y*gridSpacing, theta);
+
+            numCountingSamples++;
 
             if(logEverything.checked)
                 console.log(
