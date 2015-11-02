@@ -26,6 +26,7 @@
 #include "CelluloBluetooth.h"
 
 #include<QBluetoothDeviceInfo>
+#include<time.h>
 
 const char* CelluloBluetooth::commandStrings[] = {
     "P", //(P)ing
@@ -78,6 +79,7 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     y = 0;
     theta = 0;
     kidnapped = true;
+    profiling = false;
 }
 
 CelluloBluetooth::~CelluloBluetooth(){ }
@@ -305,6 +307,13 @@ void CelluloBluetooth::processResponse(){
                         emit kidnappedChanged();
                     }
                 }
+
+                if (profiling) {
+                    int timeElapsed = int(time(0))-timeStart;
+                    poseChangeCount++;
+                    decodingRate = poseChangeCount/(float)timeElapsed;
+                    emit decodingRateChanged();
+                }
             }
             break;
 
@@ -504,6 +513,14 @@ void CelluloBluetooth::reset(){
 
     if(commands.count() == 1)
         sendCommand();
+}
+
+void CelluloBluetooth::toggleProfiling(){
+    profiling = !profiling;
+    poseChangeCount = 0;
+    if (profiling)
+        timeStart = time(0);
+    emit profilingChanged();
 }
 
 void CelluloBluetooth::shutdown(){

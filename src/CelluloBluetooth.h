@@ -39,6 +39,8 @@ class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
     Q_PROPERTY(QString macAddr WRITE setMacAddr)
     Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
+    Q_PROPERTY(bool profiling READ isProfiling NOTIFY profilingChanged)
+    Q_PROPERTY(int decodingRate READ getDecodingRate NOTIFY decodingRateChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
@@ -143,6 +145,20 @@ public:
      */
     bool getKidnapped(){ return kidnapped; }
 
+    /**
+     * @brief Gets the latest profiling state
+     *
+     * @return Whether or not we are measure decoding rate
+     */
+    bool isProfiling() { return profiling; }
+
+    /**
+     * @brief Gets the current decoding rate (profiling must be activated)
+     *
+     * @return The current measured decoding rate
+     */
+    int getDecodingRate() { return decodingRate; }
+
 private slots:
 
     /**
@@ -220,6 +236,11 @@ public slots:
      */
     void shutdown();
 
+    /**
+     * @brief Turns profiling on or off
+     */
+    void toggleProfiling();
+
 signals:
 
     /**
@@ -279,6 +300,16 @@ signals:
     void poseChanged();
 
     /**
+     * @brief Emitted when we toggle profiling
+     */
+    void profilingChanged();
+
+    /**
+     * @brief Emitted when the decoding rate gets updated
+     */
+    void decodingRateChanged();
+
+    /**
      * @brief Emitted when the kidnap state of the robot changes
      */
     void kidnappedChanged();
@@ -312,11 +343,15 @@ private:
     unsigned int currentLine;               ///< Current line in the camera frame being received
 
     bool connected;                         ///< Whether Bluetooth is connected now
+    bool profiling;                         ///< Whether or not we're currently measuring the frame rate
     int batteryState;                       ///< Current battery state
     float x;                                ///< Current x position in grid coordinates
     float y;                                ///< Current y position in grid coordinates
     float theta;                            ///< Current orientation in degrees
     bool kidnapped;                         ///< Whether currently kidnapped
+    int poseChangeCount;                    ///< Number of times we've received a poseChanged event since starting profiling
+    int decodingRate;                     ///< Our decoding rate in hz
+    int timeStart;                        ///< When we started profiling
 
     /**
      * @brief Connects or reconnects to the server if not already connected

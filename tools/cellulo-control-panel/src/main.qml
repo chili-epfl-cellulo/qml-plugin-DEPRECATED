@@ -207,6 +207,20 @@ ApplicationWindow {
                     text: "X=" + robotComm.x + " Y=" + robotComm.y + " Theta=" + robotComm.theta
                 }
             }
+            Row{
+                spacing: 5
+
+                Button{
+                    text: robotComm.profiling ? "ON" : "OFF"
+                    onClicked: robotComm.toggleProfiling()
+                }
+                Text{
+                    text: "Decoding Frame Rate:"
+                }
+                Text{
+                    text: robotComm.profiling ? robotComm.decodingRate : " Profiling off"
+                }
+            }
         }
     }
 
