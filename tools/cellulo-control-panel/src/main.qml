@@ -148,9 +148,87 @@ ApplicationWindow {
     }
 
     GroupBox {
+        id: motorBox
+        title: "Locomotion"
+        anchors.top: powerBox.bottom
+
+        Column{
+            Row{
+                Label{
+                    text: "Motor 1 output:"
+                }
+                Slider{
+                    id: motor1Slider
+                    minimumValue: -0xFFF
+                    maximumValue: 0xFFF
+                    stepSize: 1
+                    value: 0
+                    style: SliderStyle {
+                        groove: Rectangle {
+                            implicitWidth: 200
+                            implicitHeight: 8
+                            radius:8
+                        }
+                    }
+                }
+                Button{
+                    text: "Zero"
+                    onClicked: motor1Slider.value = 0
+                }
+            }
+            Row{
+                Label{
+                    text: "Motor 2 output:"
+                }
+                Slider{
+                    id: motor2Slider
+                    minimumValue: -0xFFF
+                    maximumValue: 0xFFF
+                    stepSize: 1
+                    value: 0
+                    style: SliderStyle {
+                        groove: Rectangle {
+                            implicitWidth: 200
+                            implicitHeight: 8
+                            radius:8
+                        }
+                    }
+                }
+                Button{
+                    text: "Zero"
+                    onClicked: motor2Slider.value = 0
+                }
+            }
+            Row{
+                Label{
+                    text: "Motor 3 output:"
+                }
+                Slider{
+                    id: motor3Slider
+                    minimumValue: -0xFFF
+                    maximumValue: 0xFFF
+                    stepSize: 1
+                    value: 0
+                    style: SliderStyle {
+                        groove: Rectangle {
+                            implicitWidth: 200
+                            implicitHeight: 8
+                            radius:8
+                        }
+                    }
+                }
+                Button{
+                    text: "Zero"
+                    onClicked: motor3Slider.value = 0
+                }
+            }
+        }
+    }
+
+    GroupBox {
         id: statusBox
         title: "Status"
-        anchors.top: powerBox.bottom
+        anchors.top: motorBox.bottom
 
         Column{
             spacing: 5
@@ -256,5 +334,8 @@ ApplicationWindow {
             case 5: k5.color = "black"; break;
             }
         }
+        motor1Output: motor1Slider.value
+        motor2Output: motor2Slider.value
+        motor3Output: motor3Slider.value
     }
 }

@@ -39,7 +39,7 @@ Window {
 
     CelluloBluetooth{
         id: robotComm
-        macAddr: "00:06:66:74:48:A7"
+        macAddr: "00:06:66:74:41:04"
         onFrameReady: cameraFrameImage.reload();
     }
 }

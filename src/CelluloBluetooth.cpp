@@ -34,6 +34,7 @@ const char* CelluloBluetooth::commandStrings[] = {
     "B", //Query (b)attery state
     "V", //Set (v)isual state
     "E", //Set (e)ffect
+    "M", //Set (m)otor output
     "R", //(R)eset
     "S"  //(S)hutdown
 };
@@ -451,6 +452,54 @@ void CelluloBluetooth::queryBatteryState(){
         sendCommand();
 }
 
+void CelluloBluetooth::setMotor1Output(int output){
+    setMotorOutput(1, output);
+}
+
+void CelluloBluetooth::setMotor2Output(int output){
+    setMotorOutput(2, output);
+}
+
+void CelluloBluetooth::setMotor3Output(int output){
+    setMotorOutput(3, output);
+}
+
+void CelluloBluetooth::setMotorOutput(int motor, int output){
+    if(expectingFrame)
+        return;
+
+    if(motor != 1 && motor != 2 && motor != 3)
+        return;
+
+    if(output < -0xFFF)
+        output = -0xFFF;
+    else if(output > 0xFFF)
+        output = 0xFFF;
+
+    bool negative = false;
+    if(output < 0){
+        output *= -1;
+        negative = true;
+    }
+
+    QueuedCommand command;
+
+    command.type = COMMAND_TYPE::SET_MOTOR_OUTPUT;
+    command.message = commandStrings[COMMAND_TYPE::SET_MOTOR_OUTPUT];
+    command.message.append((char)(motor + '0'));
+    if(negative)
+        command.message.append('-');
+    command.message.append(getHexChar(output/0x100));
+    command.message.append(getHexChar(output/0x10%0x10));
+    command.message.append(getHexChar(output%0x10));
+    command.message.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1)
+        sendCommand();
+}
+
 void CelluloBluetooth::setVisualState(int state){
     if(expectingFrame)
         return;
@@ -565,5 +614,14 @@ int CelluloBluetooth::hexToInt(QByteArray const& array, int begin, int end){
         result += (int)array[i] >= 65 ? (int)array[i] - 65 + 10 : (int)array[i] - 48;
     }
     return result;
+}
+
+char CelluloBluetooth::getHexChar(unsigned int value){
+    if(value <= 0x9)
+        return (char)(value + '0');
+    else if(value <= 0xF)
+        return (char)(value - 0xA + 'A');
+    else
+        return 'F';
 }
 

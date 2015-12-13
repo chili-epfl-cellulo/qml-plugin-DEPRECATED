@@ -46,6 +46,9 @@ Q_OBJECT
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
     Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
     Q_PROPERTY(bool kidnapped READ getKidnapped NOTIFY kidnappedChanged)
+    Q_PROPERTY(int motor1Output WRITE setMotor1Output)
+    Q_PROPERTY(int motor2Output WRITE setMotor2Output)
+    Q_PROPERTY(int motor3Output WRITE setMotor3Output)
 
 public:
 
@@ -55,6 +58,7 @@ public:
         BATTERY_STATE_REQUEST,
         SET_VISUAL_STATE,
         SET_VISUAL_EFFECT,
+        SET_MOTOR_OUTPUT,
         RESET,
         SHUTDOWN
     };
@@ -194,6 +198,27 @@ public slots:
      * @param macAddr Bluetooth MAC address of the server (robot)
      */
     void setMacAddr(QString macAddr);
+
+    /**
+     * @brief Sets output of motor 1
+     *
+     * @param output Value between -0xFFF and 0xFFF
+     */
+    void setMotor1Output(int output);
+
+    /**
+     * @brief Sets output of motor 2
+     *
+     * @param output Value between -0xFFF and 0xFFF
+     */
+    void setMotor2Output(int output);
+
+    /**
+     * @brief Sets output of motor 3
+     *
+     * @param output Value between -0xFFF and 0xFFF
+     */
+    void setMotor3Output(int output);
 
     /**
      * @brief Sends a ping, expecting an acknowledge
@@ -359,6 +384,14 @@ private:
     void reconnectToServer();
 
     /**
+     * @brief Sets the motor output
+     *
+     * @param motor 1, 2 or 3
+     * @param output Value between -FFF and FFF
+     */
+    void setMotorOutput(int motor, int output);
+
+    /**
      * @brief Sends next command over Bluetooth socket and starts timeout timer
      */
     void sendCommand();
@@ -396,6 +429,15 @@ private:
      * @return The value
      */
     int hexToInt(QByteArray const& array, int begin, int end);
+
+    /**
+     * @brief Converts single digit integer to hexadecimal character
+     *
+     * @param value Between 0x0 and 0xF
+     *
+     * @return Hexadecimal representation of value
+     */
+    char getHexChar(unsigned int value);
 };
 
 #endif // CELLULOBLUETOOTH_H
