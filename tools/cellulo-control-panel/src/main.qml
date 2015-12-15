@@ -234,30 +234,30 @@ ApplicationWindow {
                 }
             }
 
-            Row{
-                spacing: 5
+            Label{
+                text: "Pose goal:"
+            }
 
-                Label{
-                    text: "Pose goal:"
-                }
-                TextField{
-                    id: goalPoseX
-                    placeholderText: "x"
-                }
-                TextField{
-                    id: goalPoseY
-                    placeholderText: "y"
+            TextField{
+                id: goalPoseX
+                placeholderText: "x"
+            }
 
-                }
-                TextField{
-                    id: goalPoseTheta
-                    placeholderText: "theta"
+            TextField{
+                id: goalPoseY
+                placeholderText: "y"
 
-                }
-                Button{
-                    text: "Go"
-                    onClicked: robotComm.setGoalPose(parseFloat(goalPoseX.text), parseFloat(goalPoseY.text), parseFloat(goalPoseTheta.text));
-                }
+            }
+
+            TextField{
+                id: goalPoseTheta
+                placeholderText: "theta"
+
+            }
+
+            Button{
+                text: "Go"
+                onClicked: robotComm.setGoalPose(parseFloat(goalPoseX.text), parseFloat(goalPoseY.text), parseFloat(goalPoseTheta.text));
             }
         }
     }
