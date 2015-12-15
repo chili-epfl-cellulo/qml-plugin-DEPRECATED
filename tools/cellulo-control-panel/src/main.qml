@@ -24,6 +24,7 @@ ApplicationWindow {
             TextField{
                 id: macAddrRight
                 placeholderText: "XX:XX"
+
             }
             Button {
                 text: "Connect"
@@ -66,7 +67,7 @@ ApplicationWindow {
                     value: 128
                     style: SliderStyle {
                         groove: Rectangle {
-                            implicitWidth: 200
+                            implicitWidth: Screen.width/5
                             implicitHeight: 8
                             color: "red"
                             radius: 8
@@ -81,7 +82,7 @@ ApplicationWindow {
                     value: 128
                     style: SliderStyle {
                         groove: Rectangle {
-                            implicitWidth: 200
+                            implicitWidth: Screen.width/5
                             implicitHeight: 8
                             color: "green"
                             radius: 8
@@ -96,7 +97,7 @@ ApplicationWindow {
                     value: 128
                     style: SliderStyle {
                         groove: Rectangle {
-                            implicitWidth: 200
+                            implicitWidth: Screen.width/5
                             implicitHeight: 8
                             color: "blue"
                             radius: 8
@@ -129,6 +130,7 @@ ApplicationWindow {
         id: powerBox
         title: "Power"
         anchors.top: colorBox.bottom
+
         Row{
             spacing: 5
 
@@ -153,7 +155,10 @@ ApplicationWindow {
         anchors.top: powerBox.bottom
 
         Column{
+
             Row{
+                spacing: 5
+
                 Label{
                     text: "Motor 1 output:"
                 }
@@ -165,9 +170,9 @@ ApplicationWindow {
                     value: 0
                     style: SliderStyle {
                         groove: Rectangle {
-                            implicitWidth: 200
+                            implicitWidth: Screen.width/5
                             implicitHeight: 8
-                            radius:8
+                            radius: 8
                         }
                     }
                 }
@@ -176,7 +181,10 @@ ApplicationWindow {
                     onClicked: motor1Slider.value = 0
                 }
             }
+
             Row{
+                spacing: 5
+
                 Label{
                     text: "Motor 2 output:"
                 }
@@ -188,9 +196,9 @@ ApplicationWindow {
                     value: 0
                     style: SliderStyle {
                         groove: Rectangle {
-                            implicitWidth: 200
+                            implicitWidth: Screen.width/5
                             implicitHeight: 8
-                            radius:8
+                            radius: 8
                         }
                     }
                 }
@@ -199,7 +207,10 @@ ApplicationWindow {
                     onClicked: motor2Slider.value = 0
                 }
             }
+
             Row{
+                spacing: 5
+
                 Label{
                     text: "Motor 3 output:"
                 }
@@ -211,15 +222,41 @@ ApplicationWindow {
                     value: 0
                     style: SliderStyle {
                         groove: Rectangle {
-                            implicitWidth: 200
+                            implicitWidth: Screen.width/5
                             implicitHeight: 8
-                            radius:8
+                            radius: 8
                         }
                     }
                 }
                 Button{
                     text: "Zero"
                     onClicked: motor3Slider.value = 0
+                }
+            }
+
+            Row{
+                spacing: 5
+
+                Label{
+                    text: "Pose goal:"
+                }
+                TextField{
+                    id: goalPoseX
+                    placeholderText: "x"
+                }
+                TextField{
+                    id: goalPoseY
+                    placeholderText: "y"
+
+                }
+                TextField{
+                    id: goalPoseTheta
+                    placeholderText: "theta"
+
+                }
+                Button{
+                    text: "Go"
+                    onClicked: robotComm.setGoalPose(parseFloat(goalPoseX.text), parseFloat(goalPoseY.text), parseFloat(goalPoseTheta.text));
                 }
             }
         }
@@ -282,7 +319,7 @@ ApplicationWindow {
                     color: robotComm.kidnapped ? "red" : "green"
                 }
                 Text{
-                    text: "X=" + robotComm.x + " Y=" + robotComm.y + " Theta=" + robotComm.theta
+                    text: "X=" + robotComm.x.toFixed(2) + " Y=" + robotComm.y.toFixed(2) + " Theta=" + robotComm.theta.toFixed(1)
                 }
             }
             Row{

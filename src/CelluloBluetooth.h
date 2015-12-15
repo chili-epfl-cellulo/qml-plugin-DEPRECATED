@@ -59,6 +59,7 @@ public:
         SET_VISUAL_STATE,
         SET_VISUAL_EFFECT,
         SET_MOTOR_OUTPUT,
+        SET_GOAL_POSE,
         RESET,
         SHUTDOWN
     };
@@ -219,6 +220,15 @@ public slots:
      * @param output Value between -0xFFF and 0xFFF
      */
     void setMotor3Output(int output);
+
+    /**
+     * @brief Sets a pose goal to follow
+     *
+     * @param x X goal in grid coordinates
+     * @param y Y goal in grid coordinates
+     * @param theta Theta goal in degrees
+     */
+    void setGoalPose(float x, float y, float theta);
 
     /**
      * @brief Sends a ping, expecting an acknowledge

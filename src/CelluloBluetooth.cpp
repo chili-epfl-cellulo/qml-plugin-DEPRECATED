@@ -35,6 +35,7 @@ const char* CelluloBluetooth::commandStrings[] = {
     "V", //Set (v)isual state
     "E", //Set (e)ffect
     "M", //Set (m)otor output
+    "G", //Set (g)oal pose
     "R", //(R)eset
     "S"  //(S)hutdown
 };
@@ -493,6 +494,25 @@ void CelluloBluetooth::setMotorOutput(int motor, int output){
     command.message.append(getHexChar(output/0x10%0x10));
     command.message.append(getHexChar(output%0x10));
     command.message.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1)
+        sendCommand();
+}
+
+void CelluloBluetooth::setGoalPose(float x, float y, float theta){
+    if(expectingFrame)
+        return;
+
+    QueuedCommand command;
+
+    command.type = COMMAND_TYPE::SET_GOAL_POSE;
+    command.message = commandStrings[COMMAND_TYPE::SET_GOAL_POSE];
+    static char buf[23 + 1];
+    sprintf(buf,"%08X%08X%04X%X\n", (unsigned int)(100*x), (unsigned int)(100*y), (unsigned int)(100*theta),
+            calculateChecksum((unsigned int)(100*x), (unsigned int)(100*y), (unsigned int)(100*theta)));
+    command.message.append(buf);
 
     commands.enqueue(command);
 
