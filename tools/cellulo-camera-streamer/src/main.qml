@@ -24,8 +24,15 @@ Window {
     Column{
         spacing: 10
 
+        CheckBox {
+            id: enable
+            text: "Enable image streaming"
+            checked: false
+            onCheckedChanged: robotComm.setImageStreamEnabled(checked);
+        }
+
         Button {
-            text: "Frame"
+            text: "Get frame"
             onClicked: robotComm.requestFrame();
         }
 

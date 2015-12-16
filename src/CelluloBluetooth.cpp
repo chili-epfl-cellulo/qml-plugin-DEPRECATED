@@ -30,6 +30,7 @@
 
 const char* CelluloBluetooth::commandStrings[] = {
     "P", //(P)ing
+    "I", //Enable (i)mage streaming + disable localization or vice-versa
     "F", //Request (f)rame
     "B", //Query (b)attery state
     "V", //Set (v)isual state
@@ -69,11 +70,6 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
 
     expectingFrame = false;
     frameBuffer.reserve(IMG_WIDTH*IMG_HEIGHT);
-
-    frameLineEndSequence.append((char)0);
-    frameLineEndSequence.append((char)255);
-    frameLineEndSequence.append((char)0);
-    frameLineEndSequence.append((char)255);
 
     connected = false;
     batteryState = 4; //Beginning with shutdown is a good idea
@@ -131,7 +127,7 @@ void CelluloBluetooth::reconnectToServer(){
 
         socket->connectToService(
                 QBluetoothAddress(macAddr),
-                QBluetoothUuid(QString("00001101-0000-1000-8000-00805F9B34FB"))); //Connect to the Serial Protocol Profile
+                QBluetoothUuid(QString("00000003-0000-1000-8000-00805F9B34FB"))); //Connect to the RFCOMM protocol
     }
 }
 
@@ -140,29 +136,11 @@ void CelluloBluetooth::socketDataArrived(){
 
     for(int i=0;i<message.length();i++){
         if(expectingFrame){
-            receiveBuffer.append(message[i]);
+            frameBuffer.append(message[i]);
+            currentPixel++;
 
-            //If line is received correctly, or too many bytes are received without the end sequence
-            if(receiveBuffer.length() >= IMG_WIDTH + frameLineEndSequence.length()){
-                frameBuffer.append(receiveBuffer.left(IMG_WIDTH));
-            }
-
-            //If line end is received prematurely
-            else if(receiveBuffer.endsWith(frameLineEndSequence)){
-                receiveBuffer.chop(frameLineEndSequence.length());
-                while(receiveBuffer.length() < IMG_WIDTH)
-                    receiveBuffer.append((char)0);
-                frameBuffer.append(receiveBuffer);
-            }
-
-            //If line is still being received
-            else
-                continue;
-
-            qDebug() << macAddr << " sent line number " << currentLine;
-            receiveBuffer.clear();
-            currentLine++;
-            if(currentLine >= IMG_HEIGHT){
+            qDebug() << macAddr << " sent " << 100.0*currentPixel/(IMG_HEIGHT*IMG_WIDTH) << "% of frame";
+            if(currentPixel >= IMG_HEIGHT*IMG_WIDTH){
                 expectingFrame = false;
                 frameTimeoutTimer.stop();
                 qDebug() << macAddr << " sent complete frame";
@@ -392,7 +370,7 @@ void CelluloBluetooth::sendCommand(){
         if(commands.head().type == COMMAND_TYPE::FRAME_REQUEST){
             frameTimeoutTimer.start(FRAME_TIMEOUT_MILLIS);
             expectingFrame = true;
-            currentLine = 0;
+            currentPixel = 0;
             frameBuffer.clear();
         }
         else
@@ -413,6 +391,23 @@ void CelluloBluetooth::ping(){
 
     command.type = COMMAND_TYPE::PING;
     command.message = commandStrings[COMMAND_TYPE::PING];
+    command.message.append('\n');
+
+    commands.enqueue(command);
+
+    if(commands.count() == 1)
+        sendCommand();
+}
+
+void CelluloBluetooth::setImageStreamEnabled(bool enabled){
+    if(expectingFrame)
+        return;
+
+    QueuedCommand command;
+
+    command.type = COMMAND_TYPE::IMAGE_STREAM_ENABLE;
+    command.message = commandStrings[COMMAND_TYPE::IMAGE_STREAM_ENABLE];
+    command.message.append(enabled ? '1' : '0');
     command.message.append('\n');
 
     commands.enqueue(command);

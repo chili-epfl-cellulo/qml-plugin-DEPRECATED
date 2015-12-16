@@ -42,6 +42,7 @@ Q_OBJECT
     Q_PROPERTY(bool profiling READ isProfiling NOTIFY profilingChanged)
     Q_PROPERTY(int decodingRate READ getDecodingRate NOTIFY decodingRateChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
+    Q_PROPERTY(bool imageStreamEnabled WRITE setImageStreamEnabled)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
     Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
@@ -54,6 +55,7 @@ public:
 
     enum COMMAND_TYPE{
         PING = 0,
+        IMAGE_STREAM_ENABLE,
         FRAME_REQUEST,
         BATTERY_STATE_REQUEST,
         SET_VISUAL_STATE,
@@ -82,7 +84,7 @@ public:
     };
 
     static const int COMMAND_TIMEOUT_MILLIS = 500;   ///< Will wait this many millis for a response before resending command
-    static const int FRAME_TIMEOUT_MILLIS = 11000;   ///< Will wait this many millis for a camera frame to complete
+    static const int FRAME_TIMEOUT_MILLIS = 10000;   ///< Will wait this many millis for a camera frame to complete
 
     static const int IMG_WIDTH = 752/4;              ///< Image width of the robot's camera
     static const int IMG_HEIGHT = 480/4;             ///< Image height of the robot's camera
@@ -199,6 +201,13 @@ public slots:
      * @param macAddr Bluetooth MAC address of the server (robot)
      */
     void setMacAddr(QString macAddr);
+
+    /**
+     * @brief Enables image streaming + disables localization or vice versa
+     *
+     * @param enabled Whether to enable image streaming
+     */
+    void setImageStreamEnabled(bool enabled);
 
     /**
      * @brief Sets output of motor 1
@@ -373,9 +382,8 @@ private:
     QTimer commandTimeout;                  ///< When this timer runs out, command is resent if not already acknowledged
     QTimer frameTimeoutTimer;               ///< When this timer runs out, frame is completed even if it is not complete
     QByteArray receiveBuffer;               ///< Receive buffer until the current response/event message is complete
-    QByteArray frameLineEndSequence;        ///< Extra sequence that ends each line in a received camera frame
     bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
-    unsigned int currentLine;               ///< Current line in the camera frame being received
+    unsigned int currentPixel;              ///< Current pixel in the camera frame being received
 
     bool connected;                         ///< Whether Bluetooth is connected now
     bool profiling;                         ///< Whether or not we're currently measuring the frame rate
