@@ -78,12 +78,10 @@ public:
         POSE_CHANGED,
         KIDNAP,
         ACKNOWLEDGED,
-        NOT_ACKNOWLEDGED,
         NUM_RECEIVE_MESSAGES,
         INVALID_MESSAGE = -1
     };
 
-    static const int COMMAND_TIMEOUT_MILLIS = 500;   ///< Will wait this many millis for a response before resending command
     static const int FRAME_TIMEOUT_MILLIS = 10000;   ///< Will wait this many millis for a camera frame to complete
 
     static const int IMG_WIDTH = 752/4;              ///< Image width of the robot's camera
@@ -182,11 +180,6 @@ private slots:
      * @brief Called when disconnected from server
      */
     void socketDisconnected();
-
-    /**
-     * @brief Called when server did not respond to command within the timeout interval
-     */
-    void serverTimeout();
 
     /**
      * @brief Called when the server did not complete the camera frame in time
@@ -365,21 +358,11 @@ signals:
 
 private:
 
-    /**
-     * @brief Packs information of a command so that it can be sent over Bluetooth and its reply parsed
-     */
-    typedef struct{
-        COMMAND_TYPE type;
-        QByteArray message;
-    } QueuedCommand;
-
     static const char* commandStrings[];    ///< Strings sent over Bluetooth to give commands
     static const char* receiveStrings[];    ///< Strings received over Bluetooth as response or event
 
     QBluetoothSocket* socket;               ///< Bluetooth socket connected to the server
     QString macAddr;                        ///< Bluetooth MAC address of the server
-    QQueue<QueuedCommand> commands;         ///< Commands to be sent over Bluetooth
-    QTimer commandTimeout;                  ///< When this timer runs out, command is resent if not already acknowledged
     QTimer frameTimeoutTimer;               ///< When this timer runs out, frame is completed even if it is not complete
     QByteArray receiveBuffer;               ///< Receive buffer until the current response/event message is complete
     bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
@@ -410,9 +393,12 @@ private:
     void setMotorOutput(int motor, int output);
 
     /**
-     * @brief Sends next command over Bluetooth socket and starts timeout timer
+     * @brief Sends command over Bluetooth
+     *
+     * @param type Type of the command
+     * @param message Message body itself
      */
-    void sendCommand();
+    void sendCommand(COMMAND_TYPE type, QByteArray& message);
 
     /**
      * @brief Processes the response in the receive buffer if possible
@@ -425,17 +411,6 @@ private:
      * @return Received message ordinal in the RECEIVE_MESSAGES enum
      */
     RECEIVE_MESSAGES getReceivedMessage();
-
-    /**
-     * @brief Calculates the 4-bit even parity of the given pose
-     *
-     * @param x X position
-     * @param y Y position
-     * @param theta Angle
-     *
-     * @return (How many 1's are in the x, y and theta)'s least significant 4 bits
-     */
-    int calculateChecksum(int x, int y, int theta);
 
     /**
      * @brief Calculates the integer value from an uppercase hex string
