@@ -28,7 +28,6 @@ Window {
             id: enable
             text: "Enable image streaming"
             checked: false
-            onCheckedChanged: robotComm.setImageStreamEnabled(checked);
         }
 
         Button {
@@ -48,5 +47,6 @@ Window {
         id: robotComm
         macAddr: "00:06:66:74:41:04"
         onFrameReady: cameraFrameImage.reload();
+        imageStreamingEnabled: enable.checked
     }
 }

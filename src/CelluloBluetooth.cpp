@@ -69,6 +69,7 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     frameBuffer.reserve(IMG_WIDTH*IMG_HEIGHT);
 
     connected = false;
+    imageStreamingEnabled = false;
     batteryState = 4; //Beginning with shutdown is a good idea
     x = 0;
     y = 0;
@@ -291,12 +292,15 @@ void CelluloBluetooth::ping(){
     sendCommand(COMMAND_TYPE::PING, message);
 }
 
-void CelluloBluetooth::setImageStreamEnabled(bool enabled){
-    QByteArray message;
-    message = commandStrings[COMMAND_TYPE::IMAGE_STREAM_ENABLE];
-    message.append(enabled ? '1' : '0');
-    message.append('\n');
-    sendCommand(COMMAND_TYPE::IMAGE_STREAM_ENABLE, message);
+void CelluloBluetooth::setImageStreamingEnabled(bool enabled){
+    if(enabled != imageStreamingEnabled){
+        imageStreamingEnabled = enabled;
+        QByteArray message;
+        message = commandStrings[COMMAND_TYPE::IMAGE_STREAM_ENABLE];
+        message.append(enabled ? '1' : '0');
+        message.append('\n');
+        sendCommand(COMMAND_TYPE::IMAGE_STREAM_ENABLE, message);
+    }
 }
 
 void CelluloBluetooth::requestFrame(){

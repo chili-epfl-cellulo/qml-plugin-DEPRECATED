@@ -175,6 +175,7 @@ ApplicationWindow {
                             radius: 8
                         }
                     }
+                    onValueChanged: robotComm.setMotor1Output(value)
                 }
                 Button{
                     text: "Zero"
@@ -201,6 +202,7 @@ ApplicationWindow {
                             radius: 8
                         }
                     }
+                    onValueChanged: robotComm.setMotor2Output(value)
                 }
                 Button{
                     text: "Zero"
@@ -227,6 +229,7 @@ ApplicationWindow {
                             radius: 8
                         }
                     }
+                    onValueChanged: robotComm.setMotor3Output(value)
                 }
                 Button{
                     text: "Zero"
@@ -371,8 +374,5 @@ ApplicationWindow {
             case 5: k5.color = "black"; break;
             }
         }
-        motor1Output: motor1Slider.value
-        motor2Output: motor2Slider.value
-        motor3Output: motor3Slider.value
     }
 }

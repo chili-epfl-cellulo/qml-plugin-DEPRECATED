@@ -122,7 +122,7 @@ ApplicationWindow {
                                            0,                   0,                  0,                  1)
 
         id: locomotionLoop
-        interval: 500
+        interval: 100
         repeat: true
 
         onTriggered: {
@@ -189,17 +189,14 @@ ApplicationWindow {
                     }
                 }
 
-                motor1Target = Math.round(motorTarget.x);
-                motor2Target = Math.round(motorTarget.y);
-                motor3Target = Math.round(motorTarget.z);
+                robotComm.setMotor1Output(Math.round(motorTarget.x));
+                robotComm.setMotor2Output(Math.round(motorTarget.y));
+                robotComm.setMotor3Output(Math.round(motorTarget.z));
             }
         }
     }
 
     CelluloBluetooth{
         id: robotComm
-        motor1Output: locomotionLoop.motor1Target
-        motor2Output: locomotionLoop.motor2Target
-        motor3Output: locomotionLoop.motor3Target
     }
 }

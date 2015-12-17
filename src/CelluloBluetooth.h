@@ -37,19 +37,16 @@
  */
 class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
-    Q_PROPERTY(QString macAddr WRITE setMacAddr)
+    Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
     Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
     Q_PROPERTY(bool profiling READ isProfiling NOTIFY profilingChanged)
     Q_PROPERTY(int decodingRate READ getDecodingRate NOTIFY decodingRateChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
-    Q_PROPERTY(bool imageStreamEnabled WRITE setImageStreamEnabled)
+    Q_PROPERTY(bool imageStreamingEnabled WRITE setImageStreamingEnabled READ getImageStreamingEnabled)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
     Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
     Q_PROPERTY(bool kidnapped READ getKidnapped NOTIFY kidnappedChanged)
-    Q_PROPERTY(int motor1Output WRITE setMotor1Output)
-    Q_PROPERTY(int motor2Output WRITE setMotor2Output)
-    Q_PROPERTY(int motor3Output WRITE setMotor3Output)
 
 public:
 
@@ -109,11 +106,25 @@ public:
     QVariantList getFrame() const;
 
     /**
+     * @brief Gets the current MAC address
+     *
+     * @return The current MAC address
+     */
+    QString getMacAddr(){ return macAddr; }
+
+    /**
      * @brief Gets whether currently connected over Bluetooth
      *
      * @return Whether currently connected over Bluetooth
      */
     bool getConnected(){ return connected; }
+
+    /**
+     * @brief Gets whether image streaming is currently enabled
+     *
+     * @return Whether image streaming is enabled or localization is enabled
+     */
+    bool getImageStreamingEnabled(){ return imageStreamingEnabled; }
 
     /**
      * @brief Gets the latest battery state
@@ -200,7 +211,7 @@ public slots:
      *
      * @param enabled Whether to enable image streaming
      */
-    void setImageStreamEnabled(bool enabled);
+    void setImageStreamingEnabled(bool enabled);
 
     /**
      * @brief Sets output of motor 1
@@ -363,6 +374,7 @@ private:
 
     QBluetoothSocket* socket;               ///< Bluetooth socket connected to the server
     QString macAddr;                        ///< Bluetooth MAC address of the server
+    bool imageStreamingEnabled;             ///< Whether image streaming is enabled or localization is enabled
     QTimer frameTimeoutTimer;               ///< When this timer runs out, frame is completed even if it is not complete
     QByteArray receiveBuffer;               ///< Receive buffer until the current response/event message is complete
     bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
