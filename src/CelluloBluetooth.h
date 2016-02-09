@@ -37,11 +37,12 @@
  */
 class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
-    Q_PROPERTY(QString macAddr WRITE setMacAddr)
+    Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
     Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
     Q_PROPERTY(bool profiling READ isProfiling NOTIFY profilingChanged)
     Q_PROPERTY(int decodingRate READ getDecodingRate NOTIFY decodingRateChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
+    Q_PROPERTY(bool imageStreamingEnabled WRITE setImageStreamingEnabled READ getImageStreamingEnabled)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
     Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
@@ -51,10 +52,14 @@ public:
 
     enum COMMAND_TYPE{
         PING = 0,
+        IMAGE_STREAM_ENABLE,
         FRAME_REQUEST,
         BATTERY_STATE_REQUEST,
         SET_VISUAL_STATE,
         SET_VISUAL_EFFECT,
+        SET_MOTOR_OUTPUT,
+        SET_ALL_MOTOR_OUTPUTS,
+        SET_GOAL_POSE,
         RESET,
         SHUTDOWN
     };
@@ -71,13 +76,11 @@ public:
         POSE_CHANGED,
         KIDNAP,
         ACKNOWLEDGED,
-        NOT_ACKNOWLEDGED,
         NUM_RECEIVE_MESSAGES,
         INVALID_MESSAGE = -1
     };
 
-    static const int COMMAND_TIMEOUT_MILLIS = 500;   ///< Will wait this many millis for a response before resending command
-    static const int FRAME_TIMEOUT_MILLIS = 11000;   ///< Will wait this many millis for a camera frame to complete
+    static const int FRAME_TIMEOUT_MILLIS = 10000;   ///< Will wait this many millis for a camera frame to complete
 
     static const int IMG_WIDTH = 752/4;              ///< Image width of the robot's camera
     static const int IMG_HEIGHT = 480/4;             ///< Image height of the robot's camera
@@ -104,11 +107,25 @@ public:
     QVariantList getFrame() const;
 
     /**
+     * @brief Gets the current MAC address
+     *
+     * @return The current MAC address
+     */
+    QString getMacAddr(){ return macAddr; }
+
+    /**
      * @brief Gets whether currently connected over Bluetooth
      *
      * @return Whether currently connected over Bluetooth
      */
     bool getConnected(){ return connected; }
+
+    /**
+     * @brief Gets whether image streaming is currently enabled
+     *
+     * @return Whether image streaming is enabled or localization is enabled
+     */
+    bool getImageStreamingEnabled(){ return imageStreamingEnabled; }
 
     /**
      * @brief Gets the latest battery state
@@ -177,11 +194,6 @@ private slots:
     void socketDisconnected();
 
     /**
-     * @brief Called when server did not respond to command within the timeout interval
-     */
-    void serverTimeout();
-
-    /**
      * @brief Called when the server did not complete the camera frame in time
      */
     void frameTimeout();
@@ -194,6 +206,52 @@ public slots:
      * @param macAddr Bluetooth MAC address of the server (robot)
      */
     void setMacAddr(QString macAddr);
+
+    /**
+     * @brief Enables image streaming + disables localization or vice versa
+     *
+     * @param enabled Whether to enable image streaming
+     */
+    void setImageStreamingEnabled(bool enabled);
+
+    /**
+     * @brief Sets output of motor 1
+     *
+     * @param output Value between -0xFFF and 0xFFF
+     */
+    void setMotor1Output(int output);
+
+    /**
+     * @brief Sets output of motor 2
+     *
+     * @param output Value between -0xFFF and 0xFFF
+     */
+    void setMotor2Output(int output);
+
+    /**
+     * @brief Sets output of motor 3
+     *
+     * @param output Value between -0xFFF and 0xFFF
+     */
+    void setMotor3Output(int output);
+
+    /**
+     * @brief Sets outputs of all motors
+     *
+     * @param m1output Value between -0xFFF and 0xFFF
+     * @param m2output Value between -0xFFF and 0xFFF
+     * @param m3output Value between -0xFFF and 0xFFF
+     */
+    void setAllMotorOutputs(int m1output, int m2output, int m3output);
+
+    /**
+     * @brief Sets a pose goal to follow
+     *
+     * @param x X goal in grid coordinates
+     * @param y Y goal in grid coordinates
+     * @param theta Theta goal in degrees
+     */
+    void setGoalPose(float x, float y, float theta);
 
     /**
      * @brief Sends a ping, expecting an acknowledge
@@ -321,26 +379,16 @@ signals:
 
 private:
 
-    /**
-     * @brief Packs information of a command so that it can be sent over Bluetooth and its reply parsed
-     */
-    typedef struct{
-        COMMAND_TYPE type;
-        QByteArray message;
-    } QueuedCommand;
-
     static const char* commandStrings[];    ///< Strings sent over Bluetooth to give commands
     static const char* receiveStrings[];    ///< Strings received over Bluetooth as response or event
 
     QBluetoothSocket* socket;               ///< Bluetooth socket connected to the server
     QString macAddr;                        ///< Bluetooth MAC address of the server
-    QQueue<QueuedCommand> commands;         ///< Commands to be sent over Bluetooth
-    QTimer commandTimeout;                  ///< When this timer runs out, command is resent if not already acknowledged
+    bool imageStreamingEnabled;             ///< Whether image streaming is enabled or localization is enabled
     QTimer frameTimeoutTimer;               ///< When this timer runs out, frame is completed even if it is not complete
     QByteArray receiveBuffer;               ///< Receive buffer until the current response/event message is complete
-    QByteArray frameLineEndSequence;        ///< Extra sequence that ends each line in a received camera frame
     bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
-    unsigned int currentLine;               ///< Current line in the camera frame being received
+    unsigned int currentPixel;              ///< Current pixel in the camera frame being received
 
     bool connected;                         ///< Whether Bluetooth is connected now
     bool profiling;                         ///< Whether or not we're currently measuring the frame rate
@@ -359,9 +407,20 @@ private:
     void reconnectToServer();
 
     /**
-     * @brief Sends next command over Bluetooth socket and starts timeout timer
+     * @brief Sets the motor output
+     *
+     * @param motor 1, 2 or 3
+     * @param output Value between -FFF and FFF
      */
-    void sendCommand();
+    void setMotorOutput(int motor, int output);
+
+    /**
+     * @brief Sends command over Bluetooth
+     *
+     * @param type Type of the command
+     * @param message Message body itself
+     */
+    void sendCommand(COMMAND_TYPE type, QByteArray& message);
 
     /**
      * @brief Processes the response in the receive buffer if possible
@@ -376,17 +435,6 @@ private:
     RECEIVE_MESSAGES getReceivedMessage();
 
     /**
-     * @brief Calculates the 4-bit even parity of the given pose
-     *
-     * @param x X position
-     * @param y Y position
-     * @param theta Angle
-     *
-     * @return (How many 1's are in the x, y and theta)'s least significant 4 bits
-     */
-    int calculateChecksum(int x, int y, int theta);
-
-    /**
      * @brief Calculates the integer value from an uppercase hex string
      *
      * @param array Array containing the hex string
@@ -396,6 +444,15 @@ private:
      * @return The value
      */
     int hexToInt(QByteArray const& array, int begin, int end);
+
+    /**
+     * @brief Converts single digit integer to hexadecimal character
+     *
+     * @param value Between 0x0 and 0xF
+     *
+     * @return Hexadecimal representation of value
+     */
+    char getHexChar(unsigned int value);
 };
 
 #endif // CELLULOBLUETOOTH_H

@@ -148,6 +148,68 @@ Rectangle {
     }
 
     //-----------------------------------------------------------------
+    // Locomotion
+
+    property real motorMax: 0xFFF
+    property real motorMin: 0x500
+    property matrix4x4 k_inv: Qt.matrix4x4(
+        0.666666666666667,  0.0,                0.333333333333333,  0,
+        -0.333333333333333, 0.577350269189626,  0.333333333333333,  0,
+        -0.333333333333333, -0.577350269189626, 0.333333333333333,  0,
+        0,                  0,                  0,                  1
+    );
+
+    // Set locomotion outputs (corresponds roughly to goal speeds) in local frame of reference; arguments are between -1.0 and 1.0
+    function setLocalSpeeds(vx, vy, vtheta){
+        if(vx > 1)
+            vx = 1;
+        else if(vx < -1)
+            vx = -1;
+        if(vy > 1)
+            vy = 1;
+        else if(vy < -1)
+            vy = -1;
+        if(vtheta > 1)
+            vtheta = 1;
+        else if(vtheta < -1)
+            vtheta = -1;
+
+        var localSpeeds = Qt.vector4d(vx, vy, vtheta, 1);
+        var motorSpeeds = k_inv.times(localSpeeds);
+
+        var maximum = Math.max(Math.abs(motorSpeeds.x), Math.abs(motorSpeeds.y), Math.abs(motorSpeeds.z));
+        if(maximum > 1.0){
+            motorSpeeds.x /= maximum;
+            motorSpeeds.y /= maximum;
+            motorSpeeds.z /= maximum;
+        }
+
+        if(motorSpeeds.x > 0)
+            motorSpeeds.x = motorSpeeds.x*(motorMax - motorMin) + motorMin;
+        else if(motorSpeeds.x < 0)
+            motorSpeeds.x = motorSpeeds.x*(motorMax - motorMin) - motorMin;
+
+        if(motorSpeeds.y > 0)
+            motorSpeeds.y = motorSpeeds.y*(motorMax - motorMin) + motorMin;
+        else if(motorSpeeds.y < 0)
+        motorSpeeds.y = motorSpeeds.y*(motorMax - motorMin) - motorMin;
+
+        if(motorSpeeds.z > 0)
+            motorSpeeds.z = motorSpeeds.z*(motorMax - motorMin) + motorMin;
+        else if(motorSpeeds.z < 0)
+        motorSpeeds.z = motorSpeeds.z*(motorMax - motorMin) - motorMin;
+
+        robotComm.setAllMotorOutputs(motorSpeeds.x, motorSpeeds.y, motorSpeeds.z);
+    }
+
+    // Set locomotion outputs (corresponds roughly to goal speeds) in global frame of reference; arguments are between -1.0 and 1.0
+    function setGlobalSpeeds(vx, vy, vtheta){
+        var vxGlobal = Math.cos(rotation/180*Math.PI)*vx - Math.sin(rotation/180*Math.PI)*vy;
+        var vyGlobal = Math.sin(rotation/180*Math.PI)*vx + Math.cos(rotation/180*Math.PI)*vy;
+        setLocalSpeeds(vxGlobal, vyGlobal, vtheta);
+    }
+
+    //-----------------------------------------------------------------
     // Transport
 
     // Simulator

@@ -24,8 +24,14 @@ Window {
     Column{
         spacing: 10
 
+        CheckBox {
+            id: enable
+            text: "Enable image streaming"
+            checked: false
+        }
+
         Button {
-            text: "Frame"
+            text: "Get frame"
             onClicked: robotComm.requestFrame();
         }
 
@@ -39,7 +45,8 @@ Window {
 
     CelluloBluetooth{
         id: robotComm
-        macAddr: "00:06:66:74:48:A7"
+        macAddr: "00:06:66:74:41:04"
         onFrameReady: cameraFrameImage.reload();
+        imageStreamingEnabled: enable.checked
     }
 }

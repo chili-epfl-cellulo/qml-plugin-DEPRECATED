@@ -24,6 +24,7 @@ ApplicationWindow {
             TextField{
                 id: macAddrRight
                 placeholderText: "XX:XX"
+
             }
             Button {
                 text: "Connect"
@@ -66,7 +67,7 @@ ApplicationWindow {
                     value: 128
                     style: SliderStyle {
                         groove: Rectangle {
-                            implicitWidth: 200
+                            implicitWidth: Screen.width/5
                             implicitHeight: 8
                             color: "red"
                             radius: 8
@@ -81,7 +82,7 @@ ApplicationWindow {
                     value: 128
                     style: SliderStyle {
                         groove: Rectangle {
-                            implicitWidth: 200
+                            implicitWidth: Screen.width/5
                             implicitHeight: 8
                             color: "green"
                             radius: 8
@@ -96,7 +97,7 @@ ApplicationWindow {
                     value: 128
                     style: SliderStyle {
                         groove: Rectangle {
-                            implicitWidth: 200
+                            implicitWidth: Screen.width/5
                             implicitHeight: 8
                             color: "blue"
                             radius: 8
@@ -129,6 +130,7 @@ ApplicationWindow {
         id: powerBox
         title: "Power"
         anchors.top: colorBox.bottom
+
         Row{
             spacing: 5
 
@@ -148,9 +150,125 @@ ApplicationWindow {
     }
 
     GroupBox {
+        id: motorBox
+        title: "Locomotion"
+        anchors.top: powerBox.bottom
+
+        Column{
+
+            Row{
+                spacing: 5
+
+                Label{
+                    text: "Motor 1 output:"
+                }
+                Slider{
+                    id: motor1Slider
+                    minimumValue: -0xFFF
+                    maximumValue: 0xFFF
+                    stepSize: 1
+                    value: 0
+                    style: SliderStyle {
+                        groove: Rectangle {
+                            implicitWidth: Screen.width/5
+                            implicitHeight: 8
+                            radius: 8
+                        }
+                    }
+                    onValueChanged: robotComm.setMotor1Output(value)
+                }
+                Button{
+                    text: "Zero"
+                    onClicked: motor1Slider.value = 0
+                }
+            }
+
+            Row{
+                spacing: 5
+
+                Label{
+                    text: "Motor 2 output:"
+                }
+                Slider{
+                    id: motor2Slider
+                    minimumValue: -0xFFF
+                    maximumValue: 0xFFF
+                    stepSize: 1
+                    value: 0
+                    style: SliderStyle {
+                        groove: Rectangle {
+                            implicitWidth: Screen.width/5
+                            implicitHeight: 8
+                            radius: 8
+                        }
+                    }
+                    onValueChanged: robotComm.setMotor2Output(value)
+                }
+                Button{
+                    text: "Zero"
+                    onClicked: motor2Slider.value = 0
+                }
+            }
+
+            Row{
+                spacing: 5
+
+                Label{
+                    text: "Motor 3 output:"
+                }
+                Slider{
+                    id: motor3Slider
+                    minimumValue: -0xFFF
+                    maximumValue: 0xFFF
+                    stepSize: 1
+                    value: 0
+                    style: SliderStyle {
+                        groove: Rectangle {
+                            implicitWidth: Screen.width/5
+                            implicitHeight: 8
+                            radius: 8
+                        }
+                    }
+                    onValueChanged: robotComm.setMotor3Output(value)
+                }
+                Button{
+                    text: "Zero"
+                    onClicked: motor3Slider.value = 0
+                }
+            }
+
+            Label{
+                text: "Pose goal:"
+            }
+
+            TextField{
+                id: goalPoseX
+                placeholderText: "x"
+            }
+
+            TextField{
+                id: goalPoseY
+                placeholderText: "y"
+
+            }
+
+            TextField{
+                id: goalPoseTheta
+                placeholderText: "theta"
+
+            }
+
+            Button{
+                text: "Go"
+                onClicked: robotComm.setGoalPose(parseFloat(goalPoseX.text), parseFloat(goalPoseY.text), parseFloat(goalPoseTheta.text));
+            }
+        }
+    }
+
+    GroupBox {
         id: statusBox
         title: "Status"
-        anchors.top: powerBox.bottom
+        anchors.top: motorBox.bottom
 
         Column{
             spacing: 5
@@ -204,7 +322,7 @@ ApplicationWindow {
                     color: robotComm.kidnapped ? "red" : "green"
                 }
                 Text{
-                    text: "X=" + robotComm.x + " Y=" + robotComm.y + " Theta=" + robotComm.theta
+                    text: "X=" + robotComm.x.toFixed(2) + " Y=" + robotComm.y.toFixed(2) + " Theta=" + robotComm.theta.toFixed(1)
                 }
             }
             Row{
