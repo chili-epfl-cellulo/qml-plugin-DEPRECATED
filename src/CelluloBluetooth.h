@@ -58,6 +58,7 @@ public:
         SET_VISUAL_STATE,
         SET_VISUAL_EFFECT,
         SET_MOTOR_OUTPUT,
+        SET_ALL_MOTOR_OUTPUTS,
         SET_GOAL_POSE,
         RESET,
         SHUTDOWN
@@ -233,6 +234,15 @@ public slots:
      * @param output Value between -0xFFF and 0xFFF
      */
     void setMotor3Output(int output);
+
+    /**
+     * @brief Sets outputs of all motors
+     *
+     * @param m1output Value between -0xFFF and 0xFFF
+     * @param m2output Value between -0xFFF and 0xFFF
+     * @param m3output Value between -0xFFF and 0xFFF
+     */
+    void setAllMotorOutputs(int m1output, int m2output, int m3output);
 
     /**
      * @brief Sets a pose goal to follow

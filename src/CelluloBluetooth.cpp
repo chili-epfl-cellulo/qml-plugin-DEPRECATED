@@ -36,6 +36,7 @@ const char* CelluloBluetooth::commandStrings[] = {
     "V", //Set (v)isual state
     "E", //Set (e)ffect
     "M", //Set (m)otor output
+    "A", //Set (a)ll motor outputs
     "G", //Set (g)oal pose
     "R", //(R)eset
     "S"  //(S)hutdown
@@ -354,6 +355,53 @@ void CelluloBluetooth::setMotorOutput(int motor, int output){
     message.append(getHexChar(output%0x10));
     message.append('\n');
     sendCommand(COMMAND_TYPE::SET_MOTOR_OUTPUT, message);
+}
+
+void CelluloBluetooth::setAllMotorOutputs(int m1output, int m2output, int m3output){
+    if(m1output < -0xFFF)
+        m1output = -0xFFF;
+    else if(m1output > 0xFFF)
+        m1output = 0xFFF;
+
+    if(m2output < -0xFFF)
+        m2output = -0xFFF;
+    else if(m2output > 0xFFF)
+        m2output = 0xFFF;
+
+    if(m3output < -0xFFF)
+        m3output = -0xFFF;
+    else if(m3output > 0xFFF)
+        m3output = 0xFFF;
+
+    QByteArray message;
+    message = commandStrings[COMMAND_TYPE::SET_ALL_MOTOR_OUTPUTS];
+
+    if(m1output < 0){
+        m1output *= -1;
+        message.append('-');
+    }
+    message.append(getHexChar(m1output/0x100));
+    message.append(getHexChar(m1output/0x10%0x10));
+    message.append(getHexChar(m1output%0x10));
+
+    if(m2output < 0){
+        m2output *= -1;
+        message.append('-');
+    }
+    message.append(getHexChar(m2output/0x100));
+    message.append(getHexChar(m2output/0x10%0x10));
+    message.append(getHexChar(m2output%0x10));
+
+    if(m3output < 0){
+        m3output *= -1;
+        message.append('-');
+    }
+    message.append(getHexChar(m3output/0x100));
+    message.append(getHexChar(m3output/0x10%0x10));
+    message.append(getHexChar(m3output%0x10));
+
+    message.append('\n');
+    sendCommand(COMMAND_TYPE::SET_ALL_MOTOR_OUTPUTS, message);
 }
 
 void CelluloBluetooth::setGoalPose(float x, float y, float theta){
