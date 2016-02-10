@@ -39,13 +39,14 @@ class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
     Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
     Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
-    Q_PROPERTY(bool profiling READ isProfiling NOTIFY profilingChanged)
-    Q_PROPERTY(int decodingRate READ getDecodingRate NOTIFY decodingRateChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
     Q_PROPERTY(bool imageStreamingEnabled WRITE setImageStreamingEnabled READ getImageStreamingEnabled)
+    Q_PROPERTY(bool timestampingEnabled WRITE setTimestampingEnabled READ getTimestampingEnabled)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
     Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
+    Q_PROPERTY(int lastTimestamp READ getLastTimestamp NOTIFY timestampChanged)
+    Q_PROPERTY(float framerate READ getFramerate NOTIFY timestampChanged)
     Q_PROPERTY(bool kidnapped READ getKidnapped NOTIFY kidnappedChanged)
 
 public:
@@ -53,6 +54,7 @@ public:
     enum COMMAND_TYPE{
         PING = 0,
         IMAGE_STREAM_ENABLE,
+        TIMESTAMP_ENABLE,
         FRAME_REQUEST,
         BATTERY_STATE_REQUEST,
         SET_VISUAL_STATE,
@@ -84,6 +86,8 @@ public:
 
     static const int IMG_WIDTH = 752/4;              ///< Image width of the robot's camera
     static const int IMG_HEIGHT = 480/4;             ///< Image height of the robot's camera
+
+    static constexpr float FRAMERATE_SMOOTH_FACTOR = 0.99f;  ///< Smoothing factor for framerate, closer to 1.0 means less update
 
     static QByteArray frameBuffer;                   ///< Container for the received camera frame data
 
@@ -128,6 +132,13 @@ public:
     bool getImageStreamingEnabled(){ return imageStreamingEnabled; }
 
     /**
+     * @brief Gets whether timestamping along with pose is currently enabled
+     *
+     * @return Whether timestamping is enabled
+     */
+    bool getTimestampingEnabled(){ return timestampingEnabled; }
+
+    /**
      * @brief Gets the latest battery state
      *
      * @return Battery state as described by the BATTERY_STATE enumeration
@@ -156,25 +167,25 @@ public:
     float getTheta(){ return theta; }
 
     /**
+     * @brief Gets the latest available timestamp
+     *
+     * @return The latest received timestamp in milliseconds
+     */
+    int getLastTimestamp(){ return lastTimestamp; }
+
+    /**
+     * @brief Gets the localization framerate
+     *
+     * @return Localization framerate in milliseconds
+     */
+    float getFramerate(){ return framerate; }
+
+    /**
      * @brief Gets the latest kidnapped state
      *
      * @return Whether kidnapped or on encoded paper
      */
     bool getKidnapped(){ return kidnapped; }
-
-    /**
-     * @brief Gets the latest profiling state
-     *
-     * @return Whether or not we are measure decoding rate
-     */
-    bool isProfiling() { return profiling; }
-
-    /**
-     * @brief Gets the current decoding rate (profiling must be activated)
-     *
-     * @return The current measured decoding rate
-     */
-    int getDecodingRate() { return decodingRate; }
 
 private slots:
 
@@ -213,6 +224,13 @@ public slots:
      * @param enabled Whether to enable image streaming
      */
     void setImageStreamingEnabled(bool enabled);
+
+    /**
+     * @brief Enables timestamping along with pose and disables pose idling or vice-versa
+     *
+     * @param enabled Whether to enable timestamping
+     */
+    void setTimestampingEnabled(bool enabled);
 
     /**
      * @brief Sets output of motor 1
@@ -294,11 +312,6 @@ public slots:
      */
     void shutdown();
 
-    /**
-     * @brief Turns profiling on or off
-     */
-    void toggleProfiling();
-
 signals:
 
     /**
@@ -358,14 +371,9 @@ signals:
     void poseChanged();
 
     /**
-     * @brief Emitted when we toggle profiling
+     * @brief A new onboard localization timestamp has been received
      */
-    void profilingChanged();
-
-    /**
-     * @brief Emitted when the decoding rate gets updated
-     */
-    void decodingRateChanged();
+    void timestampChanged();
 
     /**
      * @brief Emitted when the kidnap state of the robot changes
@@ -385,21 +393,20 @@ private:
     QBluetoothSocket* socket;               ///< Bluetooth socket connected to the server
     QString macAddr;                        ///< Bluetooth MAC address of the server
     bool imageStreamingEnabled;             ///< Whether image streaming is enabled or localization is enabled
+    bool timestampingEnabled;               ///< Whether timestamping along with pose is enabled and idling disabled
+    int lastTimestamp;                      ///< Latest received onboard timestamp (in milliseconds)
+    float framerate;                        ///< Framerate calculated over time
     QTimer frameTimeoutTimer;               ///< When this timer runs out, frame is completed even if it is not complete
     QByteArray receiveBuffer;               ///< Receive buffer until the current response/event message is complete
     bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
     unsigned int currentPixel;              ///< Current pixel in the camera frame being received
 
     bool connected;                         ///< Whether Bluetooth is connected now
-    bool profiling;                         ///< Whether or not we're currently measuring the frame rate
     int batteryState;                       ///< Current battery state
     float x;                                ///< Current x position in grid coordinates
     float y;                                ///< Current y position in grid coordinates
     float theta;                            ///< Current orientation in degrees
     bool kidnapped;                         ///< Whether currently kidnapped
-    int poseChangeCount;                    ///< Number of times we've received a poseChanged event since starting profiling
-    int decodingRate;                     ///< Our decoding rate in hz
-    int timeStart;                        ///< When we started profiling
 
     /**
      * @brief Connects or reconnects to the server if not already connected

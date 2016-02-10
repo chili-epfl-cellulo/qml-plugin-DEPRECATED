@@ -325,18 +325,33 @@ ApplicationWindow {
                     text: "X=" + robotComm.x.toFixed(2) + " Y=" + robotComm.y.toFixed(2) + " Theta=" + robotComm.theta.toFixed(1)
                 }
             }
-            Row{
-                spacing: 5
+        }
+    }
 
-                Button{
-                    text: robotComm.profiling ? "ON" : "OFF"
-                    onClicked: robotComm.toggleProfiling()
+    GroupBox{
+        id: profilingBox
+        title: "Profiling"
+        anchors.top: statusBox.bottom
+
+        Column{
+            spacing: 5
+
+            Row{
+                CheckBox{
+                    id: timestampingCheckbox
+                    text: "Get onboard timestamps"
                 }
+            }
+
+            Row{
                 Text{
-                    text: "Decoding Frame Rate:"
+                    text: "Framerate: " + robotComm.framerate.toFixed(2) + " fps"
                 }
+            }
+
+            Row{
                 Text{
-                    text: robotComm.profiling ? robotComm.decodingRate : " Profiling off"
+                    text: "Last timestamp: " + robotComm.lastTimestamp + " ms"
                 }
             }
         }
@@ -344,6 +359,7 @@ ApplicationWindow {
 
     CelluloBluetooth{
         id: robotComm
+        timestampingEnabled: timestampingCheckbox.checked
         onTouchBegan:{
             switch(key){
             case 0: k0.color = "yellow"; break;

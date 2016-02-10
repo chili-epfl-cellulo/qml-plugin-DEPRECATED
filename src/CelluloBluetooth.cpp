@@ -31,6 +31,7 @@
 const char* CelluloBluetooth::commandStrings[] = {
     "P", //(P)ing
     "I", //Enable (i)mage streaming + disable localization or vice-versa
+    "T", //Enable (t)imestamping along with pose and disable idling or vice-versa
     "F", //Request (f)rame
     "B", //Query (b)attery state
     "V", //Set (v)isual state
@@ -71,12 +72,14 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
 
     connected = false;
     imageStreamingEnabled = false;
+    timestampingEnabled = false;
     batteryState = 4; //Beginning with shutdown is a good idea
     x = 0;
     y = 0;
     theta = 0;
+    lastTimestamp = 0;
+    framerate = 0.0;
     kidnapped = true;
-    profiling = false;
 }
 
 CelluloBluetooth::~CelluloBluetooth(){ }
@@ -223,17 +226,19 @@ void CelluloBluetooth::processResponse(){
                 y = hexToInt(receiveBuffer, 9, 16)/100.0f;
                 theta = hexToInt(receiveBuffer, 17, 20)/100.0f;
                 emit poseChanged();
+
+                if(timestampingEnabled){
+                    int newTimestamp = hexToInt(receiveBuffer, 21, 28);
+                    framerate = FRAMERATE_SMOOTH_FACTOR*framerate + (1.0 - FRAMERATE_SMOOTH_FACTOR)*1000/(newTimestamp - lastTimestamp);
+                    lastTimestamp = newTimestamp;
+                    emit timestampChanged();
+                }
+
                 if(kidnapped){
                     kidnapped = false;
                     emit kidnappedChanged();
                 }
 
-                if (profiling) {
-                    int timeElapsed = int(time(0))-timeStart;
-                    poseChangeCount++;
-                    decodingRate = poseChangeCount/(float)timeElapsed;
-                    emit decodingRateChanged();
-                }
                 break;
             }
 
@@ -301,6 +306,17 @@ void CelluloBluetooth::setImageStreamingEnabled(bool enabled){
         message.append(enabled ? '1' : '0');
         message.append('\n');
         sendCommand(COMMAND_TYPE::IMAGE_STREAM_ENABLE, message);
+    }
+}
+
+void CelluloBluetooth::setTimestampingEnabled(bool enabled){
+    if(enabled != timestampingEnabled){
+        timestampingEnabled = enabled;
+        QByteArray message;
+        message = commandStrings[COMMAND_TYPE::TIMESTAMP_ENABLE];
+        message.append(enabled ? '1' : '0');
+        message.append('\n');
+        sendCommand(COMMAND_TYPE::TIMESTAMP_ENABLE, message);
     }
 }
 
@@ -449,14 +465,6 @@ void CelluloBluetooth::reset(){
     message = commandStrings[COMMAND_TYPE::RESET];
     message.append('\n');
     sendCommand(COMMAND_TYPE::RESET, message);
-}
-
-void CelluloBluetooth::toggleProfiling(){
-    profiling = !profiling;
-    poseChangeCount = 0;
-    if (profiling)
-        timeStart = time(0);
-    emit profilingChanged();
 }
 
 void CelluloBluetooth::shutdown(){
