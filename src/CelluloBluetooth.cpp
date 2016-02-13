@@ -54,7 +54,8 @@ const char* CelluloBluetooth::receiveStrings[] = {
     "R", //Touch (r)eleased
     "P", //(P)ose changed
     "K", //Robot (k)idnapped or unkidnapped
-    "A"  //(A)cknowledged
+    "A", //(A)cknowledged
+    "E"  //D(e)bug message
 };
 
 QByteArray CelluloBluetooth::frameBuffer;
@@ -254,6 +255,10 @@ void CelluloBluetooth::processResponse(){
             }
 
         case ACKNOWLEDGED:
+            break;
+
+        case DEBUG:
+            qDebug() << "Debug message: " << receiveBuffer.right(receiveBuffer.size() - 1);
             break;
 
         default:

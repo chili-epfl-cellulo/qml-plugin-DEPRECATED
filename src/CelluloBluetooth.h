@@ -78,6 +78,7 @@ public:
         POSE_CHANGED,
         KIDNAP,
         ACKNOWLEDGED,
+        DEBUG,
         NUM_RECEIVE_MESSAGES,
         INVALID_MESSAGE = -1
     };
