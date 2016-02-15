@@ -61,6 +61,7 @@ public:
         SET_VISUAL_EFFECT,
         SET_MOTOR_OUTPUT,
         SET_ALL_MOTOR_OUTPUTS,
+        SET_WHEEL_VELOCITIES,
         SET_GOAL_POSE,
         RESET,
         SHUTDOWN
@@ -89,6 +90,8 @@ public:
     static const int IMG_HEIGHT = 480/4;             ///< Image height of the robot's camera
 
     static constexpr float FRAMERATE_SMOOTH_FACTOR = 0.99f;  ///< Smoothing factor for framerate, closer to 1.0 means less update
+
+    static constexpr float WHEEL_VELOCITY_FACTOR = 200.0f;   ///< Wheel velocities are multiplied by this before comm.
 
     static QByteArray frameBuffer;                   ///< Container for the received camera frame data
 
@@ -262,6 +265,15 @@ public slots:
      * @param m3output Value between -0xFFF and 0xFFF
      */
     void setAllMotorOutputs(int m1output, int m2output, int m3output);
+
+    /**
+     * @brief Sets goal wheel velocities in mm/s
+     *
+     * @param v1 Wheel 1 velocity
+     * @param v2 Wheel 2 velocity
+     * @param v3 Wheel 3 velocity
+     */
+    void setWheelVelocities(float v1, float v2, float v3);
 
     /**
      * @brief Sets a pose goal to follow

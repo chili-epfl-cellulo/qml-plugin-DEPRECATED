@@ -38,6 +38,7 @@ const char* CelluloBluetooth::commandStrings[] = {
     "E", //Set (e)ffect
     "M", //Set (m)otor output
     "A", //Set (a)ll motor outputs
+    "W", //Set goal (w)heel velocities
     "G", //Set (g)oal pose
     "R", //(R)eset
     "S"  //(S)hutdown
@@ -423,6 +424,61 @@ void CelluloBluetooth::setAllMotorOutputs(int m1output, int m2output, int m3outp
 
     message.append('\n');
     sendCommand(COMMAND_TYPE::SET_ALL_MOTOR_OUTPUTS, message);
+}
+
+void CelluloBluetooth::setWheelVelocities(float v1, float v2, float v3){
+    int v1_ = (int)(v1*WHEEL_VELOCITY_FACTOR);
+    int v2_ = (int)(v2*WHEEL_VELOCITY_FACTOR);
+    int v3_ = (int)(v3*WHEEL_VELOCITY_FACTOR);
+
+    if(v1_ < -0x7FFF)
+        v1_ = -0x7FFF;
+    else if(v1_ > 0x7FFF)
+        v1_ = 0x7FFF;
+
+    if(v2_ < -0x7FFF)
+        v2_ = -0x7FFF;
+    else if(v2_ > 0x7FFF)
+        v2_ = 0x7FFF;
+
+    if(v3_ < -0x7FFF)
+        v3_ = -0x7FFF;
+    else if(v3_ > 0x7FFF)
+        v3_ = 0x7FFF;
+
+    QByteArray message;
+    message = commandStrings[COMMAND_TYPE::SET_WHEEL_VELOCITIES];
+
+    if(v1_ < 0){
+        v1_ *= -1;
+        message.append('-');
+    }
+    message.append(getHexChar(v1_/0x1000));
+    message.append(getHexChar(v1_/0x100%0x10));
+    message.append(getHexChar(v1_/0x10%0x10));
+    message.append(getHexChar(v1_%0x10));
+
+    if(v2_ < 0){
+        v2_ *= -1;
+        message.append('-');
+    }
+    message.append(getHexChar(v2_/0x1000));
+    message.append(getHexChar(v2_/0x100%0x10));
+    message.append(getHexChar(v2_/0x10%0x10));
+    message.append(getHexChar(v2_%0x10));
+
+     if(v3_ < 0){
+        v3_ *= -1;
+        message.append('-');
+    }
+    message.append(getHexChar(v3_/0x1000));
+    message.append(getHexChar(v3_/0x100%0x10));
+    message.append(getHexChar(v3_/0x10%0x10));
+    message.append(getHexChar(v3_%0x10));
+
+    message.append('\n');
+
+    sendCommand(COMMAND_TYPE::SET_WHEEL_VELOCITIES, message);
 }
 
 void CelluloBluetooth::setGoalPose(float x, float y, float theta){
