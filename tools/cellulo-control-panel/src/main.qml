@@ -237,30 +237,64 @@ ApplicationWindow {
                 }
             }
 
-            Label{
-                text: "Pose goal:"
-            }
+            Row{
+                spacing: 5
 
-            TextField{
-                id: goalPoseX
-                placeholderText: "x"
-            }
+                Column{
+                    Label{
+                        text: "Pose goal:"
+                    }
 
-            TextField{
-                id: goalPoseY
-                placeholderText: "y"
+                    TextField{
+                        id: goalPoseX
+                        placeholderText: "x"
+                    }
 
-            }
+                    TextField{
+                        id: goalPoseY
+                        placeholderText: "y"
 
-            TextField{
-                id: goalPoseTheta
-                placeholderText: "theta"
+                    }
 
-            }
+                    TextField{
+                        id: goalPoseTheta
+                        placeholderText: "theta"
 
-            Button{
-                text: "Go"
-                onClicked: robotComm.setGoalPose(parseFloat(goalPoseX.text), parseFloat(goalPoseY.text), parseFloat(goalPoseTheta.text));
+                    }
+
+                    Button{
+                        text: "Go"
+                        onClicked: robotComm.setGoalPose(parseFloat(goalPoseX.text), parseFloat(goalPoseY.text), parseFloat(goalPoseTheta.text));
+                    }
+                }
+
+                Column{
+                    Label{
+                        text: "Goal velocity:"
+                    }
+
+                    TextField{
+                        id: goalVelX
+                        placeholderText: "X (mm/s)"
+                    }
+
+                    TextField{
+                        id: goalVelY
+                        placeholderText: "Y (mm/s)"
+
+                    }
+
+                    TextField{
+                        id: goalW
+                        placeholderText: "w (rad/s)"
+
+                    }
+
+                    Button{
+                        text: "Set"
+                        onClicked: robotComm.setGoalVelocity(parseFloat(goalVelX.text), parseFloat(goalVelY.text), parseFloat(goalW.text));
+                    }
+                }
             }
         }
     }

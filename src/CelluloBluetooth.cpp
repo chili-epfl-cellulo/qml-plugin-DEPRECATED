@@ -38,7 +38,7 @@ const char* CelluloBluetooth::commandStrings[] = {
     "E", //Set (e)ffect
     "M", //Set (m)otor output
     "A", //Set (a)ll motor outputs
-    "W", //Set goal (w)heel velocities
+    "C", //Set goal velo(c)ity
     "G", //Set (g)oal pose
     "R", //(R)eset
     "S"  //(S)hutdown
@@ -426,66 +426,67 @@ void CelluloBluetooth::setAllMotorOutputs(int m1output, int m2output, int m3outp
     sendCommand(COMMAND_TYPE::SET_ALL_MOTOR_OUTPUTS, message);
 }
 
-void CelluloBluetooth::setWheelVelocities(float v1, float v2, float v3){
-    int v1_ = (int)(v1*WHEEL_VELOCITY_FACTOR);
-    int v2_ = (int)(v2*WHEEL_VELOCITY_FACTOR);
-    int v3_ = (int)(v3*WHEEL_VELOCITY_FACTOR);
+void CelluloBluetooth::setGoalVelocity(float vx, float vy, float w){
+    int vx_ = (int)(vx*GOAL_VELOCITY_FACTOR);
+    int vy_ = (int)(vy*GOAL_VELOCITY_FACTOR);
+    int w_ = (int)(w*GOAL_VELOCITY_FACTOR);
 
-    if(v1_ < -0x7FFF)
-        v1_ = -0x7FFF;
-    else if(v1_ > 0x7FFF)
-        v1_ = 0x7FFF;
+    if(vx_ < -0x7FFF)
+        vx_ = -0x7FFF;
+    else if(vx_ > 0x7FFF)
+        vx_ = 0x7FFF;
 
-    if(v2_ < -0x7FFF)
-        v2_ = -0x7FFF;
-    else if(v2_ > 0x7FFF)
-        v2_ = 0x7FFF;
+    if(vy_ < -0x7FFF)
+        vy_ = -0x7FFF;
+    else if(vy_ > 0x7FFF)
+        vy_ = 0x7FFF;
 
-    if(v3_ < -0x7FFF)
-        v3_ = -0x7FFF;
-    else if(v3_ > 0x7FFF)
-        v3_ = 0x7FFF;
+    if(w_ < -0x7FFF)
+        w_ = -0x7FFF;
+    else if(w_ > 0x7FFF)
+        w_ = 0x7FFF;
 
     QByteArray message;
-    message = commandStrings[COMMAND_TYPE::SET_WHEEL_VELOCITIES];
+    message = commandStrings[COMMAND_TYPE::SET_GOAL_VELOCITY];
 
-    if(v1_ < 0){
-        v1_ *= -1;
+    if(vx_ < 0){
+        vx_ *= -1;
         message.append('-');
     }
-    message.append(getHexChar(v1_/0x1000));
-    message.append(getHexChar(v1_/0x100%0x10));
-    message.append(getHexChar(v1_/0x10%0x10));
-    message.append(getHexChar(v1_%0x10));
+    message.append(getHexChar(vx_/0x1000));
+    message.append(getHexChar(vx_/0x100%0x10));
+    message.append(getHexChar(vx_/0x10%0x10));
+    message.append(getHexChar(vx_%0x10));
 
-    if(v2_ < 0){
-        v2_ *= -1;
+    if(vy_ < 0){
+        vy_ *= -1;
         message.append('-');
     }
-    message.append(getHexChar(v2_/0x1000));
-    message.append(getHexChar(v2_/0x100%0x10));
-    message.append(getHexChar(v2_/0x10%0x10));
-    message.append(getHexChar(v2_%0x10));
+    message.append(getHexChar(vy_/0x1000));
+    message.append(getHexChar(vy_/0x100%0x10));
+    message.append(getHexChar(vy_/0x10%0x10));
+    message.append(getHexChar(vy_%0x10));
 
-     if(v3_ < 0){
-        v3_ *= -1;
+     if(w_ < 0){
+        w_ *= -1;
         message.append('-');
     }
-    message.append(getHexChar(v3_/0x1000));
-    message.append(getHexChar(v3_/0x100%0x10));
-    message.append(getHexChar(v3_/0x10%0x10));
-    message.append(getHexChar(v3_%0x10));
+    message.append(getHexChar(w_/0x1000));
+    message.append(getHexChar(w_/0x100%0x10));
+    message.append(getHexChar(w_/0x10%0x10));
+    message.append(getHexChar(w_%0x10));
 
     message.append('\n');
 
-    sendCommand(COMMAND_TYPE::SET_WHEEL_VELOCITIES, message);
+    sendCommand(COMMAND_TYPE::SET_GOAL_VELOCITY, message);
 }
 
 void CelluloBluetooth::setGoalPose(float x, float y, float theta){
     QByteArray message;
     message = commandStrings[COMMAND_TYPE::SET_GOAL_POSE];
     static char buf[23 + 1];
-    sprintf(buf,"%08X%08X%04X", (unsigned int)(100*x), (unsigned int)(100*y), (unsigned int)(100*theta));
+    sprintf(buf,"%08X%08X%04X",
+            (unsigned int)(GOAL_POSE_FACTOR*x), (unsigned int)(GOAL_POSE_FACTOR*y), (unsigned int)(GOAL_POSE_FACTOR*theta));
     message.append(buf);
     message.append('\n');
     sendCommand(COMMAND_TYPE::SET_GOAL_POSE, message);
