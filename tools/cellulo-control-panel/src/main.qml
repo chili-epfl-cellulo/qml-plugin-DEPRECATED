@@ -262,9 +262,22 @@ ApplicationWindow {
 
                     }
 
+                    TextField{
+                        id: goalPoseMaxV
+                        placeholderText: "v"
+
+                    }
+
+                    TextField{
+                        id: goalPoseMaxW
+                        placeholderText: "w"
+
+                    }
+
                     Button{
                         text: "Go"
-                        onClicked: robotComm.setGoalPose(parseFloat(goalPoseX.text), parseFloat(goalPoseY.text), parseFloat(goalPoseTheta.text));
+                        onClicked: robotComm.setGoalPose(parseFloat(goalPoseX.text), parseFloat(goalPoseY.text), parseFloat(goalPoseTheta.text),
+                                                         parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                     }
                 }
 

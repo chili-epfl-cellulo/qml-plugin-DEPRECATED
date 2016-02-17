@@ -277,13 +277,15 @@ public slots:
     void setGoalVelocity(float vx, float vy, float w);
 
     /**
-     * @brief Sets a pose goal to follow
+     * @brief Sets a pose goal to track
      *
      * @param x X goal in grid coordinates
      * @param y Y goal in grid coordinates
      * @param theta Theta goal in degrees
+     * @param v Maximum linear speed to track pose in mm/s
+     * @param w Maximum angular speed to track pose in rad/s
      */
-    void setGoalPose(float x, float y, float theta);
+    void setGoalPose(float x, float y, float theta, float v, float w);
 
     /**
      * @brief Sends a ping, expecting an acknowledge

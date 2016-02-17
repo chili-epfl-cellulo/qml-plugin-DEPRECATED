@@ -481,12 +481,13 @@ void CelluloBluetooth::setGoalVelocity(float vx, float vy, float w){
     sendCommand(COMMAND_TYPE::SET_GOAL_VELOCITY, message);
 }
 
-void CelluloBluetooth::setGoalPose(float x, float y, float theta){
+void CelluloBluetooth::setGoalPose(float x, float y, float theta, float v, float w){
     QByteArray message;
     message = commandStrings[COMMAND_TYPE::SET_GOAL_POSE];
-    static char buf[23 + 1];
-    sprintf(buf,"%08X%08X%04X",
-            (unsigned int)(GOAL_POSE_FACTOR*x), (unsigned int)(GOAL_POSE_FACTOR*y), (unsigned int)(GOAL_POSE_FACTOR*theta));
+    static char buf[31 + 1];
+    sprintf(buf,"%08X%08X%04X%04X%04X",
+            (unsigned int)(GOAL_POSE_FACTOR*x), (unsigned int)(GOAL_POSE_FACTOR*y), (unsigned int)(GOAL_POSE_FACTOR*theta),
+            (unsigned int)(GOAL_VELOCITY_FACTOR*v), (unsigned int)(GOAL_VELOCITY_FACTOR*w));
     message.append(buf);
     message.append('\n');
     sendCommand(COMMAND_TYPE::SET_GOAL_POSE, message);
