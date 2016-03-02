@@ -11,51 +11,28 @@ ApplicationWindow {
     visible: true
 
     GroupBox {
-        id: addressBox
-        title: "Robot Address"
-
-        Row{
-            spacing: 5
-
-            Label{
-                text: "00:06:66:74:"
-                anchors.verticalCenter: macAddrRight.verticalCenter
-            }
-            TextField{
-                id: macAddrRight
-                text: "41:14"
-                placeholderText: "XX:XX"
-
-            }
-            Button {
-                text: "Connect"
-                onClicked: robotComm.macAddr =  "00:06:66:74:" + macAddrRight.text;
-            }
-        }
-    }
-
-    GroupBox {
         id: motorBox
         title: "Locomotion"
-        anchors.top: addressBox.bottom
 
         Row{
             spacing: 5
 
             Column{
                 Label{
-                    text: "Pose goal:"
+                    text: "Limit velocities:"
                 }
 
                 TextField{
                     id: goalPoseMaxV
                     placeholderText: "v"
+                    text: "150"
 
                 }
 
                 TextField{
                     id: goalPoseMaxW
                     placeholderText: "w"
+                    text: "1"
                 }
 
                 Button{
@@ -108,9 +85,11 @@ ApplicationWindow {
     CelluloBluetooth{
         id: robotComm
         onTimestampChanged: console.log(lastTimestamp + " " + x + " " + y + " " + theta)
+        macAddr: "00:06:66:74:41:14"
+
 
         property int currentGoal: 0
-        property real marginXY: 6.0
+        property real marginXY: 8.0
         property real marginTheta: 2.5
 
         property real goalPoseX1: 250
