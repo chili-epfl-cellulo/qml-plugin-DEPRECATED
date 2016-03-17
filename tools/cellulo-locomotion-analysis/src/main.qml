@@ -11,8 +11,32 @@ ApplicationWindow {
     visible: true
 
     GroupBox {
+        id: addressBox
+        title: "Robot Address"
+
+        Row{
+            spacing: 5
+
+            Label{
+                text: "00:06:66:74:"
+                anchors.verticalCenter: macAddrRight.verticalCenter
+            }
+            TextField{
+                id: macAddrRight
+                text: "41:14"
+                placeholderText: "XX:XX"
+            }
+            Button {
+                text: "Connect"
+                onClicked: robotComm.macAddr =  "00:06:66:74:" + macAddrRight.text;
+            }
+        }
+    }
+
+    GroupBox {
         id: motorBox
         title: "Locomotion"
+        anchors.top: addressBox.bottom
 
         Row{
             spacing: 5
@@ -85,28 +109,26 @@ ApplicationWindow {
     CelluloBluetooth{
         id: robotComm
         onTimestampChanged: console.log(lastTimestamp + " " + x + " " + y + " " + theta)
-        macAddr: "00:06:66:74:41:14"
-
 
         property int currentGoal: 0
         property real marginXY: 8.0
         property real marginTheta: 2.5
 
-        property real goalPoseX1: 250
-        property real goalPoseY1: 1035
-        property real goalPoseT1: 0
+        property real goalPoseX1: 228
+        property real goalPoseY1: 1428
+        property real goalPoseT1: 210
 
-        property real goalPoseX2: 250
-        property real goalPoseY2: 2235
-        property real goalPoseT2: 180
+        property real goalPoseX2: 228
+        property real goalPoseY2: 228
+        property real goalPoseT2: 30
 
-        property real goalPoseX3: 1450
-        property real goalPoseY3: 2235
-        property real goalPoseT3: 0
+        property real goalPoseX3: 1428
+        property real goalPoseY3: 228
+        property real goalPoseT3: 210
 
-        property real goalPoseX4: 1450
-        property real goalPoseY4: 1035
-        property real goalPoseT4: 180
+        property real goalPoseX4: 1428
+        property real goalPoseY4: 1428
+        property real goalPoseT4: 30
 
         function checkMargins(goalX, goalY, goalTheta){
             if(Math.abs(goalX - x) > marginXY)
@@ -137,23 +159,23 @@ ApplicationWindow {
         onCurrentGoalChanged: {
             switch(currentGoal){
                  case 1:
-                     robotComm.setGoalPose(goalPoseX1, goalPoseY1, 0, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                     robotComm.setGoalPose(goalPoseX1, goalPoseY1, goalPoseT1, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                      console.log("");
                      break;
                  case 2:
-                     robotComm.setGoalPose(goalPoseX2, goalPoseY2, 160, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                     robotComm.setGoalPose(goalPoseX2, goalPoseY2, 50, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                      console.log("");
                      break;
                  case 3:
-                     robotComm.setGoalPose(goalPoseX3, goalPoseY3, 20, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                     robotComm.setGoalPose(goalPoseX3, goalPoseY3, 190, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                      console.log("");
                      break;
                  case 4:
-                     robotComm.setGoalPose(goalPoseX4, goalPoseY4, 160, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                     robotComm.setGoalPose(goalPoseX4, goalPoseY4, 50, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                      console.log("");
                      break;
                  case 5:
-                     robotComm.setGoalPose(goalPoseX1, goalPoseY1, 20, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                     robotComm.setGoalPose(goalPoseX1, goalPoseY1, 190, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                      console.log("");
                      break;
             }
@@ -168,26 +190,26 @@ ApplicationWindow {
                      }
                      break;
                  case 2:
-                     if(checkOrientation(90))
-                         robotComm.setGoalPose(goalPoseX2, goalPoseY2, 180, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                     if(checkOrientation(120))
+                         robotComm.setGoalPose(goalPoseX2, goalPoseY2, goalPoseT2, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                      if(checkMargins(goalPoseX2, goalPoseY2, goalPoseT2))
                          currentGoal = 3;
                      break;
                  case 3:
-                     if(checkOrientation(90))
-                         robotComm.setGoalPose(goalPoseX3, goalPoseY3, 0, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                     if(checkOrientation(120))
+                         robotComm.setGoalPose(goalPoseX3, goalPoseY3, goalPoseT3, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                      if(checkMargins(goalPoseX3, goalPoseY3, goalPoseT3))
                          currentGoal = 4;
                      break;
                  case 4:
-                     if(checkOrientation(90))
-                         robotComm.setGoalPose(goalPoseX4, goalPoseY4, 180, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                     if(checkOrientation(120))
+                         robotComm.setGoalPose(goalPoseX4, goalPoseY4, goalPoseT4, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                      if(checkMargins(goalPoseX4, goalPoseY4, goalPoseT4))
                          currentGoal = 5;
                      break;
                  case 5:
-                     if(checkOrientation(90))
-                         robotComm.setGoalPose(goalPoseX1, goalPoseY1, 0, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                     if(checkOrientation(120))
+                         robotComm.setGoalPose(goalPoseX1, goalPoseY1, goalPoseT1, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
                      if(checkMargins(goalPoseX1, goalPoseY1, goalPoseT1)){
                          robotComm.timestampingEnabled = false;
                          currentGoal = 0;
