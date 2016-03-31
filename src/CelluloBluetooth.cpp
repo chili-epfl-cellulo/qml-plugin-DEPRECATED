@@ -30,6 +30,7 @@
 
 const char* CelluloBluetooth::commandStrings[] = {
     "P", //(P)ing
+    "D", //Set broadcast perio(d)
     "I", //Enable (i)mage streaming + disable localization or vice-versa
     "T", //Enable (t)imestamping along with pose and disable idling or vice-versa
     "F", //Request (f)rame
@@ -303,6 +304,20 @@ void CelluloBluetooth::ping(){
     message.append('\n');
     sendCommand(COMMAND_TYPE::PING, message);
 }
+
+void CelluloBluetooth::setPoseBcastPeriod(unsigned int period){
+    if(period > 0xFFF)
+        period = 0xFFF;
+
+    QByteArray message;
+    message = commandStrings[COMMAND_TYPE::SET_BCAST_PERIOD];
+    message.append(getHexChar(period/0x100));
+    message.append(getHexChar(period/0x10%0x10));
+    message.append(getHexChar(period%0x10));
+    message.append('\n');
+    sendCommand(COMMAND_TYPE::SET_BCAST_PERIOD, message);
+}
+
 
 void CelluloBluetooth::setImageStreamingEnabled(bool enabled){
     if(enabled != imageStreamingEnabled){

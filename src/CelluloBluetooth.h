@@ -53,6 +53,7 @@ public:
 
     enum COMMAND_TYPE{
         PING = 0,
+        SET_BCAST_PERIOD,
         IMAGE_STREAM_ENABLE,
         TIMESTAMP_ENABLE,
         FRAME_REQUEST,
@@ -222,6 +223,13 @@ public slots:
      * @param macAddr Bluetooth MAC address of the server (robot)
      */
     void setMacAddr(QString macAddr);
+
+    /**
+     * @brief Sets the pose broadcast period
+     *
+     * @param period Desired period in milliseconds
+     */
+    void setPoseBcastPeriod(unsigned int period);
 
     /**
      * @brief Enables image streaming + disables localization or vice versa

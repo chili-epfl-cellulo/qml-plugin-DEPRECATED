@@ -426,6 +426,21 @@ ApplicationWindow {
                             text: "Last timestamp: " + robotComm.lastTimestamp + " ms"
                         }
                     }
+
+                    Row{
+                        Text{
+                            text: "Pose broadcast period:"
+                        }
+                        TextField{
+                            id: poseBcastPeriodField
+                            placeholderText: "(ms)"
+                            width: em(5)
+                        }
+                        Button{
+                            text: "Set"
+                            onClicked: robotComm.setPoseBcastPeriod(parseFloat(poseBcastPeriodField.text))
+                        }
+                    }
                 }
             }
         }
