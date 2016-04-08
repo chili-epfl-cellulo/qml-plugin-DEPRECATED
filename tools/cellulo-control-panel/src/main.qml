@@ -32,7 +32,6 @@ ApplicationWindow {
                 width: gWidth
 
                 MacAddrSelector{
-                    id: macAddrSelector
                     addresses: [
                         "00:06:66:74:40:D2",
                         "00:06:66:74:40:D4",

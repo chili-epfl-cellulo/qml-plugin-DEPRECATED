@@ -13,7 +13,7 @@ Rectangle {
 
     // Battery state
     // -> Gets updated everytime the battery state changes. Is one of BatteryEnum members
-    property int batteryState: CelluloToolkit.BatteryEnum.SHUTDOWN //Starting with shutdown is a good idea
+    property int batteryState: btComm.batteryState
 
     // Touches
     // -> get updated everytime a touch occurs. Stores the touches over the last "touchHistoryDuration" seconds
@@ -43,16 +43,9 @@ Rectangle {
     //property url simulatorUrl: "ws://192.168.0.12:51102"
     property url simulatorUrl: "ws://192.168.1.11:51102"
     //property url simulatorUrl: "ws://10.42.0.1:51102"
-    
-    property string robotMacAddress: ""
 
-    property bool connected: false
-
-    //-----------------------------------------------------------------
-    // General
-    function reset() {
-        robotComm.reset();
-    }
+    // Object exposing communications
+    property alias robotComm: btComm
 
     //-----------------------------------------------------------------
     // Touches
@@ -81,39 +74,34 @@ Rectangle {
     // Colors
     onFullColorChanged: {
         robotSimulatorSocket.publish("E" + CelluloToolkit.VisualEffectEnum.CONST_ALL + CelluloToolkit.formatColor(fullColor) + "00");
-        robotComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.CONST_ALL, fullColor, 0);
+        btComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.CONST_ALL, fullColor, 0);
     }
 
     function setPadColor(pad, color) {
         robotSimulatorSocket.publish("E" + CelluloToolkit.VisualEffectEnum.CONST_SINGLE + CelluloToolkit.formatColor(color) + "0" + pad);
-        robotComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.CONST_SINGLE, color, pad);
+        btComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.CONST_SINGLE, color, pad);
     }
 
     function alert(color, nbtimes) {
         nbtimes = typeof nbtimes !== 'undefined' ? nbtimes : 1;
 
         robotSimulatorSocket.publish("E" + CelluloToolkit.VisualEffectEnum.ALERT_ALL + CelluloToolkit.formatColor(color) + "0" + nbtimes);
-        robotComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.ALERT_ALL, color, nbtimes);
-
+        btComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.ALERT_ALL, color, nbtimes);
     }
 
     function waiting(color) {
         robotSimulatorSocket.publish("E" + CelluloToolkit.VisualEffectEnum.WAITING + CelluloToolkit.formatColor(color) + "00");
-        robotComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.WAITING, color,0);
-
+        btComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.WAITING, color,0);
     }
 
-
     function blink(color) {
-
         robotSimulatorSocket.publish("E" + CelluloToolkit.VisualEffectEnum.BLINK + CelluloToolkit.formatColor(color) + "09");
-        robotComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.BLINK, color, 0);
+        btComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.BLINK, color, 0);
     }
 
     function pulse(color) {
-
         robotSimulatorSocket.publish("E" + CelluloToolkit.VisualEffectEnum.PULSE + CelluloToolkit.formatColor(color) + "09");
-        robotComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.PULSE, color, 0);
+        btComm.setVisualEffect(CelluloToolkit.VisualEffectEnum.PULSE, color, 0);
     }
 
     //-----------------------------------------------------------------
@@ -150,6 +138,7 @@ Rectangle {
     //-----------------------------------------------------------------
     // Locomotion
 
+    // DEPRECATE
     property real motorMax: 0xFFF
     property real motorMin: 0x500
     property matrix4x4 k_inv: Qt.matrix4x4(
@@ -159,6 +148,7 @@ Rectangle {
         0,                  0,                  0,                  1
     );
 
+    // DEPRECATE
     // Set locomotion outputs (corresponds roughly to goal speeds) in local frame of reference; arguments are between -1.0 and 1.0
     function setLocalSpeeds(vx, vy, vtheta){
         if(vx > 1)
@@ -202,6 +192,7 @@ Rectangle {
         robotComm.setAllMotorOutputs(motorSpeeds.x, motorSpeeds.y, motorSpeeds.z);
     }
 
+    // DEPRECATE
     // Set locomotion outputs (corresponds roughly to goal speeds) in global frame of reference; arguments are between -1.0 and 1.0
     function setGlobalSpeeds(vx, vy, vtheta){
         var vxGlobal = Math.cos(rotation/180*Math.PI)*vx - Math.sin(rotation/180*Math.PI)*vy;
@@ -301,18 +292,14 @@ Rectangle {
 
     // Real robot
     CelluloBluetooth{
-        id: robotComm
-        macAddr: robotMacAddress
+        id: btComm
 
         //Signals
         onBootCompleted:        console.log("Robot " + robotId + " completed its (re)boot")
         onWokeUp:               console.log("Robot " + robotId + " completed its wake-up")
         onShuttingDown:         console.log("Robot " + robotId + " going to sleep (user request)")
-        onLowBattery:           console.log("Robot " + robotId + " going to sleep (low battery)")
-        onBatteryStateChanged:{
-            console.log("Robot " + robotId + " battery state changed to: " + batteryState);
-            parent.batteryState = batteryState;
-        }
+        onBatteryStateChanged:  console.log("Robot " + robotId + " battery state changed to: " + batteryState)
+
         onTouchBegan:{
             console.log("Robot " + robotId + " key " + key + "was touched");
             addTouch(key);
@@ -341,15 +328,10 @@ Rectangle {
             checkZone();
         }
         onKidnappedChanged: {
-
-            if(kidnapped) {
+            if(kidnapped)
                 console.log("Robot " + robotId + " was kidnapped");
-                parent.pulse(Qt.rgba(0.7,0.5,0,1)); // orange
-            }
-            else {
+            else
                 console.log("Robot " + robotId + " was returned on paper");
-                parent.fullColor = parent.defaultColor;
-            }
         }
 
         onConnectedChanged: {
@@ -357,15 +339,10 @@ Rectangle {
                 console.log("ROBOT %1 IS CONNECTED".arg(robotId));
                 parent.fullColor = parent.defaultColor;
                 parent.alert(Qt.rgba(0.7,0.5,0,1),3);
-                parent.connected=true;
             }
             else {
                 console.warn("ROBOT %1 DISCONNECTED".arg(robotId));
-                parent.connected=false;
-
             }
         }
     }
-
 }
-

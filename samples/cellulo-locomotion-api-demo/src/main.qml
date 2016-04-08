@@ -16,25 +16,28 @@ ApplicationWindow {
         id: addressBox
         title: "Robot"
 
-        Row{
-            spacing: 5
-
-            Label{
-                text: "00:06:66:74:"
-                anchors.verticalCenter: macAddrRight.verticalCenter
-            }
-            TextField{
-                id: macAddrRight
-                placeholderText: "XX:XX"
-            }
-            Button {
-                text: "Connect"
-                onClicked: cellulo1.robotMacAddress =  "00:06:66:74:" + macAddrRight.text;
-            }
-            Text{
-                text: "Connected?"
-                color: cellulo1.connected ? "green" : "red"
-            }
+        MacAddrSelector{
+            addresses: [
+                "00:06:66:74:40:D2",
+                "00:06:66:74:40:D4",
+                "00:06:66:74:40:D5",
+                "00:06:66:74:40:DB",
+                "00:06:66:74:40:DC",
+                "00:06:66:74:40:E4",
+                "00:06:66:74:40:EC",
+                "00:06:66:74:40:EE",
+                "00:06:66:74:41:04",
+                "00:06:66:74:41:14",
+                "00:06:66:74:41:4C",
+                "00:06:66:74:43:00",
+                "00:06:66:74:46:58",
+                "00:06:66:74:46:60",
+                "00:06:66:74:48:A7"
+            ]
+            onConnectRequested: cellulo1.robotComm.macAddr = selectedAddress
+            onDisconnectRequested: cellulo1.robotComm.disconnectFromServer()
+            connected: cellulo1.robotComm.connected
+            connecting: cellulo1.robotComm.connecting
         }
     }
 
@@ -110,11 +113,6 @@ ApplicationWindow {
 
         width: 1050 // in mm
         height: 2400 // in mm
-
-        property int gridLeft: 0
-        property int gridRight: 209900
-        property int gridTop: 0
-        property int gridBottom: 479900
     }
 
     CelluloRobot{

@@ -14,22 +14,28 @@ ApplicationWindow {
         id: addressBox
         title: "Robot Address"
 
-        Row{
-            spacing: 5
-
-            Label{
-                text: "00:06:66:74:"
-                anchors.verticalCenter: macAddrRight.verticalCenter
-            }
-            TextField{
-                id: macAddrRight
-                text: "41:14"
-                placeholderText: "XX:XX"
-            }
-            Button {
-                text: "Connect"
-                onClicked: robotComm.macAddr =  "00:06:66:74:" + macAddrRight.text;
-            }
+        MacAddrSelector{
+            addresses: [
+                "00:06:66:74:40:D2",
+                "00:06:66:74:40:D4",
+                "00:06:66:74:40:D5",
+                "00:06:66:74:40:DB",
+                "00:06:66:74:40:DC",
+                "00:06:66:74:40:E4",
+                "00:06:66:74:40:EC",
+                "00:06:66:74:40:EE",
+                "00:06:66:74:41:04",
+                "00:06:66:74:41:14",
+                "00:06:66:74:41:4C",
+                "00:06:66:74:43:00",
+                "00:06:66:74:46:58",
+                "00:06:66:74:46:60",
+                "00:06:66:74:48:A7"
+            ]
+            onConnectRequested: robotComm.macAddr = selectedAddress
+            onDisconnectRequested: robotComm.disconnectFromServer()
+            connected: robotComm.connected
+            connecting: robotComm.connecting
         }
     }
 
@@ -158,63 +164,63 @@ ApplicationWindow {
 
         onCurrentGoalChanged: {
             switch(currentGoal){
-                 case 1:
-                     robotComm.setGoalPose(goalPoseX1, goalPoseY1, goalPoseT1, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
-                     console.log("");
-                     break;
-                 case 2:
-                     robotComm.setGoalPose(goalPoseX2, goalPoseY2, 50, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
-                     console.log("");
-                     break;
-                 case 3:
-                     robotComm.setGoalPose(goalPoseX3, goalPoseY3, 190, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
-                     console.log("");
-                     break;
-                 case 4:
-                     robotComm.setGoalPose(goalPoseX4, goalPoseY4, 50, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
-                     console.log("");
-                     break;
-                 case 5:
-                     robotComm.setGoalPose(goalPoseX1, goalPoseY1, 190, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
-                     console.log("");
-                     break;
+            case 1:
+                robotComm.setGoalPose(goalPoseX1, goalPoseY1, goalPoseT1, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                console.log("");
+                break;
+            case 2:
+                robotComm.setGoalPose(goalPoseX2, goalPoseY2, 50, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                console.log("");
+                break;
+            case 3:
+                robotComm.setGoalPose(goalPoseX3, goalPoseY3, 190, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                console.log("");
+                break;
+            case 4:
+                robotComm.setGoalPose(goalPoseX4, goalPoseY4, 50, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                console.log("");
+                break;
+            case 5:
+                robotComm.setGoalPose(goalPoseX1, goalPoseY1, 190, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                console.log("");
+                break;
             }
         }
 
         onPoseChanged: {
             switch(currentGoal){
-                 case 1:
-                     if(checkMargins(goalPoseX1, goalPoseY1, goalPoseT1)){
-                         robotComm.timestampingEnabled = true;
-                         currentGoal = 2;
-                     }
-                     break;
-                 case 2:
-                     if(checkOrientation(120))
-                         robotComm.setGoalPose(goalPoseX2, goalPoseY2, goalPoseT2, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
-                     if(checkMargins(goalPoseX2, goalPoseY2, goalPoseT2))
-                         currentGoal = 3;
-                     break;
-                 case 3:
-                     if(checkOrientation(120))
-                         robotComm.setGoalPose(goalPoseX3, goalPoseY3, goalPoseT3, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
-                     if(checkMargins(goalPoseX3, goalPoseY3, goalPoseT3))
-                         currentGoal = 4;
-                     break;
-                 case 4:
-                     if(checkOrientation(120))
-                         robotComm.setGoalPose(goalPoseX4, goalPoseY4, goalPoseT4, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
-                     if(checkMargins(goalPoseX4, goalPoseY4, goalPoseT4))
-                         currentGoal = 5;
-                     break;
-                 case 5:
-                     if(checkOrientation(120))
-                         robotComm.setGoalPose(goalPoseX1, goalPoseY1, goalPoseT1, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
-                     if(checkMargins(goalPoseX1, goalPoseY1, goalPoseT1)){
-                         robotComm.timestampingEnabled = false;
-                         currentGoal = 0;
-                     }
-                     break;
+            case 1:
+                if(checkMargins(goalPoseX1, goalPoseY1, goalPoseT1)){
+                    robotComm.timestampingEnabled = true;
+                    currentGoal = 2;
+                }
+                break;
+            case 2:
+                if(checkOrientation(120))
+                    robotComm.setGoalPose(goalPoseX2, goalPoseY2, goalPoseT2, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                if(checkMargins(goalPoseX2, goalPoseY2, goalPoseT2))
+                    currentGoal = 3;
+                break;
+            case 3:
+                if(checkOrientation(120))
+                    robotComm.setGoalPose(goalPoseX3, goalPoseY3, goalPoseT3, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                if(checkMargins(goalPoseX3, goalPoseY3, goalPoseT3))
+                    currentGoal = 4;
+                break;
+            case 4:
+                if(checkOrientation(120))
+                    robotComm.setGoalPose(goalPoseX4, goalPoseY4, goalPoseT4, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                if(checkMargins(goalPoseX4, goalPoseY4, goalPoseT4))
+                    currentGoal = 5;
+                break;
+            case 5:
+                if(checkOrientation(120))
+                    robotComm.setGoalPose(goalPoseX1, goalPoseY1, goalPoseT1, parseFloat(goalPoseMaxV.text), parseFloat(goalPoseMaxW.text));
+                if(checkMargins(goalPoseX1, goalPoseY1, goalPoseT1)){
+                    robotComm.timestampingEnabled = false;
+                    currentGoal = 0;
+                }
+                break;
             }
         }
     }
