@@ -67,6 +67,10 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
 {
     socket = NULL;
 
+    btConnectTimeoutTimer.setSingleShot(true);
+    btConnectTimeoutTimer.setInterval(BT_CONNECT_TIMEOUT_MILLIS);
+    connect(&btConnectTimeoutTimer, SIGNAL(timeout()), this, SLOT(refreshConnection()));
+
     frameTimeoutTimer.setSingleShot(true);
     connect(&frameTimeoutTimer, SIGNAL(timeout()), this, SLOT(frameTimeout()));
 
@@ -74,6 +78,8 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     frameBuffer.reserve(IMG_WIDTH*IMG_HEIGHT);
 
     connected = false;
+    connecting = false;
+
     imageStreamingEnabled = false;
     timestampingEnabled = false;
     batteryState = 4; //Beginning with shutdown is a good idea
@@ -87,6 +93,25 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
 
 CelluloBluetooth::~CelluloBluetooth(){ }
 
+void CelluloBluetooth::resetProperties(){
+    expectingFrame = false;
+    imageStreamingEnabled = false;
+    timestampingEnabled = false;
+    batteryState = 4; //Beginning with shutdown is a good idea
+    emit batteryStateChanged();
+    x = 0;
+    y = 0;
+    theta = 0;
+    emit poseChanged();
+    lastTimestamp = 0;
+    framerate = 0.0;
+    emit timestampChanged();
+    kidnapped = true;
+    emit kidnappedChanged();
+    for(int i=0;i<6;i++)
+        emit touchReleased(i);
+}
+
 QVariantList CelluloBluetooth::getFrame() const {
     QVariantList frame;
     for(int i=0;i<frameBuffer.length();i++)
@@ -97,41 +122,92 @@ QVariantList CelluloBluetooth::getFrame() const {
 }
 
 void CelluloBluetooth::setMacAddr(QString macAddr){
+    disconnectFromServer();
     this->macAddr = macAddr;
-    socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
-
-    connect(socket, SIGNAL(readyRead()), this, SLOT(socketDataArrived()));
-    connect(socket, SIGNAL(connected()), this, SLOT(socketConnected()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
-
-    reconnectToServer();
+    connectToServer();
 }
 
-void CelluloBluetooth::socketConnected(){
-    qDebug() << "Connected to " << macAddr;
+void CelluloBluetooth::refreshConnection(){
     if(!connected){
-        connected = true;
-        emit connectedChanged();
+        qDebug() << "Connection attempt timed out, will retry.";
+        disconnectFromServer();
+        connectToServer();
     }
 }
 
-void CelluloBluetooth::socketDisconnected(){
-    qDebug() << "Disconnected from " << macAddr << ", will try to reconnect";
-    if(connected){
-        connected = false;
-        emit connectedChanged();
-    }
-    reconnectToServer();
-}
-
-void CelluloBluetooth::reconnectToServer(){
+void CelluloBluetooth::openSocket(){
     if(socket != NULL){
         qDebug() << "Connecting to " << macAddr << "...";
 
         socket->connectToService(
                 QBluetoothAddress(macAddr),
                 QBluetoothUuid(QString("00000003-0000-1000-8000-00805F9B34FB"))); //Connect to the RFCOMM protocol
+        btConnectTimeoutTimer.start();
+        if(!connecting){
+            connecting = true;
+            emit connectingChanged();
+        }
     }
+}
+
+void CelluloBluetooth::connectToServer(){
+    if(socket == NULL){
+        socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
+
+        connect(socket, SIGNAL(readyRead()), this, SLOT(socketDataArrived()));
+        connect(socket, SIGNAL(connected()), this, SLOT(socketConnected()));
+        connect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+
+        openSocket();
+    }
+}
+
+void CelluloBluetooth::disconnectFromServer(){
+    if(socket != NULL){
+        qDebug() << "Disconnecting from " << macAddr << "...";
+        disconnect(socket, SIGNAL(readyRead()), this, SLOT(socketDataArrived()));
+        disconnect(socket, SIGNAL(connected()), this, SLOT(socketConnected()));
+        disconnect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+        socket->abort();
+        socket->close();
+        if(connected){
+            connected = false;
+            emit connectedChanged();
+        }
+        if(connecting){
+            connecting = false;
+            emit connectingChanged();
+        }
+        socket->deleteLater();
+        socket = NULL;
+        btConnectTimeoutTimer.stop();
+        resetProperties();
+    }
+}
+
+void CelluloBluetooth::socketConnected(){
+    qDebug() << "Connected to " << macAddr << ".";
+    if(!connected){
+        connected = true;
+        emit connectedChanged();
+    }
+    if(connecting){
+        connecting = false;
+        emit connectingChanged();
+    }
+}
+
+void CelluloBluetooth::socketDisconnected(){
+    qDebug() << "Disconnected from " << macAddr << ", will try to reconnect.";
+    if(connected){
+        connected = false;
+        emit connectedChanged();
+    }
+    if(connecting){
+        connecting = false;
+        emit connectingChanged();
+    }
+    openSocket();
 }
 
 void CelluloBluetooth::socketDataArrived(){

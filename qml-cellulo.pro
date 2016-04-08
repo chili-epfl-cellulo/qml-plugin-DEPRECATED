@@ -25,7 +25,7 @@ SOURCES += \
 
 qmldir.files = qmldir
 javascript.files = src/cellulo-toolkit.js
-qml.files = src/CelluloRobot.qml
+qml.files = src/CelluloRobot.qml src/MacAddrSelector.qml
 
 OTHER_FILES += qmldir.files javascript.files qml.files
 

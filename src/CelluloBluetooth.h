@@ -39,6 +39,7 @@ class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
     Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
     Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
+    Q_PROPERTY(bool connecting READ getConnecting NOTIFY connectingChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
     Q_PROPERTY(bool imageStreamingEnabled WRITE setImageStreamingEnabled READ getImageStreamingEnabled)
     Q_PROPERTY(bool timestampingEnabled WRITE setTimestampingEnabled READ getTimestampingEnabled)
@@ -85,6 +86,8 @@ public:
         INVALID_MESSAGE = -1
     };
 
+    static const int BT_CONNECT_TIMEOUT_MILLIS = 10000; ///< Will try to reconnect after this much time
+
     static const int FRAME_TIMEOUT_MILLIS = 10000;   ///< Will wait this many millis for a camera frame to complete
 
     static const int IMG_WIDTH = 752/4;              ///< Image width of the robot's camera
@@ -129,6 +132,13 @@ public:
      * @return Whether currently connected over Bluetooth
      */
     bool getConnected(){ return connected; }
+
+    /**
+     * @brief Gets whether currently trying to connect over Bluetooth
+     *
+     * @return Whether currently trying to connect over Bluetooth
+     */
+    bool getConnecting(){ return connecting; }
 
     /**
      * @brief Gets whether image streaming is currently enabled
@@ -211,6 +221,11 @@ private slots:
     void socketDisconnected();
 
     /**
+     * @brief Disconnects first and then connects again if not connected yet
+     */
+    void refreshConnection();
+
+    /**
      * @brief Called when the server did not complete the camera frame in time
      */
     void frameTimeout();
@@ -223,6 +238,16 @@ public slots:
      * @param macAddr Bluetooth MAC address of the server (robot)
      */
     void setMacAddr(QString macAddr);
+
+    /**
+     * @brief Creates socket and connects to the current target MAC address
+     */
+    void connectToServer();
+
+    /**
+     * @brief Disconnects from the currently connected device and destroys the socket if possible
+     */
+    void disconnectFromServer();
 
     /**
      * @brief Sets the pose broadcast period
@@ -344,6 +369,11 @@ signals:
     void connectedChanged();
 
     /**
+     * @brief Emitted when Bluetooth starts or stops trying to connect
+     */
+    void connectingChanged();
+
+    /**
      * @brief Emitted when the robot is ready after a power up or a reset
      */
     void bootCompleted();
@@ -414,6 +444,7 @@ private:
     static const char* commandStrings[];    ///< Strings sent over Bluetooth to give commands
     static const char* receiveStrings[];    ///< Strings received over Bluetooth as response or event
 
+    QTimer btConnectTimeoutTimer;           ///< Timeout timer to reconnect if connection fails
     QBluetoothSocket* socket;               ///< Bluetooth socket connected to the server
     QString macAddr;                        ///< Bluetooth MAC address of the server
     bool imageStreamingEnabled;             ///< Whether image streaming is enabled or localization is enabled
@@ -426,6 +457,7 @@ private:
     unsigned int currentPixel;              ///< Current pixel in the camera frame being received
 
     bool connected;                         ///< Whether Bluetooth is connected now
+    bool connecting;                        ///< Whether Bluetooth is trying to connect
     int batteryState;                       ///< Current battery state
     float x;                                ///< Current x position in grid coordinates
     float y;                                ///< Current y position in grid coordinates
@@ -433,9 +465,14 @@ private:
     bool kidnapped;                         ///< Whether currently kidnapped
 
     /**
-     * @brief Connects or reconnects to the server if not already connected
+     * @brief Resets properties of the robot to default
      */
-    void reconnectToServer();
+    void resetProperties();
+
+    /**
+     * @brief Connects or reconnects to the service on the server if not already connected
+     */
+    void openSocket();
 
     /**
      * @brief Sets the motor output
