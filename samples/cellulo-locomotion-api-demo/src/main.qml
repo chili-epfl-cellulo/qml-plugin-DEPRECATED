@@ -56,7 +56,7 @@ ApplicationWindow {
                 }
                 TextField{
                     id: xOutputField
-                    placeholderText: "X Output"
+                    placeholderText: "X Output (mm/s)"
                 }
             }
 
@@ -66,7 +66,7 @@ ApplicationWindow {
                 }
                 TextField{
                     id: yOutputField
-                    placeholderText: "Y Output"
+                    placeholderText: "Y Output (mm/s)"
                 }
             }
 
@@ -76,31 +76,13 @@ ApplicationWindow {
                 }
                 TextField{
                     id: thetaOutputField
-                    placeholderText: "Theta Output"
+                    placeholderText: "Theta Output (rad/s)"
                 }
             }
 
             Button{
-                text: "Local"
-                onClicked: {
-                    locomotionLoop.stop();
-                    cellulo1.setLocalSpeeds(parseFloat(xOutputField.text), parseFloat(yOutputField.text), parseFloat(thetaOutputField.text));
-                }
-            }
-
-            Button{
-                text: "Global"
-                onClicked: {
-                    if(!locomotionLoop.running)
-                        locomotionLoop.start();
-                }
-            }
-
-            Timer{
-                id: locomotionLoop
-                interval: 100
-                repeat: true
-                onTriggered: cellulo1.setGlobalSpeeds(parseFloat(xOutputField.text), parseFloat(yOutputField.text), parseFloat(thetaOutputField.text));
+                text: "Set"
+                onClicked: cellulo1.setGlobalSpeeds(parseFloat(xOutputField.text), parseFloat(yOutputField.text), parseFloat(thetaOutputField.text));
             }
         }
     }
@@ -108,7 +90,6 @@ ApplicationWindow {
     Item {
         id: playground
 
-        // Zones playground-JourneeClasses
         property var zones: []
 
         property real gridSize: 0.508 //in mmm
