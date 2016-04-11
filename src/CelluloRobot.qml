@@ -27,16 +27,20 @@ Rectangle {
 
     // Location
     // -> 'coords' holds the current coordinates of the robot, *normalized* from 0 to 1, with (0,0) the top left corner of the playground.
-    property point coords: Qt.point(0,0)
+    property point coords: Qt.point(robotComm.x*playground.gridSize/playground.widthmm, robotComm.y*playground.gridSize/playground.heightmm)
+    // -> gridCoords holds the robot coordinates in grid units
+    property point gridCoords: Qt.point(robotComm.x, robotComm.y)
     // -> physicalCoords holds the robot coordinates, in mm
-    property point physicalCoords: Qt.point(0,0)
+    property point physicalCoords: Qt.point(robotComm.x*playground.gridSize, robotComm.y*playground.gridSize)
+    // -> robot orientation in degrees
+    property real orientation: robotComm.theta
     // -> 'zone' holds the current zone that the robot hovers (empty string if none)
     property string zone: ""
     // holds the list of crossed zones
     property var zonesHistory: []
 
     // Object exposing the size of the playground and the list of active zones (to be set when creating an instance of Cellulo)
-    property var playground: ({})
+    property variant playground: ({})
 
     // Communication-related properties
     //property url simulatorUrl: "ws://127.0.0.1:51102"
@@ -307,7 +311,7 @@ Rectangle {
         onLongTouch:            console.log("Robot " + robotId + " key " + key + "was long touched")
         onTouchReleased:        console.log("Robot " + robotId + " key " + key + "was released")
         onPoseChanged:{
-            var gridCoords = CelluloToolkit.grid2mm(x*100, y*100, playground);
+            /*var gridCoords = CelluloToolkit.grid2mm(x*100, y*100, playground);
             physicalCoords.x = gridCoords.x;
             physicalCoords.y = gridCoords.y;
 
@@ -323,8 +327,9 @@ Rectangle {
                 coords.x = newcoordx;
                 coords.y = newcoordy;
                 parent.rotation = newrotation;
-                console.log("Robot %1 at (%2, %3), theta: %4".arg(robotId).arg(coords.x).arg(coords.y).arg(rotation));
-            }
+
+            }*/
+            console.log("Coords: " + parent.coords + " " + parent.orientation);
             checkZone();
         }
         onKidnappedChanged: {

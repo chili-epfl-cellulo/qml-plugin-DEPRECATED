@@ -111,8 +111,9 @@ ApplicationWindow {
         // Zones playground-JourneeClasses
         property var zones: []
 
-        width: 1050 // in mm
-        height: 2400 // in mm
+        property real gridSize: 0.508 //in mmm
+        property real widthmm: 210
+        property real heightmm: 297
     }
 
     CelluloRobot{
