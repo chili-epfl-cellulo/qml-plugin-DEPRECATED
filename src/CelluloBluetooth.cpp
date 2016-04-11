@@ -40,6 +40,7 @@ const char* CelluloBluetooth::commandStrings[] = {
     "M", //Set (m)otor output
     "A", //Set (a)ll motor outputs
     "C", //Set goal velo(c)ity
+    "Y", //Set goal velocit(y) compact
     "G", //Set (g)oal pose
     "N", //Set goal positio(n)
     "R", //(R)eset
@@ -572,6 +573,41 @@ void CelluloBluetooth::setGoalVelocity(float vx, float vy, float w){
 
     sendCommand(COMMAND_TYPE::SET_GOAL_VELOCITY, message);
 }
+
+void CelluloBluetooth::setGoalVelocityCompact(int vx, int vy){
+    int vx_ = vx/GOAL_VELOCITY_COMPACT_DIVISOR;
+    int vy_ = vy/GOAL_VELOCITY_COMPACT_DIVISOR;
+
+    if(vx_ < -0x80)
+        vx_ = -0x80;
+    else if(vx_ > 0x7F)
+        vx_ = 0x7F;
+
+    if(vy_ < -0x80)
+        vy_ = -0x80;
+    else if(vy_ > 0x7F)
+        vy_ = 0x7F;
+
+    QByteArray message;
+    message = commandStrings[COMMAND_TYPE::SET_GOAL_VELOCITY_COMPACT];
+
+    if(vx_ < 0){
+        vx_ += 0x100;
+    }
+    message.append(getHexChar(vx_/0x10));
+    message.append(getHexChar(vx_%0x10));
+
+    if(vy_ < 0){
+        vy_ += 0x100;
+    }
+    message.append(getHexChar(vy_/0x10));
+    message.append(getHexChar(vy_%0x10));
+
+    message.append('\n');
+
+    sendCommand(COMMAND_TYPE::SET_GOAL_VELOCITY_COMPACT, message);
+}
+
 
 void CelluloBluetooth::setGoalPose(float x, float y, float theta, float v, float w){
     QByteArray message;

@@ -64,6 +64,7 @@ public:
         SET_MOTOR_OUTPUT,
         SET_ALL_MOTOR_OUTPUTS,
         SET_GOAL_VELOCITY,
+        SET_GOAL_VELOCITY_COMPACT,
         SET_GOAL_POSE,
         SET_GOAL_POSITION,
         RESET,
@@ -98,6 +99,7 @@ public:
 
     static constexpr float GOAL_POSE_FACTOR = 100.0f;       ///< Goal pose elements are multiplied by this before comm.
     static constexpr float GOAL_VELOCITY_FACTOR = 100.0f;   ///< Goal velocities are multiplied by this before comm.
+    static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;     ///< Goal velocities are divided by this in the compact velocity command
 
     static QByteArray frameBuffer;                   ///< Container for the received camera frame data
 
@@ -309,6 +311,16 @@ public slots:
      * @param w Angular velocity in rad/s
      */
     void setGoalVelocity(float vx, float vy, float w);
+
+    /**
+     * @brief Sets robot goal velocity in global world frame
+     *
+     * Since this is a compact message, there is no angular velocity and resolution is low (2 mm/s)
+     *
+     * @param vx X velocity in mm/s (between -256 and 254)
+     * @param vy Y velocity in mm/s (between -256 and 254)
+     */
+    void setGoalVelocityCompact(int vx, int vy);
 
     /**
      * @brief Sets a pose goal to track
