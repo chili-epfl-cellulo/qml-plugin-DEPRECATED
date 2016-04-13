@@ -602,9 +602,6 @@ void CelluloBluetooth::setGoalPosition(float x, float y, float v){
             (unsigned int)(GOAL_VELOCITY_FACTOR*v), checksum);
     message.append(buf);
     message.append('\n');
-
-    qDebug() << message;
-
     sendCommand(COMMAND_TYPE::SET_GOAL_POSITION, message);
 }
 
