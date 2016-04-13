@@ -313,6 +313,35 @@ ApplicationWindow {
 
                         Column{
                             Label{
+                                text: "Position goal:"
+                            }
+
+                            TextField{
+                                id: goalPositionX
+                                placeholderText: "x (grid coords)"
+                            }
+
+                            TextField{
+                                id: goalPositionY
+                                placeholderText: "y (grid coords)"
+
+                            }
+
+                            TextField{
+                                id: goalPositionMaxV
+                                placeholderText: "v (mm/s)"
+
+                            }
+
+                            Button{
+                                text: "Go"
+                                onClicked: robotComm.setGoalPosition(parseFloat(goalPositionX.text), parseFloat(goalPositionY.text), parseFloat(goalPositionMaxV.text));
+                            }
+                        }
+
+
+                        Column{
+                            Label{
                                 text: "Goal velocity:"
                             }
 

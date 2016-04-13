@@ -41,6 +41,7 @@ const char* CelluloBluetooth::commandStrings[] = {
     "A", //Set (a)ll motor outputs
     "C", //Set goal velo(c)ity
     "G", //Set (g)oal pose
+    "N", //Set goal positio(n)
     "R", //(R)eset
     "S"  //(S)hutdown
 };
@@ -575,13 +576,36 @@ void CelluloBluetooth::setGoalVelocity(float vx, float vy, float w){
 void CelluloBluetooth::setGoalPose(float x, float y, float theta, float v, float w){
     QByteArray message;
     message = commandStrings[COMMAND_TYPE::SET_GOAL_POSE];
-    static char buf[31 + 1];
+    static char buf[8 + 8 + 4 + 4 + 4 + 1];
     sprintf(buf,"%08X%08X%04X%04X%04X",
             (unsigned int)(GOAL_POSE_FACTOR*x), (unsigned int)(GOAL_POSE_FACTOR*y), (unsigned int)(GOAL_POSE_FACTOR*theta),
             (unsigned int)(GOAL_VELOCITY_FACTOR*v), (unsigned int)(GOAL_VELOCITY_FACTOR*w));
     message.append(buf);
     message.append('\n');
     sendCommand(COMMAND_TYPE::SET_GOAL_POSE, message);
+}
+
+void CelluloBluetooth::setGoalPosition(float x, float y, float v){
+    QByteArray message;
+    message = commandStrings[COMMAND_TYPE::SET_GOAL_POSITION];
+
+    //Calculate checksum
+    char checksum = getHexChar(
+            (getNumberOfOnes((unsigned int)(GOAL_POSE_FACTOR*x)) +
+            getNumberOfOnes((unsigned int)(GOAL_POSE_FACTOR*y)) +
+            getNumberOfOnes((unsigned int)(GOAL_VELOCITY_FACTOR*v))) % 16
+        );
+
+    static char buf[8 + 8 + 4 + 1 + 1 + 1];
+    sprintf(buf,"%08X%08X%04X%c",
+            (unsigned int)(GOAL_POSE_FACTOR*x), (unsigned int)(GOAL_POSE_FACTOR*y),
+            (unsigned int)(GOAL_VELOCITY_FACTOR*v), checksum);
+    message.append(buf);
+    message.append('\n');
+
+    qDebug() << message;
+
+    sendCommand(COMMAND_TYPE::SET_GOAL_POSITION, message);
 }
 
 void CelluloBluetooth::setVisualState(int state){
@@ -644,5 +668,14 @@ char CelluloBluetooth::getHexChar(unsigned int value){
         return (char)(value - 0xA + 'A');
     else
         return 'F';
+}
+
+char CelluloBluetooth::getNumberOfOnes(unsigned int value){
+    char result = 0;
+    for(int i=0;i<32;i++){
+        result += value % 2;
+        value /= 2;
+    }
+    return result;
 }
 

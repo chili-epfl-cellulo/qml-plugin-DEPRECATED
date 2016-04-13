@@ -65,6 +65,7 @@ public:
         SET_ALL_MOTOR_OUTPUTS,
         SET_GOAL_VELOCITY,
         SET_GOAL_POSE,
+        SET_GOAL_POSITION,
         RESET,
         SHUTDOWN
     };
@@ -321,6 +322,15 @@ public slots:
     void setGoalPose(float x, float y, float theta, float v, float w);
 
     /**
+     * @brief Sets a position goal to track
+     *
+     * @param x X goal in grid coordinates
+     * @param y Y goal in grid coordinates
+     * @param v Maximum linear speed to track pose in mm/s
+     */
+    void setGoalPosition(float x, float y, float v);
+
+    /**
      * @brief Sends a ping, expecting an acknowledge
      */
     void ping();
@@ -521,6 +531,15 @@ private:
      * @return Hexadecimal representation of value
      */
     char getHexChar(unsigned int value);
+
+    /**
+     * @brief Calculates the number of 1 bits in the given value
+     *
+     * @param value Given value
+     *
+     * @return Number of 1 bits in given value
+     */
+    char getNumberOfOnes(unsigned int value);
 };
 
 #endif // CELLULOBLUETOOTH_H

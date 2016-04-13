@@ -145,6 +145,9 @@ Rectangle {
     // Set locomotion outputs (corresponds roughly to goal speeds) in global frame of reference; arguments are in mm/s and rad/s
     function setGlobalSpeeds(vx, vy, vtheta){ robotComm.setGoalVelocity(vx, vy, vtheta); }
 
+    // Set pose goals; arguments are in grid units and mm/s
+    function setPositionGoal(x, y, v){ robotComm.setGoalPosition(x, y, v); }
+
     //-----------------------------------------------------------------
     // Transport
 
