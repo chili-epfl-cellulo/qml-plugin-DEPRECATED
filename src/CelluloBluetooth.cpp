@@ -603,6 +603,9 @@ void CelluloBluetooth::setGoalVelocityCompact(int vx, int vy){
     message.append(getHexChar(vy_/0x10));
     message.append(getHexChar(vy_%0x10));
 
+    char checksum = getHexChar((getNumberOfOnes(vx_) + getNumberOfOnes(vy_)) % 16);
+    message.append(checksum);
+
     message.append('\n');
 
     sendCommand(COMMAND_TYPE::SET_GOAL_VELOCITY_COMPACT, message);
