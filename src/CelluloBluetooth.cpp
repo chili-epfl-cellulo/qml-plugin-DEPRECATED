@@ -143,7 +143,7 @@ void CelluloBluetooth::openSocket(){
 
         socket->connectToService(
                 QBluetoothAddress(macAddr),
-                QBluetoothUuid(QString("00000003-0000-1000-8000-00805F9B34FB"))); //Connect to the RFCOMM protocol
+                QBluetoothUuid(QBluetoothUuid::SerialPort));
         btConnectTimeoutTimer.start();
         if(!connecting){
             connecting = true;
