@@ -38,23 +38,19 @@ flags = [
         '-isystem',
         '/usr/include',
         '-I',
-        '/opt/Qt/5.3/gcc_64/include',
+        '/opt/Qt/5.6/gcc_64/include',
         '-I',
-        '/opt/Qt/5.3/gcc_64/include/QtCore',
+        '/opt/Qt/5.6/gcc_64/include/QtQuick',
         '-I',
-        '/opt/Qt/5.3/gcc_64/include/QtQuick',
+        '/opt/Qt/5.6/gcc_64/include/QtGui',
         '-I',
-        '/opt/Qt/5.3/gcc_64/include/QtQml',
+        '/opt/Qt/5.6/gcc_64/include/QtQml',
         '-I',
-        '/opt/Qt/5.3/gcc_64/include/QtMultimedia',
+        '/opt/Qt/5.6/gcc_64/include/QtNetwork',
         '-I',
-        '/opt/Qt/5.3/gcc_64/include/QtGui',
+        '/opt/Qt/5.6/gcc_64/include/QtBluetooth',
         '-I',
-        '/opt/Qt/5.3/gcc_64/include/Qt3D',
-        '-I',
-        '/opt/Qt/5.3/gcc_64/include/QtWidgets',
-        '-I',
-        '/opt/Qt/5.3/gcc_64/include/QtBluetooth'
+        '/opt/Qt/5.6/gcc_64/include/QtCore'
         ]
 
 if compilation_database_folder:
