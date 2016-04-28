@@ -26,17 +26,19 @@
 #ifndef CELLULOBLUETOOTH_H
 #define CELLULOBLUETOOTH_H
 
-#include<QTimer>
-#include<QQueue>
-#include<QQuickItem>
-#include<QBluetoothSocket>
-#include<QColor>
+#include <QTimer>
+#include <QQueue>
+#include <QQuickItem>
+#include <QBluetoothSocket>
+#include <QColor>
 
 /**
  * @brief Bluetooth communicator for a Cellulo robot
  */
 class CelluloBluetooth : public QQuickItem {
+/* *INDENT-OFF* */
 Q_OBJECT
+/* *INDENT-ON* */
     Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
     Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
     Q_PROPERTY(bool connecting READ getConnecting NOTIFY connectingChanged)
@@ -52,7 +54,7 @@ Q_OBJECT
 
 public:
 
-    enum COMMAND_TYPE{
+    enum COMMAND_TYPE {
         PING = 0,
         SET_BCAST_PERIOD,
         IMAGE_STREAM_ENABLE,
@@ -71,7 +73,7 @@ public:
         SHUTDOWN
     };
 
-    enum RECEIVE_MESSAGES{
+    enum RECEIVE_MESSAGES {
         BOOT_COMPLETE = 0,
         WAKE_UP,
         SHUTTING_DOWN,
@@ -127,84 +129,108 @@ public:
      *
      * @return The current MAC address
      */
-    QString getMacAddr(){ return macAddr; }
+    QString getMacAddr(){
+        return macAddr;
+    }
 
     /**
      * @brief Gets whether currently connected over Bluetooth
      *
      * @return Whether currently connected over Bluetooth
      */
-    bool getConnected(){ return connected; }
+    bool getConnected(){
+        return connected;
+    }
 
     /**
      * @brief Gets whether currently trying to connect over Bluetooth
      *
      * @return Whether currently trying to connect over Bluetooth
      */
-    bool getConnecting(){ return connecting; }
+    bool getConnecting(){
+        return connecting;
+    }
 
     /**
      * @brief Gets whether image streaming is currently enabled
      *
      * @return Whether image streaming is enabled or localization is enabled
      */
-    bool getImageStreamingEnabled(){ return imageStreamingEnabled; }
+    bool getImageStreamingEnabled(){
+        return imageStreamingEnabled;
+    }
 
     /**
      * @brief Gets whether timestamping along with pose is currently enabled
      *
      * @return Whether timestamping is enabled
      */
-    bool getTimestampingEnabled(){ return timestampingEnabled; }
+    bool getTimestampingEnabled(){
+        return timestampingEnabled;
+    }
 
     /**
      * @brief Gets the latest battery state
      *
      * @return Battery state as described by the BATTERY_STATE enumeration
      */
-    int getBatteryState(){ return batteryState; }
+    int getBatteryState(){
+        return batteryState;
+    }
 
     /**
      * @brief Gets the latest x position
      *
      * @return Latest x position in grid coordinates
      */
-    float getX(){ return x; }
+    float getX(){
+        return x;
+    }
 
     /**
      * @brief Gets the latest y position
      *
      * @return Latest y position in grid coordinates
      */
-    float getY(){ return y; }
+    float getY(){
+        return y;
+    }
 
     /**
      * @brief Gets the latest orientation
      *
      * @return Latest orientation in degrees
      */
-    float getTheta(){ return theta; }
+    float getTheta(){
+        return theta;
+    }
 
     /**
      * @brief Gets the latest available timestamp
      *
      * @return The latest received timestamp in milliseconds
      */
-    int getLastTimestamp(){ return lastTimestamp; }
+    int getLastTimestamp(){
+        return lastTimestamp;
+    }
 
     /**
      * @brief Gets the localization framerate
      *
      * @return Localization framerate in milliseconds
      */
-    float getFramerate(){ return framerate; }
+    float getFramerate(){
+        return framerate;
+    }
 
     /**
      * @brief Gets the latest kidnapped state
      *
      * @return Whether kidnapped or on encoded paper
      */
-    bool getKidnapped(){ return kidnapped; }
+    bool getKidnapped(){
+        return kidnapped;
+    }
 
 private slots:
 
