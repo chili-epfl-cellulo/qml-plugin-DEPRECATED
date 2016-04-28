@@ -143,7 +143,7 @@ void CelluloBluetooth::openSocket(){
 
         socket->connectToService(
                 QBluetoothAddress(macAddr),
-                QBluetoothUuid(QBluetoothUuid::SerialPort));
+                1); //TODO: Temporary fix until https://bugreports.qt.io/browse/QTBUG-53041 is fixed
         btConnectTimeoutTimer.start();
         if(!connecting){
             connecting = true;
@@ -714,4 +714,3 @@ char CelluloBluetooth::getNumberOfOnes(unsigned int value){
     }
     return result;
 }
-
