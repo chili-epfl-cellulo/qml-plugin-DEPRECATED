@@ -6,3 +6,4 @@
 -I/opt/Qt/5.6/gcc_64/include/QtBluetooth
 -I/opt/Qt/5.6/gcc_64/include/QtCore
 -fPIE
+-std=c++11
