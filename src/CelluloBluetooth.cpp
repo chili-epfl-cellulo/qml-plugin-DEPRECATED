@@ -25,8 +25,8 @@
 
 #include "CelluloBluetooth.h"
 
-#include<QBluetoothDeviceInfo>
-#include<time.h>
+#include <QBluetoothDeviceInfo>
+#include <time.h>
 
 const char* CelluloBluetooth::commandStrings[] = {
     "P", //(P)ing
@@ -65,8 +65,7 @@ const char* CelluloBluetooth::receiveStrings[] = {
 QByteArray CelluloBluetooth::frameBuffer;
 
 CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
-    QQuickItem(parent)
-{
+    QQuickItem(parent){
     socket = NULL;
 
     btConnectTimeoutTimer.setSingleShot(true);
@@ -93,7 +92,8 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     kidnapped = true;
 }
 
-CelluloBluetooth::~CelluloBluetooth(){ }
+CelluloBluetooth::~CelluloBluetooth(){
+}
 
 void CelluloBluetooth::resetProperties(){
     expectingFrame = false;
@@ -110,13 +110,13 @@ void CelluloBluetooth::resetProperties(){
     emit timestampChanged();
     kidnapped = true;
     emit kidnappedChanged();
-    for(int i=0;i<6;i++)
+    for(int i=0; i<6; i++)
         emit touchReleased(i);
 }
 
 QVariantList CelluloBluetooth::getFrame() const {
     QVariantList frame;
-    for(int i=0;i<frameBuffer.length();i++)
+    for(int i=0; i<frameBuffer.length(); i++)
         frame.append((int)frameBuffer[i]);
     while(frame.length() < IMG_WIDTH*IMG_HEIGHT)
         frame.append((int)0);
@@ -142,8 +142,8 @@ void CelluloBluetooth::openSocket(){
         qDebug() << "Connecting to " << macAddr << "...";
 
         socket->connectToService(
-                QBluetoothAddress(macAddr),
-                1); //TODO: Temporary fix until https://bugreports.qt.io/browse/QTBUG-53041 is fixed
+            QBluetoothAddress(macAddr),
+            1); //TODO: Temporary fix until https://bugreports.qt.io/browse/QTBUG-53041 is fixed
         btConnectTimeoutTimer.start();
         if(!connecting){
             connecting = true;
@@ -159,6 +159,8 @@ void CelluloBluetooth::connectToServer(){
         connect(socket, SIGNAL(readyRead()), this, SLOT(socketDataArrived()));
         connect(socket, SIGNAL(connected()), this, SLOT(socketConnected()));
         connect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+        connect(socket, static_cast<void (QBluetoothSocket::*)(QBluetoothSocket::SocketError)>(&QBluetoothSocket::error),
+                [=](QBluetoothSocket::SocketError error){ qDebug() << error; });
 
         openSocket();
     }
@@ -215,7 +217,7 @@ void CelluloBluetooth::socketDisconnected(){
 void CelluloBluetooth::socketDataArrived(){
     QByteArray message = socket->readAll();
 
-    for(int i=0;i<message.length();i++){
+    for(int i=0; i<message.length(); i++){
 
         //We're receiving a camera image
         if(expectingFrame){
@@ -265,74 +267,68 @@ void CelluloBluetooth::processResponse(){
             emit lowBattery();
             break;
 
-        case BATTERY_STATE_CHANGED:
-            {
-                int newState = (int)(receiveBuffer[1] - 48);
-                if(newState >= 0 && newState <= 4){
-                    if(batteryState != newState){
-                        batteryState = newState;
-                        emit batteryStateChanged();
-                    }
+        case BATTERY_STATE_CHANGED: {
+            int newState = (int)(receiveBuffer[1] - 48);
+            if(newState >= 0 && newState <= 4){
+                if(batteryState != newState){
+                    batteryState = newState;
+                    emit batteryStateChanged();
                 }
-                break;
+            }
+            break;
+        }
+
+        case TOUCH_BEGIN: {
+            int key = (int)(receiveBuffer[1] - 48);
+            if(key >= 0 && key <= 5)
+                emit touchBegan(key);
+            break;
+        }
+
+        case TOUCH_LONG_PRESSED: {
+            int key = (int)(receiveBuffer[1] - 48);
+            if(key >= 0 && key <= 5)
+                emit longTouch(key);
+            break;
+        }
+
+        case TOUCH_RELEASED: {
+            int key = (int)(receiveBuffer[1] - 48);
+            if(key >= 0 && key <= 5)
+                emit touchReleased(key);
+            break;
+        }
+
+        case POSE_CHANGED: {
+            x = hexToInt(receiveBuffer, 1, 8)/100.0f;
+            y = hexToInt(receiveBuffer, 9, 16)/100.0f;
+            theta = hexToInt(receiveBuffer, 17, 20)/100.0f;
+            emit poseChanged();
+
+            if(timestampingEnabled){
+                int newTimestamp = hexToInt(receiveBuffer, 21, 28);
+                framerate = FRAMERATE_SMOOTH_FACTOR*framerate + (1.0 - FRAMERATE_SMOOTH_FACTOR)*1000/(newTimestamp - lastTimestamp);
+                lastTimestamp = newTimestamp;
+                emit timestampChanged();
             }
 
-        case TOUCH_BEGIN:
-            {
-                int key = (int)(receiveBuffer[1] - 48);
-                if(key >= 0 && key <= 5)
-                    emit touchBegan(key);
-                break;
+            if(kidnapped){
+                kidnapped = false;
+                emit kidnappedChanged();
             }
 
-        case TOUCH_LONG_PRESSED:
-            {
-                int key = (int)(receiveBuffer[1] - 48);
-                if(key >= 0 && key <= 5)
-                    emit longTouch(key);
-                break;
-            }
+            break;
+        }
 
-        case TOUCH_RELEASED:
-            {
-                int key = (int)(receiveBuffer[1] - 48);
-                if(key >= 0 && key <= 5)
-                    emit touchReleased(key);
-                break;
-            }
-
-        case POSE_CHANGED:
-            {
-                x = hexToInt(receiveBuffer, 1, 8)/100.0f;
-                y = hexToInt(receiveBuffer, 9, 16)/100.0f;
-                theta = hexToInt(receiveBuffer, 17, 20)/100.0f;
-                emit poseChanged();
-
-                if(timestampingEnabled){
-                    int newTimestamp = hexToInt(receiveBuffer, 21, 28);
-                    framerate = FRAMERATE_SMOOTH_FACTOR*framerate + (1.0 - FRAMERATE_SMOOTH_FACTOR)*1000/(newTimestamp - lastTimestamp);
-                    lastTimestamp = newTimestamp;
-                    emit timestampChanged();
-                }
-
-                if(kidnapped){
-                    kidnapped = false;
+        case KIDNAP: {
+            int newKidnapped = (int)(receiveBuffer[1] - 48);
+            if(newKidnapped == 0 || newKidnapped == 1)
+                if((bool)newKidnapped != kidnapped){
+                    kidnapped = newKidnapped;
                     emit kidnappedChanged();
                 }
-
-                break;
-            }
-
-        case KIDNAP:
-            {
-                int newKidnapped = (int)(receiveBuffer[1] - 48);
-                if(newKidnapped == 0 || newKidnapped == 1)
-                    if((bool)newKidnapped != kidnapped){
-                        kidnapped = newKidnapped;
-                        emit kidnappedChanged();
-                    }
-                break;
-            }
+            break;
+        }
 
         case ACKNOWLEDGED:
             break;
@@ -349,7 +345,7 @@ void CelluloBluetooth::processResponse(){
 }
 
 CelluloBluetooth::RECEIVE_MESSAGES CelluloBluetooth::getReceivedMessage(){
-    for(int i=0;i<(int)RECEIVE_MESSAGES::NUM_RECEIVE_MESSAGES;i++)
+    for(int i=0; i<(int)RECEIVE_MESSAGES::NUM_RECEIVE_MESSAGES; i++)
         if(receiveStrings[i][0] == receiveBuffer[0])
             return (RECEIVE_MESSAGES)i;
     return RECEIVE_MESSAGES::INVALID_MESSAGE;
@@ -560,7 +556,7 @@ void CelluloBluetooth::setGoalVelocity(float vx, float vy, float w){
     message.append(getHexChar(vy_/0x10%0x10));
     message.append(getHexChar(vy_%0x10));
 
-     if(w_ < 0){
+    if(w_ < 0){
         w_ *= -1;
         message.append('-');
     }
@@ -630,9 +626,9 @@ void CelluloBluetooth::setGoalPosition(float x, float y, float v){
 
     //Calculate checksum
     char checksum = getHexChar(
-            (getNumberOfOnes((unsigned int)(GOAL_POSE_FACTOR*x)) +
-            getNumberOfOnes((unsigned int)(GOAL_POSE_FACTOR*y)) +
-            getNumberOfOnes((unsigned int)(GOAL_VELOCITY_FACTOR*v))) % 16
+        (getNumberOfOnes((unsigned int)(GOAL_POSE_FACTOR*x)) +
+         getNumberOfOnes((unsigned int)(GOAL_POSE_FACTOR*y)) +
+         getNumberOfOnes((unsigned int)(GOAL_VELOCITY_FACTOR*v))) % 16
         );
 
     static char buf[8 + 8 + 4 + 1 + 1 + 1];
@@ -690,7 +686,7 @@ void CelluloBluetooth::shutdown(){
 
 int CelluloBluetooth::hexToInt(QByteArray const& array, int begin, int end){
     int result = 0;
-    for(int i=begin;i<=end;i++){
+    for(int i=begin; i<=end; i++){
         result <<= 4;
         result += (int)array[i] >= 65 ? (int)array[i] - 65 + 10 : (int)array[i] - 48;
     }
@@ -708,7 +704,7 @@ char CelluloBluetooth::getHexChar(unsigned int value){
 
 char CelluloBluetooth::getNumberOfOnes(unsigned int value){
     char result = 0;
-    for(int i=0;i<32;i++){
+    for(int i=0; i<32; i++){
         result += value % 2;
         value /= 2;
     }

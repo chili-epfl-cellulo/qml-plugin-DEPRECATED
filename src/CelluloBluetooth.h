@@ -88,7 +88,7 @@ public:
         INVALID_MESSAGE = -1
     };
 
-    static const int BT_CONNECT_TIMEOUT_MILLIS = 10000; ///< Will try to reconnect after this much time
+    static const int BT_CONNECT_TIMEOUT_MILLIS = 30000; ///< Will try to reconnect after this much time
 
     static const int FRAME_TIMEOUT_MILLIS = 10000;   ///< Will wait this many millis for a camera frame to complete
 

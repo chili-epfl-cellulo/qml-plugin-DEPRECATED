@@ -30,4 +30,3 @@ mkdir build-android && cd build-android
 /path-to-qt-install-root/5.4/android_armv7/bin/qmake ..
 make -j5 install
 ```
-
