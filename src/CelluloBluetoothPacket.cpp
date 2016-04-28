@@ -146,7 +146,7 @@ void CelluloBluetoothPacket::clear(){
 
 void CelluloBluetoothPacket::load(quint32 num){
 
-    //Assume little endian storage and convert to big endian
+    //Convert to big endian
     char* p = ((char*)&num) + 3;
     payload.append(*p);
     p--;
@@ -157,9 +157,22 @@ void CelluloBluetoothPacket::load(quint32 num){
     payload.append(*p);
 }
 
+void CelluloBluetoothPacket::load24(quint32 num){
+    if(num > 0xFFFFFF)
+        num = 0xFFFFFF;
+
+    //Convert to big endian
+    char* p = ((char*)&num) + 2;
+    payload.append(*p);
+    p--;
+    payload.append(*p);
+    p--;
+    payload.append(*p);
+}
+
 void CelluloBluetoothPacket::load(quint16 num){
 
-    //Assume little endian storage and convert to big endian
+    //Convert to big endian
     char* p = ((char*)&num) + 1;
     payload.append(*p);
     p--;
@@ -172,7 +185,7 @@ void CelluloBluetoothPacket::load(quint8 num){
 
 void CelluloBluetoothPacket::load(qint32 num){
 
-    //Assume little endian storage and convert to big endian
+    //Convert to big endian
     char* p = ((char*)&num) + 3;
     payload.append(*p);
     p--;
@@ -183,9 +196,24 @@ void CelluloBluetoothPacket::load(qint32 num){
     payload.append(*p);
 }
 
+void CelluloBluetoothPacket::load24(qint32 num){
+    if(num > 0x7FFFFF)
+        num = 0x7FFFFF;
+    else if(num < -0x800000)
+        num = -0x800000;
+
+    //Convert to big endian
+    char* p = ((char*)&num) + 2;
+    payload.append(*p);
+    p--;
+    payload.append(*p);
+    p--;
+    payload.append(*p);
+}
+
 void CelluloBluetoothPacket::load(qint16 num){
 
-    //Assume little endian storage and convert to big endian
+    //Convert to big endian
     char* p = ((char*)&num) + 1;
     payload.append(*p);
     p--;
@@ -265,26 +293,116 @@ bool CelluloBluetoothPacket::loadReceivedByte(char c){
 }
 
 quint32 CelluloBluetoothPacket::unloadUInt32(){
-    //unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
+    if(unloadIndex + 4 > payload.length()){
+        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        return 0;
+    }
+    else{
 
+        //Decode from big endian
+        unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
+        unloadIndex += 4;
+        return (quint32)(0x1000000*p[0] + 0x10000*p[1] + 0x100*p[2] + p[3]);
+    }
+}
+
+quint32 CelluloBluetoothPacket::unloadUInt24(){
+    if(unloadIndex + 3 > payload.length()){
+        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        return 0;
+    }
+    else{
+
+        //Decode from big endian
+        unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
+        unloadIndex += 3;
+        return (quint32)(0x10000*p[0] + 0x100*p[1] + p[2]);
+    }
 }
 
 quint16 CelluloBluetoothPacket::unloadUInt16(){
+    if(unloadIndex + 2 > payload.length()){
+        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        return 0;
+    }
+    else{
 
+        //Decode from big endian
+        unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
+        unloadIndex += 2;
+        return (quint16)(0x100*p[0] + p[1]);
+    }
 }
 
 quint8 CelluloBluetoothPacket::unloadUInt8(){
-
+    if(unloadIndex + 1 > payload.length()){
+        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        return 0;
+    }
+    else{
+        quint8 result = (quint8)(*((unsigned char*)payload.data() + unloadIndex));
+        unloadIndex++;
+        return result;
+    }
 }
 
 qint32 CelluloBluetoothPacket::unloadInt32(){
+    if(unloadIndex + 4 > payload.length()){
+        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        return 0;
+    }
+    else{
 
+        //Decode from big endian
+        unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
+        unloadIndex += 4;
+        quint32 unum = (quint32)(0x1000000*p[0] + 0x10000*p[1] + 0x100*p[2] + p[3]);
+        return *((qint32*)(&unum));
+    }
+}
+
+qint32 CelluloBluetoothPacket::unloadInt24(){
+    if(unloadIndex + 3 > payload.length()){
+        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        return 0;
+    }
+    else{
+
+        //Decode from big endian
+        unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
+        unloadIndex += 3;
+        quint32 unum = (quint32)(0x10000*p[0] + 0x100*p[1] + p[2]);
+
+        //Sign extension
+        if(unum >= 0x800000)
+            unum += 0xFF000000;
+        return *((qint32*)(&unum));
+    }
 }
 
 qint16 CelluloBluetoothPacket::unloadInt16(){
+    if(unloadIndex + 2 > payload.length()){
+        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        return 0;
+    }
+    else{
 
+        //Decode from big endian
+        unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
+        unloadIndex += 2;
+        quint16 unum = (quint16)(0x100*p[0] + p[1]);
+        return *((qint16*)(&unum));
+    }
 }
 
 qint8 CelluloBluetoothPacket::unloadInt8(){
-
+    if(unloadIndex + 1 > payload.length()){
+        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        return 0;
+    }
+    else{
+        qint8 result = (qint8)(*((char*)payload.data() + unloadIndex));
+        unloadIndex++;
+        return result;
+    }
 }

@@ -143,6 +143,15 @@ public:
     void load(quint32 num);
 
     /**
+     * @brief Appends the first 24 bits of the given number in binary form (2's complement) to the payload
+     *
+     * Clamps the value to 24-bits if outside of bounds.
+     *
+     * @param num The number to append
+     */
+    void load24(quint32 num);
+
+    /**
      * @brief Appends the given number in binary form to the payload
      *
      * @param num The number to append
@@ -162,6 +171,15 @@ public:
      * @param num The number to append
      */
     void load(qint32 num);
+
+    /**
+     * @brief Appends the first 24 bits of the given number in binary form (2's complement) to the payload
+     *
+     * Clamps the value to 24-bits if outside of bounds.
+     *
+     * @param num The number to append
+     */
+    void load24(qint32 num);
 
     /**
      * @brief Appends the given number in binary form to the payload
@@ -209,6 +227,13 @@ public:
     quint32 unloadUInt32();
 
     /**
+     * @brief Attempts to unload a 24-bit unsigned integer
+     *
+     * @return Unloaded value if successful
+     */
+    quint32 unloadUInt24();
+
+    /**
      * @brief Attempts to unload a 16-bit unsigned integer
      *
      * @return Unloaded value if successful
@@ -228,6 +253,13 @@ public:
      * @return Unloaded value if successful
      */
     qint32 unloadInt32();
+
+    /**
+     * @brief Attempts to unload a 24-bit signed integer
+     *
+     * @return Unloaded value if successful
+     */
+    qint32 unloadInt24();
 
     /**
      * @brief Attempts to unload a 16-bit signed integer
