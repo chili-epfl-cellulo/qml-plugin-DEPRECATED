@@ -94,6 +94,34 @@ const int CelluloBluetoothPacket::receivePacketPayloadLen[] = {
     2  //Debug message
 };
 
+CelluloBluetoothPacket::operator QString() const{
+    QString str;
+    const QMetaObject& metaObject = CelluloBluetoothPacket::staticMetaObject;
+    QMetaEnum metaEnum;
+
+    metaEnum = metaObject.enumerator(metaObject.indexOfEnumerator("SEND_PACKET_TYPE"));
+    str += "sendPacketType: ";
+    str += metaEnum.valueToKey((int)sendPacketType);
+
+    metaEnum = metaObject.enumerator(metaObject.indexOfEnumerator("RECEIVE_PACKET_TYPE"));
+    str += "; receivePacketType: ";
+    str += metaEnum.valueToKey((int)receivePacketType);
+
+    metaEnum = metaObject.enumerator(metaObject.indexOfEnumerator("RECEIVE_STATUS"));
+    str += "; receiveStatus: ";
+    str += metaEnum.valueToKey((int)receiveStatus);
+
+    str += "; payload:";
+    QByteArray hex = payload.toHex().toUpper();
+    for(int i=0;i<hex.length();i+=2){
+        str += " 0x";
+        str += hex[i];
+        str += hex[i + 1];
+    }
+
+    return str;
+}
+
 CelluloBluetoothPacket::CelluloBluetoothPacket(){
     clear();
 }

@@ -117,6 +117,13 @@ public:
     virtual ~CelluloBluetoothPacket();
 
     /**
+     * @brief Prettyprinting
+     *
+     * @return String representation of this object
+     */
+    operator QString() const;
+
+    /**
      * @brief Sets the outgoing message type
      *
      * @param type Outgoing message type
