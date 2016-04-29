@@ -392,7 +392,6 @@ void CelluloBluetooth::setPoseBcastPeriod(unsigned int period){
     sendCommand(COMMAND_TYPE::SET_BCAST_PERIOD, message);
 }
 
-
 void CelluloBluetooth::setImageStreamingEnabled(bool enabled){
     if(enabled != imageStreamingEnabled){
         imageStreamingEnabled = enabled;
