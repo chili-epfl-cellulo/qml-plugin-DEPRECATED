@@ -230,14 +230,14 @@ void CelluloBluetoothPacket::load(qint8 num){
     payload.append(*((char*)&num));
 }
 
-QByteArray CelluloBluetoothPacket::getSendPacket(){
-    QByteArray packet;
+QByteArray CelluloBluetoothPacket::getSendData(){
+    QByteArray data;
 
-    packet.append(PACKET_START_CHAR);
-    packet.append(sendPacketTypeStr[(int)sendPacketType]);
-    packet.append(payload);
+    data.append(PACKET_START_CHAR);
+    data.append(sendPacketTypeStr[(int)sendPacketType]);
+    data.append(payload);
 
-    return packet;
+    return data;
 }
 
 bool CelluloBluetoothPacket::loadReceivedByte(char c){
@@ -308,7 +308,7 @@ quint32 CelluloBluetoothPacket::unloadUInt32(){
         //Decode from big endian
         unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
         unloadIndex += 4;
-        return (quint32)(0x1000000*p[0] + 0x10000*p[1] + 0x100*p[2] + p[3]);
+        return (quint32)((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | (p[3] << 0));
     }
 }
 
@@ -322,7 +322,7 @@ quint32 CelluloBluetoothPacket::unloadUInt24(){
         //Decode from big endian
         unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
         unloadIndex += 3;
-        return (quint32)(0x10000*p[0] + 0x100*p[1] + p[2]);
+        return (quint32)((p[0] << 16) | (p[1] << 8) | (p[2] << 0));
     }
 }
 
@@ -336,7 +336,7 @@ quint16 CelluloBluetoothPacket::unloadUInt16(){
         //Decode from big endian
         unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
         unloadIndex += 2;
-        return (quint16)(0x100*p[0] + p[1]);
+        return (quint16)((p[0] << 8) | (p[1] << 0));
     }
 }
 
@@ -362,7 +362,7 @@ qint32 CelluloBluetoothPacket::unloadInt32(){
         //Decode from big endian
         unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
         unloadIndex += 4;
-        quint32 unum = (quint32)(0x1000000*p[0] + 0x10000*p[1] + 0x100*p[2] + p[3]);
+        quint32 unum = (quint32)((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | (p[3] << 0));
         return *((qint32*)(&unum));
     }
 }
@@ -377,7 +377,7 @@ qint32 CelluloBluetoothPacket::unloadInt24(){
         //Decode from big endian
         unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
         unloadIndex += 3;
-        quint32 unum = (quint32)(0x10000*p[0] + 0x100*p[1] + p[2]);
+        quint32 unum = (quint32)((p[0] << 16) | (p[1] << 8) | (p[2] << 0));
 
         //Sign extension
         if(unum >= 0x800000)
@@ -396,7 +396,7 @@ qint16 CelluloBluetoothPacket::unloadInt16(){
         //Decode from big endian
         unsigned char* p = (unsigned char*)payload.data() + unloadIndex;
         unloadIndex += 2;
-        quint16 unum = (quint16)(0x100*p[0] + p[1]);
+        quint16 unum = (quint16)((p[0] << 8) | (p[1] << 0));
         return *((qint16*)(&unum));
     }
 }

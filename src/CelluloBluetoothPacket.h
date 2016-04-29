@@ -97,7 +97,7 @@ public:
         NUM_RECEIVE_STATUS
     };
 
-    const char PACKET_START_CHAR = 0x01;                    ///< Put into the beginning of every Cellulo packet
+    static const char PACKET_START_CHAR = 0x01;             ///< Put into the beginning of every Cellulo packet
 
     static const int IMG_WIDTH = 752/4;                     ///< Image width of the robot's camera
     static const int IMG_HEIGHT = 480/4;                    ///< Image height of the robot's camera
@@ -200,7 +200,7 @@ public:
      *
      * @return Message to be sent
      */
-    QByteArray getSendPacket();
+    QByteArray getSendData();
 
     /**
      * @brief Processes incoming byte, determines type if byte is relevant
@@ -275,13 +275,13 @@ public:
      */
     qint8 unloadInt8();
 
-private:
-
     static const char* sendPacketTypeStr[];     ///< Strings sent over Bluetooth to give commands
     static const char* receivePacketTypeStr[];  ///< Strings received over Bluetooth as response or event
 
     static const int sendPacketPayloadLen[];    ///< Total lengths of packets sent over Bluetooth
     static const int receivePacketPayloadLen[]; ///< Total lengths of packets received over Bluetooth
+
+private:
 
     SEND_PACKET_TYPE sendPacketType;            ///< Packet type if outgoing packet
     RECEIVE_PACKET_TYPE receivePacketType;      ///< Packet type if incoming packet
