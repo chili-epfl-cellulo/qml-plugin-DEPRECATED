@@ -1,40 +1,57 @@
-#Building of native code
-
-TEMPLATE = lib
-TARGET = celluloplugin
-
-CONFIG += qt plugin c++11 nostrip
-CONFIG -= android_install
-
 QT += qml quick bluetooth
 
-TARGET = $$qtLibraryTarget($$TARGET)
-uri = Cellulo
+CONFIG += qt c++11 nostrip
 
 HEADERS += \
     src/CelluloBluetooth.h \
     src/CameraFrameImageProvider.h \
-    src/CelluloBluetoothPlugin.h
+    src/CelluloBluetoothPlugin.h \
+    src/CelluloBluetoothPacket.h
 
 SOURCES += \
     src/CelluloBluetooth.cpp \
     src/CameraFrameImageProvider.cpp \
-    src/CelluloBluetoothPlugin.cpp
+    src/CelluloBluetoothPlugin.cpp \
+    src/CelluloBluetoothPacket.cpp
 
-#File installation
+test{
+    message(Configuring test build...)
 
-qmldir.files = qmldir
-javascript.files = src/cellulo-toolkit.js
-qml.files = src/CelluloRobot.qml src/MacAddrSelector.qml
+    TEMPLATE = app
+    TARGET = celluloplugintests
 
-OTHER_FILES += qmldir.files javascript.files qml.files
+    QT += testlib
 
-unix {
-    installPath = $$[QT_INSTALL_QML]/$$replace(uri, \\., /)
-    qmldir.path = $$installPath
-    javascript.path = $$installPath
-    qml.path = $$installPath
-    target.path = $$installPath
-    INSTALLS += target qmldir javascript qml
+    HEADERS += \
+        test/TestCelluloBluetoothPacket.h
+
+    SOURCES += \
+        test/TestCelluloBluetoothPacket.cpp
 }
+else{
+    TEMPLATE = lib
+    TARGET = celluloplugin
 
+    CONFIG += plugin
+    CONFIG -= android_install
+
+    TARGET = $$qtLibraryTarget($$TARGET)
+    uri = Cellulo
+
+    #File installation
+
+    qmldir.files = qmldir
+    javascript.files = src/cellulo-toolkit.js
+    qml.files = src/CelluloRobot.qml src/MacAddrSelector.qml
+
+    OTHER_FILES += qmldir.files javascript.files qml.files
+
+    unix {
+        installPath = $$[QT_INSTALL_QML]/$$replace(uri, \\., /)
+        qmldir.path = $$installPath
+        javascript.path = $$installPath
+        qml.path = $$installPath
+        target.path = $$installPath
+        INSTALLS += target qmldir javascript qml
+    }
+}

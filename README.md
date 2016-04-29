@@ -30,3 +30,13 @@ mkdir build-android && cd build-android
 /path-to-qt-install-root/5.4/android_armv7/bin/qmake ..
 make -j5 install
 ```
+
+Build & run unit tests
+----------------------
+
+```
+mkdir build-test && cd build-test
+/path-to-qt-install-root/5.4/gcc_64/bin/qmake .. "CONFIG += test"
+make -j5
+./celluloplugintests
+```
