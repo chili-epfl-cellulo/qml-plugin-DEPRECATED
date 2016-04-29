@@ -89,46 +89,27 @@ void TestCelluloBluetoothPacket::loadUnload(){
     BCOMP(0xB9); BCOMP(0x75); BCOMP(0xD1); //12154321
     BCOMP(0xFF); BCOMP(0xFF); BCOMP(0xFF); //1000000000
     BCOMP(0xB4); BCOMP(0xDF); BCOMP(0xD4); BCOMP(0xD2); //3034567890
+
+    //Check negative signed int unloads
+    QCOMPARE(packet.unloadInt8(), (qint8)-100);
+    QCOMPARE(packet.unloadInt16(), (qint16)-22454);
+    QCOMPARE(packet.unloadInt24(), (qint32)-6123456);
+    QCOMPARE(packet.unloadInt24(), (qint32)-8388608);
+    QCOMPARE(packet.unloadInt32(), (qint32)-1734567890);
+
+    //Check positive signed int unloads
+    QCOMPARE(packet.unloadInt8(), (qint8)126);
+    QCOMPARE(packet.unloadInt16(), (qint16)12545);
+    QCOMPARE(packet.unloadInt24(), (qint32)6654321);
+    QCOMPARE(packet.unloadInt24(), (qint32)8388607);
+    QCOMPARE(packet.unloadInt32(), (qint32)1834567890);
+
+    //Check usigned int unloads
+    QCOMPARE(packet.unloadUInt8(), (quint8)200);
+    QCOMPARE(packet.unloadUInt16(), (quint16)52545);
+    QCOMPARE(packet.unloadUInt24(), (quint32)12154321);
+    QCOMPARE(packet.unloadUInt24(), (quint32)16777215);
+    QCOMPARE(packet.unloadUInt32(), (quint32)3034567890);
 }
 
 QTEST_MAIN(TestCelluloBluetoothPacket)
-
-/*int main(){
-
-    CelluloBluetoothPacket packet;
-
-    packet.setSendPacketType(CelluloBluetoothPacket::SEND_PACKET_TYPE::RESET);
-    packet.load((qint8)-100);
-    packet.load((qint16)-12545);
-    packet.load24((qint32)-1000000000);
-    packet.load((qint32)-1234567890);
-    packet.load((qint8)126);
-    packet.load((qint16)12545);
-    packet.load24((qint32)1000000000);
-    packet.load((qint32)1234567890);
-    packet.load((quint8)200);
-    packet.load((quint16)52545);
-    packet.load24((quint32)1000000000);
-    packet.load((quint32)2034567890);
-
-
-    qDebug() << packet;
-
-    //QByteArray res = packet.getSendPacket();
-
-    qDebug() << packet.unloadInt8();
-    qDebug() << packet.unloadInt16();
-    qDebug() << packet.unloadInt24();
-    qDebug() << packet.unloadInt32();
-    qDebug() << packet.unloadInt8();
-    qDebug() << packet.unloadInt16();
-    qDebug() << packet.unloadInt24();
-    qDebug() << packet.unloadInt32();
-    qDebug() << packet.unloadUInt8();
-    qDebug() << packet.unloadUInt16();
-    qDebug() << packet.unloadUInt24();
-    qDebug() << packet.unloadUInt32();
-
-    return 0;
-}
-*/
