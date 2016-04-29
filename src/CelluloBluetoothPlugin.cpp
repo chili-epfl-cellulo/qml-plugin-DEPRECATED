@@ -36,4 +36,3 @@ void CelluloBluetoothPlugin::registerTypes(const char *uri){
 void CelluloBluetoothPlugin::initializeEngine(QQmlEngine *engine, const char *uri){
     engine->addImageProvider("cameraFrame", new CameraFrameImageProvider());
 }
-

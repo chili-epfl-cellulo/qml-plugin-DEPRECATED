@@ -46,22 +46,22 @@ const char* CelluloBluetoothPacket::sendPacketTypeStr[] = {
 };
 
 const int CelluloBluetoothPacket::sendPacketPayloadLen[] = {
-    0, //Ping
-    -1, //Set broadcast period
-    -1, //Enable image streaming + disable localization or vice-versa
-    -1, //Enable timestamping along with pose and disable idling or vice-versa
-    -1, //Request frame
-    -1, //Query battery state
-    -1, //Set visual state
-    -1, //Set effect
-    -1, //Set motor output
-    -1, //Set all motor outputs
-    -1, //Set goal velocity
-    -1, //Set goal velocity compact
-    -1, //Set goal pose
-    -1, //Set goal position
-    0, //Reset
-    0  //Shutdown
+    0,                 //Ping
+    2,                 //Set broadcast period
+    -1,                //Enable image streaming + disable localization or vice-versa
+    1,                 //Enable timestamping along with pose and disable idling or vice-versa
+    0,                 //Request frame
+    0,                 //Query battery state
+    1,                 //Set visual state
+    1 + 1 + 1 + 1 + 1, //Set effect
+    1 + 2,             //Set motor output
+    2 + 2 + 2,         //Set all motor outputs
+    2 + 2 + 2,         //Set goal velocity
+    -1,                //Set goal velocity compact
+    4 + 4 + 2 + 2 + 2, //Set goal pose
+    4 + 4 + 2,         //Set goal position
+    0,                 //Reset
+    0                  //Shutdown
 };
 
 const char* CelluloBluetoothPacket::receivePacketTypeStr[] = {
@@ -80,18 +80,18 @@ const char* CelluloBluetoothPacket::receivePacketTypeStr[] = {
 };
 
 const int CelluloBluetoothPacket::receivePacketPayloadLen[] = {
-    0, //Boot finished
-    0, //Wake up finished (Hello)
-    0, //Shutting down
-    0, //Battery low, shutting down
-    -1, //Battery state changed
-    -1, //Touch began
-    -1, //Long touch
-    -1, //Touch released
-    -1, //Pose changed
-    -1, //Robot kidnapped or unkidnapped
-    0, //Acknowledged
-    2  //Debug message
+    0,         //Boot finished
+    0,         //Wake up finished (Hello)
+    0,         //Shutting down
+    0,         //Battery low, shutting down
+    1,         //Battery state changed
+    1,         //Touch began
+    1,         //Long touch
+    1,         //Touch released
+    4 + 4 + 2, //Pose changed
+    1,         //Robot kidnapped or unkidnapped
+    0,         //Acknowledged
+    0          //Debug message
 };
 
 CelluloBluetoothPacket::operator QString() const {
@@ -126,8 +126,7 @@ CelluloBluetoothPacket::CelluloBluetoothPacket(){
     clear();
 }
 
-CelluloBluetoothPacket::~CelluloBluetoothPacket(){
-}
+CelluloBluetoothPacket::~CelluloBluetoothPacket(){ }
 
 void CelluloBluetoothPacket::setSendPacketType(SEND_PACKET_TYPE type){
     sendPacketType = type;

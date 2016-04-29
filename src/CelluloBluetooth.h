@@ -45,7 +45,7 @@ Q_OBJECT
     Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
     Q_PROPERTY(bool connecting READ getConnecting NOTIFY connectingChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
-    Q_PROPERTY(bool imageStreamingEnabled WRITE setImageStreamingEnabled READ getImageStreamingEnabled)
+    //Q_PROPERTY(bool imageStreamingEnabled WRITE setImageStreamingEnabled READ getImageStreamingEnabled)
     Q_PROPERTY(bool timestampingEnabled WRITE setTimestampingEnabled READ getTimestampingEnabled)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
@@ -56,56 +56,20 @@ Q_OBJECT
 
 public:
 
-    enum COMMAND_TYPE {
-        PING = 0,
-        SET_BCAST_PERIOD,
-        IMAGE_STREAM_ENABLE,
-        TIMESTAMP_ENABLE,
-        FRAME_REQUEST,
-        BATTERY_STATE_REQUEST,
-        SET_VISUAL_STATE,
-        SET_VISUAL_EFFECT,
-        SET_MOTOR_OUTPUT,
-        SET_ALL_MOTOR_OUTPUTS,
-        SET_GOAL_VELOCITY,
-        SET_GOAL_VELOCITY_COMPACT,
-        SET_GOAL_POSE,
-        SET_GOAL_POSITION,
-        RESET,
-        SHUTDOWN
-    };
+static const int BT_CONNECT_TIMEOUT_MILLIS     = 30000;  ///< Will try to reconnect after this much time
 
-    enum RECEIVE_MESSAGES {
-        BOOT_COMPLETE = 0,
-        WAKE_UP,
-        SHUTTING_DOWN,
-        LOW_BATTERY,
-        BATTERY_STATE_CHANGED,
-        TOUCH_BEGIN,
-        TOUCH_LONG_PRESSED,
-        TOUCH_RELEASED,
-        POSE_CHANGED,
-        KIDNAP,
-        ACKNOWLEDGED,
-        DEBUG,
-        NUM_RECEIVE_MESSAGES,
-        INVALID_MESSAGE = -1
-    };
+static const int FRAME_TIMEOUT_MILLIS          = 10000;  ///< Will wait this many millis for a camera frame to complete
 
-    static const int BT_CONNECT_TIMEOUT_MILLIS = 30000; ///< Will try to reconnect after this much time
+static const int IMG_WIDTH                     = 752/4;  ///< Image width of the robot's camera
+static const int IMG_HEIGHT                    = 480/4;  ///< Image height of the robot's camera
 
-    static const int FRAME_TIMEOUT_MILLIS = 10000;   ///< Will wait this many millis for a camera frame to complete
+static constexpr float FRAMERATE_SMOOTH_FACTOR = 0.99f;  ///< Smoothing factor for framerate, closer to 1.0 means less update
 
-    static const int IMG_WIDTH = 752/4;              ///< Image width of the robot's camera
-    static const int IMG_HEIGHT = 480/4;             ///< Image height of the robot's camera
+static constexpr float GOAL_POSE_FACTOR        = 100.0f; ///< Goal pose elements are multiplied by this before comm.
+static constexpr float GOAL_VELOCITY_FACTOR    = 100.0f; ///< Goal velocities are multiplied by this before comm.
+static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;      ///< Goal velocities are divided by this in the compact velocity command
 
-    static constexpr float FRAMERATE_SMOOTH_FACTOR = 0.99f;  ///< Smoothing factor for framerate, closer to 1.0 means less update
-
-    static constexpr float GOAL_POSE_FACTOR = 100.0f;       ///< Goal pose elements are multiplied by this before comm.
-    static constexpr float GOAL_VELOCITY_FACTOR = 100.0f;   ///< Goal velocities are multiplied by this before comm.
-    static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;     ///< Goal velocities are divided by this in the compact velocity command
-
-    static QByteArray frameBuffer;                   ///< Container for the received camera frame data
+static QByteArray frameBuffer;                           ///< Container for the received camera frame data
 
     /**
      * @brief Creates a new Cellulo robot communicator
@@ -152,7 +116,7 @@ public:
      *
      * @return Whether image streaming is enabled or localization is enabled
      */
-    bool getImageStreamingEnabled(){ return imageStreamingEnabled; }
+    //bool getImageStreamingEnabled(){ return imageStreamingEnabled; }
 
     /**
      * @brief Gets whether timestamping along with pose is currently enabled
@@ -235,7 +199,7 @@ private slots:
     /**
      * @brief Called when the server did not complete the camera frame in time
      */
-    void frameTimeout();
+    //void frameTimeout();
 
 public slots:
 
@@ -268,7 +232,7 @@ public slots:
      *
      * @param enabled Whether to enable image streaming
      */
-    void setImageStreamingEnabled(bool enabled);
+    //void setImageStreamingEnabled(bool enabled);
 
     /**
      * @brief Enables timestamping along with pose and disables pose idling or vice-versa
@@ -324,7 +288,7 @@ public slots:
      * @param vx X velocity in mm/s (between -256 and 254)
      * @param vy Y velocity in mm/s (between -256 and 254)
      */
-    void setGoalVelocityCompact(int vx, int vy);
+    //void setGoalVelocityCompact(int vx, int vy);
 
     /**
      * @brief Sets a pose goal to track
@@ -467,28 +431,32 @@ signals:
 
 private:
 
-    static const char* commandStrings[];    ///< Strings sent over Bluetooth to give commands
-    static const char* receiveStrings[];    ///< Strings received over Bluetooth as response or event
+    using SEND_PACKET_TYPE = CelluloBluetoothPacket::SEND_PACKET_TYPE;
+    using RECEIVE_PACKET_TYPE = CelluloBluetoothPacket::RECEIVE_PACKET_TYPE;
 
-    QTimer btConnectTimeoutTimer;           ///< Timeout timer to reconnect if connection fails
-    QBluetoothSocket* socket;               ///< Bluetooth socket connected to the server
-    QString macAddr;                        ///< Bluetooth MAC address of the server
-    bool imageStreamingEnabled;             ///< Whether image streaming is enabled or localization is enabled
-    bool timestampingEnabled;               ///< Whether timestamping along with pose is enabled and idling disabled
-    int lastTimestamp;                      ///< Latest received onboard timestamp (in milliseconds)
-    float framerate;                        ///< Framerate calculated over time
-    QTimer frameTimeoutTimer;               ///< When this timer runs out, frame is completed even if it is not complete
-    QByteArray receiveBuffer;               ///< Receive buffer until the current response/event message is complete
-    bool expectingFrame;                    ///< True after sending a camera frame request until the camera frame arrives completely
-    unsigned int currentPixel;              ///< Current pixel in the camera frame being received
+    CelluloBluetoothPacket sendPacket; ///< Outgoing packet
+    CelluloBluetoothPacket recvPacket; ///< Incoming packet
 
-    bool connected;                         ///< Whether Bluetooth is connected now
-    bool connecting;                        ///< Whether Bluetooth is trying to connect
-    int batteryState;                       ///< Current battery state
-    float x;                                ///< Current x position in grid coordinates
-    float y;                                ///< Current y position in grid coordinates
-    float theta;                            ///< Current orientation in degrees
-    bool kidnapped;                         ///< Whether currently kidnapped
+    QTimer btConnectTimeoutTimer;      ///< Timeout timer to reconnect if connection fails
+    QBluetoothSocket* socket;          ///< Bluetooth socket connected to the server
+    QString macAddr;                   ///< Bluetooth MAC address of the server
+    bool connected;                    ///< Whether Bluetooth is connected now
+    bool connecting;                   ///< Whether Bluetooth is trying to connect
+
+    //bool imageStreamingEnabled;        ///< Whether image streaming is enabled or localization is enabled
+    bool timestampingEnabled;          ///< Whether timestamping along with pose is enabled and idling disabled
+    int lastTimestamp;                 ///< Latest received onboard timestamp (in milliseconds)
+    float framerate;                   ///< Framerate calculated over time
+    //QTimer frameTimeoutTimer;          ///< When this timer runs out, frame is completed even if it is not complete
+    //QByteArray receiveBuffer;          ///< Receive buffer until the current response/event message is complete
+    //bool expectingFrame;               ///< True after sending a camera frame request until the camera frame arrives completely
+    unsigned int currentPixel;         ///< Current pixel in the camera frame being received
+
+    int batteryState;                  ///< Current battery state
+    float x;                           ///< Current x position in grid coordinates
+    float y;                           ///< Current y position in grid coordinates
+    float theta;                       ///< Current orientation in degrees
+    bool kidnapped;                    ///< Whether currently kidnapped
 
     /**
      * @brief Resets properties of the robot to default
@@ -509,53 +477,14 @@ private:
     void setMotorOutput(int motor, int output);
 
     /**
-     * @brief Sends command over Bluetooth
-     *
-     * @param type Type of the command
-     * @param message Message body itself
+     * @brief Sends the already built packet over Bluetooth
      */
-    void sendCommand(COMMAND_TYPE type, QByteArray& message);
+    void sendCommand();
 
     /**
      * @brief Processes the response in the receive buffer if possible
      */
     void processResponse();
-
-    /**
-     * @brief Gets the ordinal of the received message in the receive buffer
-     *
-     * @return Received message ordinal in the RECEIVE_MESSAGES enum
-     */
-    RECEIVE_MESSAGES getReceivedMessage();
-
-    /**
-     * @brief Calculates the integer value from an uppercase hex string
-     *
-     * @param array Array containing the hex string
-     * @param begin Index of most significant digit
-     * @param end Index of least significant digit
-     *
-     * @return The value
-     */
-    int hexToInt(QByteArray const& array, int begin, int end);
-
-    /**
-     * @brief Converts single digit integer to hexadecimal character
-     *
-     * @param value Between 0x0 and 0xF
-     *
-     * @return Hexadecimal representation of value
-     */
-    char getHexChar(unsigned int value);
-
-    /**
-     * @brief Calculates the number of 1 bits in the given value
-     *
-     * @param value Given value
-     *
-     * @return Number of 1 bits in given value
-     */
-    char getNumberOfOnes(unsigned int value);
 };
 
 #endif // CELLULOBLUETOOTH_H

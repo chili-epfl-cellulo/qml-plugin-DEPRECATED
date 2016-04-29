@@ -97,20 +97,20 @@ public:
         NUM_RECEIVE_STATUS
     };
 
-    static const char* sendPacketTypeStr[];                 ///< Strings sent over Bluetooth to give commands
-    static const char* receivePacketTypeStr[];              ///< Strings received over Bluetooth as response or event
+static const char* sendPacketTypeStr[];               ///< Strings sent over Bluetooth to give commands
+static const char* receivePacketTypeStr[];            ///< Strings received over Bluetooth as response or event
 
-    static const int sendPacketPayloadLen[];                ///< Total lengths of packets sent over Bluetooth
-    static const int receivePacketPayloadLen[];             ///< Total lengths of packets received over Bluetooth
+static const int sendPacketPayloadLen[];              ///< Total lengths of packets sent over Bluetooth
+static const int receivePacketPayloadLen[];           ///< Total lengths of packets received over Bluetooth
 
-    static const char PACKET_START_CHAR = 0x01;             ///< Put into the beginning of every Cellulo packet
+static const char PACKET_START_CHAR = 0x01;           ///< Put into the beginning of every Cellulo packet
 
-    static const int IMG_WIDTH = 752/4;                     ///< Image width of the robot's camera
-    static const int IMG_HEIGHT = 480/4;                    ///< Image height of the robot's camera
+static const int IMG_WIDTH = 752/4;                   ///< Image width of the robot's camera
+static const int IMG_HEIGHT = 480/4;                  ///< Image height of the robot's camera
 
-    static constexpr float GOAL_POSE_FACTOR = 100.0f;       ///< Goal pose elements are multiplied by this before comm.
-    static constexpr float GOAL_VELOCITY_FACTOR = 100.0f;   ///< Goal velocities are multiplied by this before comm.
-    static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;     ///< Goal velocities are divided by this in the compact velocity command
+static constexpr float GOAL_POSE_FACTOR = 100.0f;     ///< Goal pose elements are multiplied by this before comm.
+static constexpr float GOAL_VELOCITY_FACTOR = 100.0f; ///< Goal velocities are multiplied by this before comm.
+static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;   ///< Goal velocities are divided by this in the compact velocity command
 
     /**
      * @brief Creates a new Cellulo Bluetooth message
@@ -221,9 +221,7 @@ public:
      *
      * @return The received packet type
      */
-    RECEIVE_PACKET_TYPE getReceivePacketType(){
-        return receivePacketType;
-    }
+    RECEIVE_PACKET_TYPE getReceivePacketType(){ return receivePacketType; }
 
     /**
      * @brief Attempts to unload a 32-bit unsigned integer
