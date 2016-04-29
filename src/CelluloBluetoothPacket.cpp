@@ -158,8 +158,10 @@ void CelluloBluetoothPacket::load(quint32 num){
 }
 
 void CelluloBluetoothPacket::load24(quint32 num){
-    if(num > 0xFFFFFF)
+    if(num > 0xFFFFFF){
         num = 0xFFFFFF;
+        qDebug() << "CelluloBluetoothPacket::load24(quint32 num): Number loaded too large, clamping to " << 0xFFFFFF;
+    }
 
     //Convert to big endian
     char* p = ((char*)&num) + 2;
@@ -197,10 +199,14 @@ void CelluloBluetoothPacket::load(qint32 num){
 }
 
 void CelluloBluetoothPacket::load24(qint32 num){
-    if(num > 0x7FFFFF)
+    if(num > 0x7FFFFF){
         num = 0x7FFFFF;
-    else if(num < -0x800000)
+        qDebug() << "CelluloBluetoothPacket::load24(qint32 num): Number loaded too large, clamping to " << 0x7FFFFF;
+    }
+    else if(num < -0x800000){
         num = -0x800000;
+        qDebug() << "CelluloBluetoothPacket::load24(qint32 num): Number loaded too small, clamping to " << -0x800000;
+    }
 
     //Convert to big endian
     char* p = ((char*)&num) + 2;
@@ -294,7 +300,7 @@ bool CelluloBluetoothPacket::loadReceivedByte(char c){
 
 quint32 CelluloBluetoothPacket::unloadUInt32(){
     if(unloadIndex + 4 > payload.length()){
-        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        qDebug() << "CelluloBluetoothPacket::unloadUInt32(): Unload index out of bounds";
         return 0;
     }
     else{
@@ -308,7 +314,7 @@ quint32 CelluloBluetoothPacket::unloadUInt32(){
 
 quint32 CelluloBluetoothPacket::unloadUInt24(){
     if(unloadIndex + 3 > payload.length()){
-        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        qDebug() << "CelluloBluetoothPacket::unloadUInt24(): Unload index out of bounds";
         return 0;
     }
     else{
@@ -322,7 +328,7 @@ quint32 CelluloBluetoothPacket::unloadUInt24(){
 
 quint16 CelluloBluetoothPacket::unloadUInt16(){
     if(unloadIndex + 2 > payload.length()){
-        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        qDebug() << "CelluloBluetoothPacket::unloadUInt16(): Unload index out of bounds";
         return 0;
     }
     else{
@@ -336,7 +342,7 @@ quint16 CelluloBluetoothPacket::unloadUInt16(){
 
 quint8 CelluloBluetoothPacket::unloadUInt8(){
     if(unloadIndex + 1 > payload.length()){
-        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        qDebug() << "CelluloBluetoothPacket::unloadUInt8(): Unload index out of bounds";
         return 0;
     }
     else{
@@ -348,7 +354,7 @@ quint8 CelluloBluetoothPacket::unloadUInt8(){
 
 qint32 CelluloBluetoothPacket::unloadInt32(){
     if(unloadIndex + 4 > payload.length()){
-        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        qDebug() << "CelluloBluetoothPacket::unloadInt32(): Unload index out of bounds";
         return 0;
     }
     else{
@@ -363,7 +369,7 @@ qint32 CelluloBluetoothPacket::unloadInt32(){
 
 qint32 CelluloBluetoothPacket::unloadInt24(){
     if(unloadIndex + 3 > payload.length()){
-        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        qDebug() << "CelluloBluetoothPacket::unloadInt24(): Unload index out of bounds";
         return 0;
     }
     else{
@@ -382,7 +388,7 @@ qint32 CelluloBluetoothPacket::unloadInt24(){
 
 qint16 CelluloBluetoothPacket::unloadInt16(){
     if(unloadIndex + 2 > payload.length()){
-        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        qDebug() << "CelluloBluetoothPacket::unloadInt16(): Unload index out of bounds";
         return 0;
     }
     else{
@@ -397,7 +403,7 @@ qint16 CelluloBluetoothPacket::unloadInt16(){
 
 qint8 CelluloBluetoothPacket::unloadInt8(){
     if(unloadIndex + 1 > payload.length()){
-        qDebug() << "CelluloBluetoothPacket: Unload index out of bounds";
+        qDebug() << "CelluloBluetoothPacket::unloadInt8(): Unload index out of bounds";
         return 0;
     }
     else{
