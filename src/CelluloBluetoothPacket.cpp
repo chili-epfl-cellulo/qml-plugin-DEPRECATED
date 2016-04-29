@@ -147,14 +147,11 @@ void CelluloBluetoothPacket::clear(){
 void CelluloBluetoothPacket::load(quint32 num){
 
     //Convert to big endian
-    char* p = ((char*)&num) + 3;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
+    char* p = ((char*)&num);
+    payload.append(p[3]);
+    payload.append(p[2]);
+    payload.append(p[1]);
+    payload.append(p[0]);
 }
 
 void CelluloBluetoothPacket::load24(quint32 num){
@@ -164,21 +161,18 @@ void CelluloBluetoothPacket::load24(quint32 num){
     }
 
     //Convert to big endian
-    char* p = ((char*)&num) + 2;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
+    char* p = ((char*)&num);
+    payload.append(p[2]);
+    payload.append(p[1]);
+    payload.append(p[0]);
 }
 
 void CelluloBluetoothPacket::load(quint16 num){
 
     //Convert to big endian
-    char* p = ((char*)&num) + 1;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
+    char* p = ((char*)&num);
+    payload.append(p[1]);
+    payload.append(p[0]);
 }
 
 void CelluloBluetoothPacket::load(quint8 num){
@@ -188,14 +182,11 @@ void CelluloBluetoothPacket::load(quint8 num){
 void CelluloBluetoothPacket::load(qint32 num){
 
     //Convert to big endian
-    char* p = ((char*)&num) + 3;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
+    char* p = ((char*)&num);
+    payload.append(p[3]);
+    payload.append(p[2]);
+    payload.append(p[1]);
+    payload.append(p[0]);
 }
 
 void CelluloBluetoothPacket::load24(qint32 num){
@@ -209,21 +200,18 @@ void CelluloBluetoothPacket::load24(qint32 num){
     }
 
     //Convert to big endian
-    char* p = ((char*)&num) + 2;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
+    char* p = ((char*)&num);
+    payload.append(p[2]);
+    payload.append(p[1]);
+    payload.append(p[0]);
 }
 
 void CelluloBluetoothPacket::load(qint16 num){
 
     //Convert to big endian
-    char* p = ((char*)&num) + 1;
-    payload.append(*p);
-    p--;
-    payload.append(*p);
+    char* p = ((char*)&num);
+    payload.append(p[1]);
+    payload.append(p[0]);
 }
 
 void CelluloBluetoothPacket::load(qint8 num){
