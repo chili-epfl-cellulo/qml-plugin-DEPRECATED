@@ -198,7 +198,7 @@ void CelluloBluetooth::socketDataArrived(){
         if(recvPacket.loadReceivedByte(message[i]))
             processResponse();
 
-        /*//We're receiving a camera image
+        /*/ /We 're receiving a camera image
         if(expectingFrame){
             frameBuffer.append(message[i]);
             currentPixel++;
@@ -222,7 +222,7 @@ void CelluloBluetooth::socketDataArrived(){
             else{
                 receiveBuffer.append(message[i]);
             }
-        }*/
+        } */
     }
 }
 
@@ -283,12 +283,26 @@ void CelluloBluetooth::processResponse(){
             theta = recvPacket.unloadUInt16()/GOAL_POSE_FACTOR;
             emit poseChanged();
 
-            /*if(timestampingEnabled){
-                int newTimestamp = hexToInt(receiveBuffer, 21, 28);
-                framerate = FRAMERATE_SMOOTH_FACTOR*framerate + (1.0 - FRAMERATE_SMOOTH_FACTOR)*1000/(newTimestamp - lastTimestamp);
-                lastTimestamp = newTimestamp;
-                emit timestampChanged();
-            }*/
+            if(kidnapped){
+                kidnapped = false;
+                emit kidnappedChanged();
+            }
+
+            break;
+        }
+
+        case RECEIVE_PACKET_TYPE::POSE_CHANGED_TIMESTAMPED: {
+            x = recvPacket.unloadUInt32()/GOAL_POSE_FACTOR;
+            y = recvPacket.unloadUInt32()/GOAL_POSE_FACTOR;
+            theta = recvPacket.unloadUInt16()/GOAL_POSE_FACTOR;
+            emit poseChanged();
+
+            unsigned int newTimestamp = recvPacket.unloadUInt32();
+            framerate =
+                FRAMERATE_SMOOTH_FACTOR*framerate +
+                (1.0 - FRAMERATE_SMOOTH_FACTOR)*1000/(newTimestamp - lastTimestamp);
+            lastTimestamp = newTimestamp;
+            emit timestampChanged();
 
             if(kidnapped){
                 kidnapped = false;
@@ -327,8 +341,8 @@ void CelluloBluetooth::processResponse(){
     qDebug() << macAddr << " timed out in sending the camera frame";
     expectingFrame = false;
     emit frameReady();
-}
-*/
+   }
+ */
 
 void CelluloBluetooth::sendCommand(){
     if(socket != NULL)
@@ -375,11 +389,13 @@ void CelluloBluetooth::setPoseBcastPeriod(unsigned int period){
 
 void CelluloBluetooth::setTimestampingEnabled(bool enabled){
     if(enabled != timestampingEnabled){
+
         timestampingEnabled = enabled;
 
         sendPacket.clear();
         sendPacket.setSendPacketType(SEND_PACKET_TYPE::TIMESTAMP_ENABLE);
         sendPacket.load((quint8)enabled);
+
         sendCommand();
     }
 }
@@ -511,8 +527,8 @@ void CelluloBluetooth::setGoalVelocity(float vx, float vy, float w){
        message.append('\n');
 
        sendCommand(COMMAND_TYPE::SET_GOAL_VELOCITY_COMPACT, message);
-}
-*/
+   }
+ */
 
 void CelluloBluetooth::setGoalPose(float x, float y, float theta, float v, float w){
     x *= GOAL_POSE_FACTOR;

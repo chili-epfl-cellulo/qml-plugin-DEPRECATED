@@ -27,71 +27,73 @@
 #include <QMetaEnum>
 
 const char* CelluloBluetoothPacket::sendPacketTypeStr[] = {
-    "P", //(P)ing
-    "D", //Set broadcast perio(d)
+    "P", //PING
+    "D", //SET_BCAST_PERIOD
     "I", //Enable (i)mage streaming + disable localization or vice-versa
-    "T", //Enable (t)imestamping along with pose and disable idling or vice-versa
-    "F", //Request (f)rame
-    "B", //Query (b)attery state
-    "V", //Set (v)isual state
-    "E", //Set (e)ffect
-    "M", //Set (m)otor output
-    "A", //Set (a)ll motor outputs
-    "C", //Set goal velo(c)ity
+    "T", //TIMESTAMP_ENABLE
+    "F", //FRAME_REQUEST
+    "B", //BATTERY_STATE_REQUEST
+    "V", //SET_VISUAL_STATE
+    "E", //SET_VISUAL_EFFECT
+    "M", //SET_MOTOR_OUTPUT
+    "A", //SET_ALL_MOTOR_OUTPUTS
+    "C", //SET_GOAL_VELOCITY
     "Y", //Set goal velocit(y) compact
-    "G", //Set (g)oal pose
-    "N", //Set goal positio(n)
-    "R", //(R)eset
-    "S"  //(S)hutdown
+    "G", //SET_GOAL_POSE
+    "N", //SET_GOAL_POSITION
+    "R", //RESET
+    "S"  //SHUTDOWN
 };
 
 const int CelluloBluetoothPacket::sendPacketPayloadLen[] = {
-    0,                 //Ping
-    2,                 //Set broadcast period
+    0,                 //PING
+    2,                 //SET_BCAST_PERIOD
     -1,                //Enable image streaming + disable localization or vice-versa
-    1,                 //Enable timestamping along with pose and disable idling or vice-versa
-    0,                 //Request frame
-    0,                 //Query battery state
-    1,                 //Set visual state
-    1 + 1 + 1 + 1 + 1, //Set effect
-    1 + 2,             //Set motor output
-    2 + 2 + 2,         //Set all motor outputs
-    2 + 2 + 2,         //Set goal velocity
+    1,                 //TIMESTAMP_ENABLE
+    0,                 //FRAME_REQUEST
+    0,                 //BATTERY_STATE_REQUEST
+    1,                 //SET_VISUAL_STATE
+    1 + 1 + 1 + 1 + 1, //SET_VISUAL_EFFECT
+    1 + 2,             //SET_MOTOR_OUTPUT
+    2 + 2 + 2,         //SET_ALL_MOTOR_OUTPUTS
+    2 + 2 + 2,         //SET_GOAL_VELOCITY
     -1,                //Set goal velocity compact
-    4 + 4 + 2 + 2 + 2, //Set goal pose
-    4 + 4 + 2,         //Set goal position
-    0,                 //Reset
-    0                  //Shutdown
+    4 + 4 + 2 + 2 + 2, //SET_GOAL_POSE
+    4 + 4 + 2,         //SET_GOAL_POSITION
+    0,                 //RESET
+    0                  //SHUTDOWN
 };
 
 const char* CelluloBluetoothPacket::receivePacketTypeStr[] = {
-    "O", //B(o)ot finished
-    "H", //Wake up finished ((H)ello)
-    "D", //All keys long touched; shutting (d)own
-    "W", //Battery lo(w), shutting down
-    "B", //(B)attery state changed
-    "T", //(T)ouch began
-    "L", //(L)ong touch
-    "R", //Touch (r)eleased
-    "P", //(P)ose changed
-    "K", //Robot (k)idnapped or unkidnapped
-    "A", //(A)cknowledged
-    "E"  //D(e)bug message
+    "O", //BOOT_COMPLETE
+    "H", //WAKE_UP
+    "D", //SHUTTING_DOWN
+    "W", //LOW_BATTERY
+    "B", //BATTERY_STATE_CHANGED
+    "T", //TOUCH_BEGIN
+    "L", //TOUCH_LONG_PRESSED
+    "R", //TOUCH_RELEASED
+    "P", //POSE_CHANGED
+    "S", //POSE_CHANGED_TIMESTAMPED
+    "K", //KIDNAP
+    "A", //ACKNOWLEDGED
+    "E"  //DEBUG
 };
 
 const int CelluloBluetoothPacket::receivePacketPayloadLen[] = {
-    0,         //Boot finished
-    0,         //Wake up finished (Hello)
-    0,         //Shutting down
-    0,         //Battery low, shutting down
-    1,         //Battery state changed
-    1,         //Touch began
-    1,         //Long touch
-    1,         //Touch released
-    4 + 4 + 2, //Pose changed
-    1,         //Robot kidnapped or unkidnapped
-    0,         //Acknowledged
-    0          //Debug message
+    0,             //BOOT_COMPLETE
+    0,             //WAKE_UP
+    0,             //SHUTTING_DOWN
+    0,             //LOW_BATTERY
+    1,             //BATTERY_STATE_CHANGED
+    1,             //TOUCH_BEGIN
+    1,             //TOUCH_LONG_PRESSED
+    1,             //TOUCH_RELEASED
+    4 + 4 + 2,     //POSE_CHANGED
+    4 + 4 + 2 + 4, //POSE_CHANGED_TIMESTAMPED
+    1,             //KIDNAP
+    0,             //ACKNOWLEDGED
+    0              //DEBUG
 };
 
 CelluloBluetoothPacket::operator QString() const {

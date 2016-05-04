@@ -79,6 +79,7 @@ public:
         TOUCH_LONG_PRESSED,
         TOUCH_RELEASED,
         POSE_CHANGED,
+        POSE_CHANGED_TIMESTAMPED,
         KIDNAP,
         ACKNOWLEDGED,
         DEBUG,
