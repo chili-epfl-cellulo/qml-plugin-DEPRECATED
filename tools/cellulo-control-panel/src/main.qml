@@ -472,6 +472,36 @@ ApplicationWindow {
                     }
                 }
             }
+
+            GroupBox{
+                id: cameraImageBox
+                title: "Camera image"
+                width: gWidth
+
+                Row{
+                    spacing: 5
+
+                    Image{
+                        id: cameraImage
+                        source: "image://cameraFrame/"
+                        cache: false
+                        function reload() {
+                            var oldSource = source;
+                            source = "";
+                            source = oldSource;
+                        }
+                    }
+
+                    Button {
+                        text: "Grab one frame"
+                        onClicked: robotComm.requestFrame();
+                    }
+
+                    ProgressBar{
+                        value: robotComm.cameraImageProgress
+                    }
+                }
+            }
         }
     }
 
@@ -508,5 +538,6 @@ ApplicationWindow {
             case 5: k5.color = "black"; break;
             }
         }
+        onFrameReady: cameraImage.reload()
     }
 }

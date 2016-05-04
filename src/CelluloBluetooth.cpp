@@ -38,19 +38,13 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     btConnectTimeoutTimer.setInterval(BT_CONNECT_TIMEOUT_MILLIS);
     connect(&btConnectTimeoutTimer, SIGNAL(timeout()), this, SLOT(refreshConnection()));
 
-    //frameTimeoutTimer.setSingleShot(true);
-    //connect(&frameTimeoutTimer, SIGNAL(timeout()), this, SLOT(frameTimeout()));
-
-
     //TODO: CALL RESET PROPERTIES INSTEAD OF THE BELOW
 
-    //expectingFrame = false;
     frameBuffer.reserve(IMG_WIDTH*IMG_HEIGHT);
 
     connected = false;
     connecting = false;
 
-    //imageStreamingEnabled = false;
     timestampingEnabled = false;
     batteryState = 4; //Beginning with shutdown is a good idea
     x = 0;
@@ -65,12 +59,10 @@ CelluloBluetooth::~CelluloBluetooth(){
 }
 
 void CelluloBluetooth::resetProperties(){
-    //expectingFrame = false;
 
     sendPacket.clear();
     recvPacket.clear();
 
-    //imageStreamingEnabled = false;
     timestampingEnabled = false;
     batteryState = 4; //Beginning with shutdown is a good idea
     emit batteryStateChanged();
@@ -192,43 +184,16 @@ void CelluloBluetooth::socketDisconnected(){
 void CelluloBluetooth::socketDataArrived(){
     QByteArray message = socket->readAll();
 
-    for(int i=0; i<message.length(); i++){
+    for(int i=0; i<message.length(); i++)
 
         //Load byte and check end of packet
         if(recvPacket.loadReceivedByte(message[i]))
             processResponse();
-
-        /*/ /We 're receiving a camera image
-        if(expectingFrame){
-            frameBuffer.append(message[i]);
-            currentPixel++;
-
-            qDebug() << macAddr << " sent " << 100.0*currentPixel/(IMG_HEIGHT*IMG_WIDTH) << "% of frame";
-            if(currentPixel >= IMG_HEIGHT*IMG_WIDTH){
-                expectingFrame = false;
-                frameTimeoutTimer.stop();
-                qDebug() << macAddr << " sent complete frame";
-                emit frameReady();
-            }
-        }
-
-        //We're receiving regular message
-        else{
-            //End of transmission
-            if(message[i] == '\n')
-                processResponse();
-
-            //Transmission continues
-            else{
-                receiveBuffer.append(message[i]);
-            }
-        } */
-    }
 }
 
-void CelluloBluetooth::processResponse(){
-    //qDebug() << macAddr << " has sent: " << receiveBuffer;
 
+
+void CelluloBluetooth::processResponse(){
     switch(recvPacket.getReceivePacketType()){
         case RECEIVE_PACKET_TYPE::BOOT_COMPLETE:
             emit bootCompleted();
@@ -326,8 +291,38 @@ void CelluloBluetooth::processResponse(){
             qDebug() << "CelluloBluetooth::processResponse(): Robot acknowledged";
             break;
 
+        case RECEIVE_PACKET_TYPE::CAMERA_IMAGE_LINE: {
+            quint16 line = recvPacket.unloadUInt16();
+
+            //Drop previous incomplete frame
+            if(frameBuffer.length() > line*IMG_WIDTH){
+                qDebug() << "CelluloBluetooth::processResponse(): Dropping previously incomplete frame";
+                frameBuffer.clear();
+            }
+
+            //Append possibly empty lines
+            while(frameBuffer.length() < line*IMG_WIDTH){
+                qDebug() << "CelluloBluetooth::processResponse(): Camera image line dropped";
+                for(int i=0; i<IMG_WIDTH; i++)
+                    frameBuffer.append('\0');
+            }
+
+            //Append line just received
+            for(int i=0; i<IMG_WIDTH; i++)
+                frameBuffer.append(recvPacket.unloadUInt8());
+
+            //Update progress
+            cameraImageProgress = (float)(line + 1)/IMG_HEIGHT;
+            emit cameraImageProgressChanged();
+
+            if(line >= IMG_HEIGHT - 1)
+                emit frameReady();
+
+            break;
+        }
+
         case RECEIVE_PACKET_TYPE::DEBUG:
-            qDebug() << "CelluloBluetooth::processResponse(): Debug message"; //<< receiveBuffer.right(receiveBuffer.size() - 1);
+            qDebug() << "CelluloBluetooth::processResponse(): Debug message";
             break;
 
         default:
@@ -337,27 +332,11 @@ void CelluloBluetooth::processResponse(){
     recvPacket.clear();
 }
 
-/*void CelluloBluetooth::frameTimeout(){
-    qDebug() << macAddr << " timed out in sending the camera frame";
-    expectingFrame = false;
-    emit frameReady();
-   }
- */
+
 
 void CelluloBluetooth::sendCommand(){
     if(socket != NULL)
         socket->write(sendPacket.getSendData());
-
-    //qDebug() << "Sending command to " << macAddr << ": " << commands.head().message;
-    //
-    /*
-        if(type == COMMAND_TYPE::FRAME_REQUEST){
-            frameTimeoutTimer.start(FRAME_TIMEOUT_MILLIS);
-            expectingFrame = true;
-            currentPixel = 0;
-            frameBuffer.clear();
-        }*/
-
 }
 
 void CelluloBluetooth::ping(){
@@ -376,20 +355,8 @@ void CelluloBluetooth::setPoseBcastPeriod(unsigned int period){
     sendCommand();
 }
 
-/*void CelluloBluetooth::setImageStreamingEnabled(bool enabled){
-    if(enabled != imageStreamingEnabled){
-        imageStreamingEnabled = enabled;
-        QByteArray message;
-        message = commandStrings[COMMAND_TYPE::IMAGE_STREAM_ENABLE];
-        message.append(enabled ? '1' : '0');
-        message.append('\n');
-        sendCommand(COMMAND_TYPE::IMAGE_STREAM_ENABLE, message);
-    }
-   }*/
-
 void CelluloBluetooth::setTimestampingEnabled(bool enabled){
     if(enabled != timestampingEnabled){
-
         timestampingEnabled = enabled;
 
         sendPacket.clear();
@@ -401,6 +368,12 @@ void CelluloBluetooth::setTimestampingEnabled(bool enabled){
 }
 
 void CelluloBluetooth::requestFrame(){
+    frameBuffer.clear();
+    if(cameraImageProgress != 0.0f){
+        cameraImageProgress = 0.0f;
+        emit cameraImageProgressChanged();
+    }
+
     sendPacket.clear();
     sendPacket.setSendPacketType(SEND_PACKET_TYPE::FRAME_REQUEST);
     sendCommand();

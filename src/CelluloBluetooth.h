@@ -45,7 +45,6 @@ Q_OBJECT
     Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
     Q_PROPERTY(bool connecting READ getConnecting NOTIFY connectingChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
-    //Q_PROPERTY(bool imageStreamingEnabled WRITE setImageStreamingEnabled READ getImageStreamingEnabled)
     Q_PROPERTY(bool timestampingEnabled WRITE setTimestampingEnabled READ getTimestampingEnabled)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
@@ -53,23 +52,24 @@ Q_OBJECT
     Q_PROPERTY(int lastTimestamp READ getLastTimestamp NOTIFY timestampChanged)
     Q_PROPERTY(float framerate READ getFramerate NOTIFY timestampChanged)
     Q_PROPERTY(bool kidnapped READ getKidnapped NOTIFY kidnappedChanged)
+    Q_PROPERTY(float cameraImageProgress READ getCameraImageProgress NOTIFY cameraImageProgressChanged)
 
 public:
 
-static const int BT_CONNECT_TIMEOUT_MILLIS     = 30000;  ///< Will try to reconnect after this much time
+    static const int BT_CONNECT_TIMEOUT_MILLIS     = 30000;  ///< Will try to reconnect after this much time
 
-static const int FRAME_TIMEOUT_MILLIS          = 10000;  ///< Will wait this many millis for a camera frame to complete
+    static const int FRAME_TIMEOUT_MILLIS          = 10000;  ///< Will wait this many millis for a camera frame to complete
 
-static const int IMG_WIDTH                     = 752/4;  ///< Image width of the robot's camera
-static const int IMG_HEIGHT                    = 480/4;  ///< Image height of the robot's camera
+    static const int IMG_WIDTH                     = 752/4;  ///< Image width of the robot's camera
+    static const int IMG_HEIGHT                    = 480/4;  ///< Image height of the robot's camera
 
-static constexpr float FRAMERATE_SMOOTH_FACTOR = 0.99f;  ///< Smoothing factor for framerate, closer to 1.0 means less update
+    static constexpr float FRAMERATE_SMOOTH_FACTOR = 0.99f;  ///< Smoothing factor for framerate, closer to 1.0 means less update
 
-static constexpr float GOAL_POSE_FACTOR        = 100.0f; ///< Goal pose elements are multiplied by this before comm.
-static constexpr float GOAL_VELOCITY_FACTOR    = 100.0f; ///< Goal velocities are multiplied by this before comm.
-static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;      ///< Goal velocities are divided by this in the compact velocity command
+    static constexpr float GOAL_POSE_FACTOR        = 100.0f; ///< Goal pose elements are multiplied by this before comm.
+    static constexpr float GOAL_VELOCITY_FACTOR    = 100.0f; ///< Goal velocities are multiplied by this before comm.
+    static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;      ///< Goal velocities are divided by this in the compact velocity command
 
-static QByteArray frameBuffer;                           ///< Container for the received camera frame data
+    static QByteArray frameBuffer;                           ///< Container for the received camera frame data
 
     /**
      * @brief Creates a new Cellulo robot communicator
@@ -95,21 +95,27 @@ static QByteArray frameBuffer;                           ///< Container for the 
      *
      * @return The current MAC address
      */
-    QString getMacAddr(){ return macAddr; }
+    QString getMacAddr(){
+        return macAddr;
+    }
 
     /**
      * @brief Gets whether currently connected over Bluetooth
      *
      * @return Whether currently connected over Bluetooth
      */
-    bool getConnected(){ return connected; }
+    bool getConnected(){
+        return connected;
+    }
 
     /**
      * @brief Gets whether currently trying to connect over Bluetooth
      *
      * @return Whether currently trying to connect over Bluetooth
      */
-    bool getConnecting(){ return connecting; }
+    bool getConnecting(){
+        return connecting;
+    }
 
     /**
      * @brief Gets whether image streaming is currently enabled
@@ -123,56 +129,81 @@ static QByteArray frameBuffer;                           ///< Container for the 
      *
      * @return Whether timestamping is enabled
      */
-    bool getTimestampingEnabled(){return timestampingEnabled; }
+    bool getTimestampingEnabled(){
+        return timestampingEnabled;
+    }
 
     /**
      * @brief Gets the latest battery state
      *
      * @return Battery state as described by the BATTERY_STATE enumeration
      */
-    int getBatteryState(){ return batteryState; }
+    int getBatteryState(){
+        return batteryState;
+    }
 
     /**
      * @brief Gets the latest x position
      *
      * @return Latest x position in grid coordinates
      */
-    float getX(){ return x; }
+    float getX(){
+        return x;
+    }
 
     /**
      * @brief Gets the latest y position
      *
      * @return Latest y position in grid coordinates
      */
-    float getY(){ return y; }
+    float getY(){
+        return y;
+    }
 
     /**
      * @brief Gets the latest orientation
      *
      * @return Latest orientation in degrees
      */
-    float getTheta(){ return theta; }
+    float getTheta(){
+        return theta;
+    }
 
     /**
      * @brief Gets the latest available timestamp
      *
      * @return The latest received timestamp in milliseconds
      */
-    int getLastTimestamp(){ return lastTimestamp; }
+    int getLastTimestamp(){
+        return lastTimestamp;
+    }
 
     /**
      * @brief Gets the localization framerate
      *
      * @return Localization framerate in milliseconds
      */
-    float getFramerate(){ return framerate; }
+    float getFramerate(){
+        return framerate;
+    }
 
     /**
      * @brief Gets the latest kidnapped state
      *
      * @return Whether kidnapped or on encoded paper
      */
-    bool getKidnapped(){ return kidnapped; }
+    bool getKidnapped(){
+        return kidnapped;
+    }
+
+    /**
+     * @brief Gets the camera image progress
+     *
+     * @return Between 0.0 and 1.0
+     */
+    float getCameraImageProgress(){
+        return cameraImageProgress;
+    }
 
 private slots:
 
@@ -226,13 +257,6 @@ public slots:
      * @param period Desired period in milliseconds
      */
     void setPoseBcastPeriod(unsigned int period);
-
-    /**
-     * @brief Enables image streaming + disables localization or vice versa
-     *
-     * @param enabled Whether to enable image streaming
-     */
-    //void setImageStreamingEnabled(bool enabled);
 
     /**
      * @brief Enables timestamping along with pose and disables pose idling or vice-versa
@@ -425,6 +449,11 @@ signals:
     void kidnappedChanged();
 
     /**
+     * @brief Emitted when a new camera image line is received
+     */
+    void cameraImageProgressChanged();
+
+    /**
      * @brief Emitted when a camera frame from the robot is ready to read
      */
     void frameReady();
@@ -443,14 +472,10 @@ private:
     bool connected;                    ///< Whether Bluetooth is connected now
     bool connecting;                   ///< Whether Bluetooth is trying to connect
 
-    //bool imageStreamingEnabled;        ///< Whether image streaming is enabled or localization is enabled
     bool timestampingEnabled;          ///< Whether timestamping along with pose is enabled and idling disabled
     int lastTimestamp;                 ///< Latest received onboard timestamp (in milliseconds)
     float framerate;                   ///< Framerate calculated over time
-    //QTimer frameTimeoutTimer;          ///< When this timer runs out, frame is completed even if it is not complete
-    //QByteArray receiveBuffer;          ///< Receive buffer until the current response/event message is complete
-    //bool expectingFrame;               ///< True after sending a camera frame request until the camera frame arrives completely
-    unsigned int currentPixel;         ///< Current pixel in the camera frame being received
+    float cameraImageProgress;         ///< Camera image streaming progress
 
     int batteryState;                  ///< Current battery state
     float x;                           ///< Current x position in grid coordinates

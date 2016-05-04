@@ -29,7 +29,6 @@
 const char* CelluloBluetoothPacket::sendPacketTypeStr[] = {
     "P", //PING
     "D", //SET_BCAST_PERIOD
-    "I", //Enable (i)mage streaming + disable localization or vice-versa
     "T", //TIMESTAMP_ENABLE
     "F", //FRAME_REQUEST
     "B", //BATTERY_STATE_REQUEST
@@ -48,7 +47,6 @@ const char* CelluloBluetoothPacket::sendPacketTypeStr[] = {
 const int CelluloBluetoothPacket::sendPacketPayloadLen[] = {
     0,                 //PING
     2,                 //SET_BCAST_PERIOD
-    -1,                //Enable image streaming + disable localization or vice-versa
     1,                 //TIMESTAMP_ENABLE
     0,                 //FRAME_REQUEST
     0,                 //BATTERY_STATE_REQUEST
@@ -77,6 +75,7 @@ const char* CelluloBluetoothPacket::receivePacketTypeStr[] = {
     "S", //POSE_CHANGED_TIMESTAMPED
     "K", //KIDNAP
     "A", //ACKNOWLEDGED
+    "C", //CAMERA_IMAGE_LINE
     "E"  //DEBUG
 };
 
@@ -93,6 +92,7 @@ const int CelluloBluetoothPacket::receivePacketPayloadLen[] = {
     4 + 4 + 2 + 4, //POSE_CHANGED_TIMESTAMPED
     1,             //KIDNAP
     0,             //ACKNOWLEDGED
+    2 + IMG_WIDTH, //CAMERA_IMAGE_LINE
     0              //DEBUG
 };
 

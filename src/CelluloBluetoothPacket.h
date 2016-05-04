@@ -48,7 +48,6 @@ public:
     enum class SEND_PACKET_TYPE {
         PING = 0,
         SET_BCAST_PERIOD,
-        IMAGE_STREAM_ENABLE,
         TIMESTAMP_ENABLE,
         FRAME_REQUEST,
         BATTERY_STATE_REQUEST,
@@ -82,6 +81,7 @@ public:
         POSE_CHANGED_TIMESTAMPED,
         KIDNAP,
         ACKNOWLEDGED,
+        CAMERA_IMAGE_LINE,
         DEBUG,
         NUM_RECEIVE_PACKET_TYPES,
         INVALID_PACKET_TYPE = -1
