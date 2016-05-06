@@ -490,15 +490,24 @@ ApplicationWindow {
                             source = "";
                             source = oldSource;
                         }
+
+                        fillMode: Image.PreserveAspectFit
+                        width: gWidth*0.4 - 10
+                        height: width/188*120
                     }
 
-                    Button {
-                        text: "Grab one frame"
-                        onClicked: robotComm.requestFrame();
-                    }
+                    Column{
+                        spacing: 5
 
-                    ProgressBar{
-                        value: robotComm.cameraImageProgress
+                        Button{
+                            text: "Grab one frame"
+                            onClicked: robotComm.requestFrame();
+                        }
+
+                        ProgressBar{
+                            value: robotComm.cameraImageProgress
+                            width: gWidth*0.6 - 10
+                        }
                     }
                 }
             }
