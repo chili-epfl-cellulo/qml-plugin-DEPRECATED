@@ -110,7 +110,12 @@ void CelluloBluetooth::openSocket(){
 
         socket->connectToService(
             QBluetoothAddress(macAddr),
-            1); //TODO: Temporary fix until https://bugreports.qt.io/browse/QTBUG-53041 is fixed
+                #ifdef ANDROID
+            QBluetoothUuid(QBluetoothUuid::SerialPort)
+                #else
+            1     //TODO: Temporary fix until https://bugreports.qt.io/browse/QTBUG-53041 is fixed
+                #endif
+            );
         btConnectTimeoutTimer.start();
         if(!connecting){
             connecting = true;

@@ -81,5 +81,9 @@ ApplicationWindow {
 
     CelluloBluetooth{
         id: robotComm
+        onConnectedChanged:{
+            if(connected)
+                setPoseBcastPeriod(0);
+        }
     }
 }
