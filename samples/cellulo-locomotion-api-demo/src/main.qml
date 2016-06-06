@@ -36,8 +36,7 @@ ApplicationWindow {
             ]
             onConnectRequested: cellulo1.robotComm.macAddr = selectedAddress
             onDisconnectRequested: cellulo1.robotComm.disconnectFromServer()
-            connected: cellulo1.robotComm.connected
-            connecting: cellulo1.robotComm.connecting
+            connectionStatus: cellulo1.robotComm.connectionStatus
         }
     }
 

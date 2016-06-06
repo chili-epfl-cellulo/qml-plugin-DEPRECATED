@@ -64,7 +64,6 @@ const int CelluloBluetoothPacket::sendPacketPayloadLen[] = {
 
 const char* CelluloBluetoothPacket::receivePacketTypeStr[] = {
     "O", //BOOT_COMPLETE
-    "H", //WAKE_UP
     "D", //SHUTTING_DOWN
     "W", //LOW_BATTERY
     "B", //BATTERY_STATE_CHANGED
@@ -81,7 +80,6 @@ const char* CelluloBluetoothPacket::receivePacketTypeStr[] = {
 
 const int CelluloBluetoothPacket::receivePacketPayloadLen[] = {
     0,             //BOOT_COMPLETE
-    0,             //WAKE_UP
     0,             //SHUTTING_DOWN
     0,             //LOW_BATTERY
     1,             //BATTERY_STATE_CHANGED

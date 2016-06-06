@@ -50,8 +50,7 @@ ApplicationWindow {
                     ]
                     onConnectRequested: robotComm.macAddr = selectedAddress
                     onDisconnectRequested: robotComm.disconnectFromServer()
-                    connected: robotComm.connected
-                    connecting: robotComm.connecting
+                    connectionStatus: robotComm.connectionStatus
                 }
             }
 

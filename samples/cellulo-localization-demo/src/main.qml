@@ -36,8 +36,7 @@ ApplicationWindow {
             ]
             onConnectRequested: robotComm.macAddr = selectedAddress
             onDisconnectRequested: robotComm.disconnectFromServer()
-            connected: robotComm.connected
-            connecting: robotComm.connecting
+            connectionStatus: robotComm.connectionStatus
         }
     }
 
@@ -81,8 +80,8 @@ ApplicationWindow {
 
     CelluloBluetooth{
         id: robotComm
-        onConnectedChanged:{
-            if(connected)
+        onConnectionStatusChanged:{
+            if(connectionStatus == CelluloBluetooth.ConnectionStatusConnected)
                 setPoseBcastPeriod(0);
         }
     }

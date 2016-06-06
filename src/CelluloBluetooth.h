@@ -42,19 +42,28 @@ class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
 /* *INDENT-ON* */
     Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
-    Q_PROPERTY(bool connected READ getConnected NOTIFY connectedChanged)
-    Q_PROPERTY(bool connecting READ getConnecting NOTIFY connectingChanged)
+    Q_PROPERTY(CelluloBluetoothConnectionStatus connectionStatus READ getConnectionStatus NOTIFY connectionStatusChanged)
     Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
     Q_PROPERTY(bool timestampingEnabled WRITE setTimestampingEnabled READ getTimestampingEnabled)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
     Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
+    Q_PROPERTY(bool kidnapped READ getKidnapped NOTIFY kidnappedChanged)
     Q_PROPERTY(int lastTimestamp READ getLastTimestamp NOTIFY timestampChanged)
     Q_PROPERTY(float framerate READ getFramerate NOTIFY timestampChanged)
-    Q_PROPERTY(bool kidnapped READ getKidnapped NOTIFY kidnappedChanged)
     Q_PROPERTY(float cameraImageProgress READ getCameraImageProgress NOTIFY cameraImageProgressChanged)
 
 public:
+
+    /**
+     * @brief Bluetooth connection status
+     */
+    enum CelluloBluetoothConnectionStatus {
+        ConnectionStatusDisconnected,   ///< Idle and not connected
+        ConnectionStatusConnecting,     ///< Actively trying to connect
+        ConnectionStatusConnected       ///< Connected
+    };
+    Q_ENUM(CelluloBluetoothConnectionStatus)
 
     static const int BT_CONNECT_TIMEOUT_MILLIS     = 30000;  ///< Will try to reconnect after this much time
 
@@ -100,21 +109,12 @@ public:
     }
 
     /**
-     * @brief Gets whether currently connected over Bluetooth
+     * @brief Gets current Bluetooth connection status
      *
-     * @return Whether currently connected over Bluetooth
+     * @return Current Bluetooth connection status
      */
-    bool getConnected(){
-        return connected;
-    }
-
-    /**
-     * @brief Gets whether currently trying to connect over Bluetooth
-     *
-     * @return Whether currently trying to connect over Bluetooth
-     */
-    bool getConnecting(){
-        return connecting;
+    CelluloBluetoothConnectionStatus getConnectionStatus(){
+        return connectionStatus;
     }
 
     /**
@@ -227,11 +227,6 @@ private slots:
      */
     void refreshConnection();
 
-    /**
-     * @brief Called when the server did not complete the camera frame in time
-     */
-    //void frameTimeout();
-
 public slots:
 
     /**
@@ -305,16 +300,6 @@ public slots:
     void setGoalVelocity(float vx, float vy, float w);
 
     /**
-     * @brief Sets robot goal velocity in global world frame
-     *
-     * Since this is a compact message, there is no angular velocity and resolution is low (2 mm/s)
-     *
-     * @param vx X velocity in mm/s (between -256 and 254)
-     * @param vy Y velocity in mm/s (between -256 and 254)
-     */
-    //void setGoalVelocityCompact(int vx, int vy);
-
-    /**
      * @brief Sets a pose goal to track
      *
      * @param x X goal in grid coordinates
@@ -378,24 +363,14 @@ public slots:
 signals:
 
     /**
-     * @brief Emitted when Bluetooth connection state changes
+     * @brief Emitted when Bluetooth connection status changes
      */
-    void connectedChanged();
-
-    /**
-     * @brief Emitted when Bluetooth starts or stops trying to connect
-     */
-    void connectingChanged();
+    void connectionStatusChanged();
 
     /**
      * @brief Emitted when the robot is ready after a power up or a reset
      */
     void bootCompleted();
-
-    /**
-     * @brief Emitted when the robot wakes up from sleep (off-state)
-     */
-    void wokeUp();
 
     /**
      * @brief Emitted when the robot is about to sleep (shutdown) due to the user command via touch keys
@@ -463,25 +438,24 @@ private:
     using SEND_PACKET_TYPE = CelluloBluetoothPacket::SEND_PACKET_TYPE;
     using RECEIVE_PACKET_TYPE = CelluloBluetoothPacket::RECEIVE_PACKET_TYPE;
 
-    CelluloBluetoothPacket sendPacket; ///< Outgoing packet
-    CelluloBluetoothPacket recvPacket; ///< Incoming packet
+    CelluloBluetoothPacket sendPacket;                 ///< Outgoing packet
+    CelluloBluetoothPacket recvPacket;                 ///< Incoming packet
 
-    QTimer btConnectTimeoutTimer;      ///< Timeout timer to reconnect if connection fails
-    QBluetoothSocket* socket;          ///< Bluetooth socket connected to the server
-    QString macAddr;                   ///< Bluetooth MAC address of the server
-    bool connected;                    ///< Whether Bluetooth is connected now
-    bool connecting;                   ///< Whether Bluetooth is trying to connect
+    QTimer btConnectTimeoutTimer;                      ///< Timeout timer to reconnect if connection fails
+    QBluetoothSocket* socket;                          ///< Bluetooth socket connected to the server
+    QString macAddr;                                   ///< Bluetooth MAC address of the server
+    CelluloBluetoothConnectionStatus connectionStatus; ///< Bluetooth connection status
 
-    bool timestampingEnabled;          ///< Whether timestamping along with pose is enabled and idling disabled
-    int lastTimestamp;                 ///< Latest received onboard timestamp (in milliseconds)
-    float framerate;                   ///< Framerate calculated over time
-    float cameraImageProgress;         ///< Camera image streaming progress
+    bool timestampingEnabled;                          ///< Whether timestamping along with pose is enabled and idling disabled
+    int lastTimestamp;                                 ///< Latest received onboard timestamp (in milliseconds)
+    float framerate;                                   ///< Framerate calculated over time
+    float cameraImageProgress;                         ///< Camera image streaming progress
 
-    int batteryState;                  ///< Current battery state
-    float x;                           ///< Current x position in grid coordinates
-    float y;                           ///< Current y position in grid coordinates
-    float theta;                       ///< Current orientation in degrees
-    bool kidnapped;                    ///< Whether currently kidnapped
+    int batteryState;                                  ///< Current battery state
+    float x;                                           ///< Current x position in grid coordinates
+    float y;                                           ///< Current y position in grid coordinates
+    float theta;                                       ///< Current orientation in degrees
+    bool kidnapped;                                    ///< Whether currently kidnapped
 
     /**
      * @brief Resets properties of the robot to default

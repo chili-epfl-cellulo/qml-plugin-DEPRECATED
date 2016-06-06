@@ -43,7 +43,7 @@ Q_OBJECT
 public:
 
     /**
-     * @brief Possible
+     * @brief Possible types of outgoing packet
      */
     enum class SEND_PACKET_TYPE {
         PING = 0,
@@ -70,7 +70,6 @@ public:
      */
     enum class RECEIVE_PACKET_TYPE {
         BOOT_COMPLETE = 0,
-        WAKE_UP,
         SHUTTING_DOWN,
         LOW_BATTERY,
         BATTERY_STATE_CHANGED,
