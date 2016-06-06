@@ -30,7 +30,7 @@
 CameraFrameImageProvider::CameraFrameImageProvider():
     QQuickImageProvider(QQuickImageProvider::Image){ }
 
-QImage CameraFrameImageProvider::requestImage(QString const& id, QSize* size, QSize const& requestedSize){
+QImage CameraFrameImageProvider::requestImage(QString const& id __attribute__((unused)), QSize* size, QSize const& requestedSize __attribute__((unused))){
     if(size != NULL)
         *size = QSize(CelluloBluetooth::IMG_WIDTH, CelluloBluetooth::IMG_HEIGHT);
 
@@ -43,4 +43,3 @@ QImage CameraFrameImageProvider::requestImage(QString const& id, QSize* size, QS
 
     return QImage(frameCharBuffer, CelluloBluetooth::IMG_WIDTH, CelluloBluetooth::IMG_HEIGHT, QImage::Format_ARGB32);
 }
-
