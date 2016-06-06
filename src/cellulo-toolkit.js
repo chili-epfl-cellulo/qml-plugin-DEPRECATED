@@ -1,15 +1,5 @@
 .pragma library
 
-var BatteryEnum = {
-    DISCHARGING: 0,      ///< No charger present, battery draining
-    LOW: 1,                  ///< No charger present, battery low
-    CHARGING: 2,             ///< Charger present, battery charging
-    CHARGED: 3,              ///< Charger present, battery full
-    SHUTDOWN: 4,             ///< Charger charging disabled, voltage too low, or battery not present
-    ERROR: 5,                ///< Thermal fault or charge timeout
-    INVALID: 6               ///< Invalid state
-}
-
 var VisualStateEnum = {
     RESPONSIVE: 0,    //LEDs respond to touches
     ABSOLUTE: 1          //LEDs do not respond to touches

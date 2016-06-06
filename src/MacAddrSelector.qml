@@ -52,18 +52,9 @@ Row {
     }
 
     Label{
-        text: {
-            switch(connectionStatus){
-            case CelluloBluetooth.ConnectionStatusDisconnected:
-                return "Disconnected";
-            case CelluloBluetooth.ConnectionStatusConnecting:
-                return "Connecting";
-            case CelluloBluetooth.ConnectionStatusConnected:
-                return "Connected";
-            }
-        }
+        text: connectionStatus.toString()
         color: {
-            switch(connectionStatus){
+            switch(connectionStatus.valueOf()){
             case CelluloBluetooth.ConnectionStatusDisconnected:
                 return "red";
             case CelluloBluetooth.ConnectionStatusConnecting:

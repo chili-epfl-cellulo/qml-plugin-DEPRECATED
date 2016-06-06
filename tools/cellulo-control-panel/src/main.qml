@@ -381,7 +381,7 @@ ApplicationWindow {
                         spacing: 5
 
                         Text{
-                            text: "Battery State: " + robotComm.batteryState
+                            text: "Battery State: " + robotComm.batteryState.toString()
                         }
                         Text{
                             id: k0

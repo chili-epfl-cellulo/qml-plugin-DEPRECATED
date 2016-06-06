@@ -42,8 +42,8 @@ class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
 /* *INDENT-ON* */
     Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
-    Q_PROPERTY(CelluloBluetoothConnectionStatus connectionStatus READ getConnectionStatus NOTIFY connectionStatusChanged)
-    Q_PROPERTY(int batteryState READ getBatteryState NOTIFY batteryStateChanged)
+    Q_PROPERTY(QVariant connectionStatus READ getConnectionStatus NOTIFY connectionStatusChanged)
+    Q_PROPERTY(QVariant batteryState READ getBatteryState NOTIFY batteryStateChanged)
     Q_PROPERTY(bool timestampingEnabled WRITE setTimestampingEnabled READ getTimestampingEnabled)
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
@@ -58,12 +58,36 @@ public:
     /**
      * @brief Bluetooth connection status
      */
-    enum CelluloBluetoothConnectionStatus {
+    enum ConnectionStatus {
         ConnectionStatusDisconnected,   ///< Idle and not connected
         ConnectionStatusConnecting,     ///< Actively trying to connect
         ConnectionStatusConnected       ///< Connected
     };
-    Q_ENUM(CelluloBluetoothConnectionStatus)
+    Q_ENUM(ConnectionStatus)
+
+    /**
+     * @brief Battery state of the robot
+     */
+    enum BatteryState {
+        BatteryStateDischarging = 0,    ///< No charger present, battery draining
+        BatteryStateLow = 1,            ///< No charger present, battery low, will shut down
+        BatteryStateCharging = 2,       ///< Charger present, battery charging
+        BatteryStateCharged = 3,        ///< Charger present, battery full
+        BatteryStateShutdown = 4,       ///< Charger charging disabled, voltage too low or battery not present
+        BatteryStateError = 5,          ///< Thermal fault or charge timeout
+        BatteryStateInvalid = -1
+    };
+    Q_ENUM(BatteryState)
+
+    /**
+     * @brief Visual state of the robot
+     */
+    /*enum CelluloBluetoothVisualState {
+        VisualStateResponsive = 0,
+        VisualStateAbsolute = 1,
+        VisualStateInvalid = -1
+       };
+       Q_ENUM(CelluloBluetoothVisualState)*/
 
     static const int BT_CONNECT_TIMEOUT_MILLIS     = 30000;  ///< Will try to reconnect after this much time
 
@@ -113,16 +137,9 @@ public:
      *
      * @return Current Bluetooth connection status
      */
-    CelluloBluetoothConnectionStatus getConnectionStatus(){
-        return connectionStatus;
+    QVariant getConnectionStatus(){
+        return QVariant::fromValue(connectionStatus);
     }
-
-    /**
-     * @brief Gets whether image streaming is currently enabled
-     *
-     * @return Whether image streaming is enabled or localization is enabled
-     */
-    //bool getImageStreamingEnabled(){ return imageStreamingEnabled; }
 
     /**
      * @brief Gets whether timestamping along with pose is currently enabled
@@ -136,10 +153,10 @@ public:
     /**
      * @brief Gets the latest battery state
      *
-     * @return Battery state as described by the BATTERY_STATE enumeration
+     * @return Battery state
      */
-    int getBatteryState(){
-        return batteryState;
+    QVariant getBatteryState(){
+        return QVariant::fromValue(batteryState);
     }
 
     /**
@@ -444,14 +461,14 @@ private:
     QTimer btConnectTimeoutTimer;                      ///< Timeout timer to reconnect if connection fails
     QBluetoothSocket* socket;                          ///< Bluetooth socket connected to the server
     QString macAddr;                                   ///< Bluetooth MAC address of the server
-    CelluloBluetoothConnectionStatus connectionStatus; ///< Bluetooth connection status
+    ConnectionStatus connectionStatus;                 ///< Bluetooth connection status
 
     bool timestampingEnabled;                          ///< Whether timestamping along with pose is enabled and idling disabled
     int lastTimestamp;                                 ///< Latest received onboard timestamp (in milliseconds)
     float framerate;                                   ///< Framerate calculated over time
     float cameraImageProgress;                         ///< Camera image streaming progress
 
-    int batteryState;                                  ///< Current battery state
+    BatteryState batteryState;                         ///< Current battery state
     float x;                                           ///< Current x position in grid coordinates
     float y;                                           ///< Current y position in grid coordinates
     float theta;                                       ///< Current orientation in degrees
