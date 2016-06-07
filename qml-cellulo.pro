@@ -4,12 +4,14 @@ CONFIG += qt c++11 nostrip
 
 HEADERS += \
     src/CelluloBluetooth.h \
+    src/CelluloBluetoothEnums.h \
     src/CameraFrameImageProvider.h \
     src/CelluloBluetoothPlugin.h \
     src/CelluloBluetoothPacket.h
 
 SOURCES += \
     src/CelluloBluetooth.cpp \
+    src/CelluloBluetoothEnums.cpp \
     src/CameraFrameImageProvider.cpp \
     src/CelluloBluetoothPlugin.cpp \
     src/CelluloBluetoothPacket.cpp

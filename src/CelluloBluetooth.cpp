@@ -42,10 +42,10 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
 
     frameBuffer.reserve(IMG_WIDTH*IMG_HEIGHT);
 
-    connectionStatus = ConnectionStatusDisconnected;
+    connectionStatus = CelluloBluetoothEnums::ConnectionStatusDisconnected;
 
     timestampingEnabled = false;
-    batteryState = BatteryStateShutdown; //Beginning with shutdown is a good idea
+    batteryState = CelluloBluetoothEnums::BatteryStateShutdown; //Beginning with shutdown is a good idea
     x = 0;
     y = 0;
     theta = 0;
@@ -63,7 +63,7 @@ void CelluloBluetooth::resetProperties(){
     recvPacket.clear();
 
     timestampingEnabled = false;
-    batteryState = BatteryStateShutdown; //Beginning with shutdown is a good idea
+    batteryState = CelluloBluetoothEnums::BatteryStateShutdown; //Beginning with shutdown is a good idea
     emit batteryStateChanged();
     x = 0;
     y = 0;
@@ -94,7 +94,7 @@ void CelluloBluetooth::setMacAddr(QString macAddr){
 }
 
 void CelluloBluetooth::refreshConnection(){
-    if(connectionStatus != ConnectionStatusConnected){
+    if(connectionStatus != CelluloBluetoothEnums::ConnectionStatusConnected){
         qDebug() << "CelluloBluetooth::refreshConnection(): Connection attempt timed out, will retry";
         disconnectFromServer();
         connectToServer();
@@ -114,8 +114,8 @@ void CelluloBluetooth::openSocket(){
                 #endif
             );
         btConnectTimeoutTimer.start();
-        if(connectionStatus != ConnectionStatusConnecting){
-            connectionStatus = ConnectionStatusConnecting;
+        if(connectionStatus != CelluloBluetoothEnums::ConnectionStatusConnecting){
+            connectionStatus = CelluloBluetoothEnums::ConnectionStatusConnecting;
             emit connectionStatusChanged();
         }
     }
@@ -143,8 +143,8 @@ void CelluloBluetooth::disconnectFromServer(){
         disconnect(socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
         socket->abort();
         socket->close();
-        if(connectionStatus != ConnectionStatusDisconnected){
-            connectionStatus = ConnectionStatusDisconnected;
+        if(connectionStatus != CelluloBluetoothEnums::ConnectionStatusDisconnected){
+            connectionStatus = CelluloBluetoothEnums::ConnectionStatusDisconnected;
             emit connectionStatusChanged();
         }
         socket->deleteLater();
@@ -156,8 +156,8 @@ void CelluloBluetooth::disconnectFromServer(){
 
 void CelluloBluetooth::socketConnected(){
     qDebug() << "CelluloBluetooth::socketConnected(): " << macAddr;
-    if(connectionStatus != ConnectionStatusConnected){
-        connectionStatus = ConnectionStatusConnected;
+    if(connectionStatus != CelluloBluetoothEnums::ConnectionStatusConnected){
+        connectionStatus = CelluloBluetoothEnums::ConnectionStatusConnected;
         emit connectionStatusChanged();
     }
 
@@ -167,8 +167,8 @@ void CelluloBluetooth::socketConnected(){
 
 void CelluloBluetooth::socketDisconnected(){
     qDebug() << "CelluloBluetooth::socketDisconnected(): " << macAddr << ", will try to reconnect.";
-    if(connectionStatus != ConnectionStatusDisconnected){
-        connectionStatus = ConnectionStatusDisconnected;
+    if(connectionStatus != CelluloBluetoothEnums::ConnectionStatusDisconnected){
+        connectionStatus = CelluloBluetoothEnums::ConnectionStatusDisconnected;
         emit connectionStatusChanged();
     }
     openSocket();
@@ -199,7 +199,7 @@ void CelluloBluetooth::processResponse(){
             break;
 
         case RECEIVE_PACKET_TYPE::BATTERY_STATE_CHANGED: {
-            BatteryState newState = (BatteryState)recvPacket.unloadUInt8();
+            CelluloBluetoothEnums::BatteryState newState = (CelluloBluetoothEnums::BatteryState)recvPacket.unloadUInt8();
             if(batteryState != newState){
                 batteryState = newState;
                 emit batteryStateChanged();
@@ -525,14 +525,14 @@ void CelluloBluetooth::setGoalPosition(float x, float y, float v){
     sendCommand();
 }
 
-void CelluloBluetooth::setVisualState(VisualState state){
+void CelluloBluetooth::setVisualState(CelluloBluetoothEnums::VisualState state){
     sendPacket.clear();
     sendPacket.setSendPacketType(SEND_PACKET_TYPE::SET_VISUAL_STATE);
     sendPacket.load((quint8)state);
     sendCommand();
 }
 
-void CelluloBluetooth::setVisualEffect(VisualEffect effect, QColor color, int value){
+void CelluloBluetooth::setVisualEffect(CelluloBluetoothEnums::VisualEffect effect, QColor color, int value){
     if(value > 0xFF)
         value = 0xFF;
     else if(value < 0)

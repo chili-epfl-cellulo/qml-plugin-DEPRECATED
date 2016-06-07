@@ -66,12 +66,14 @@ ApplicationWindow {
 
                     ComboBox {
                         id: effect
-                        model: robotComm.VisualEffectEnumStrings()
+                        model: CelluloBluetoothEnums.VisualEffectStrings()
                         currentIndex: 0
                     }
                     Column{
                         Layout.fillWidth: true
                         Slider{
+                            property string hexStr: (value < 16 ? "0" : "") + value.toString(16).toUpperCase()
+
                             id: redSlider
                             anchors.left: parent.left
                             anchors.right: parent.right
@@ -87,6 +89,8 @@ ApplicationWindow {
                             }
                         }
                         Slider{
+                            property string hexStr: (value < 16 ? "0" : "") + value.toString(16).toUpperCase()
+
                             id: greenSlider
                             anchors.left: parent.left
                             anchors.right: parent.right
@@ -102,6 +106,8 @@ ApplicationWindow {
                             }
                         }
                         Slider{
+                            property string hexStr: (value < 16 ? "0" : "") + value.toString(16).toUpperCase()
+
                             id: blueSlider
                             anchors.left: parent.left
                             anchors.right: parent.right
@@ -130,11 +136,7 @@ ApplicationWindow {
                     }
                     Button {
                         text: "Send"
-                        onClicked:robotComm.setVisualEffect(effect.currentIndex, "#FF"
-                                                            + (redSlider.value < 16 ? "0" : "") + redSlider.value.toString(16).toUpperCase()
-                                                            + (greenSlider.value < 16 ? "0" : "") + greenSlider.value.toString(16).toUpperCase()
-                                                            + (blueSlider.value < 16 ? "0" : "") + blueSlider.value.toString(16).toUpperCase(),
-                                                            effectValue.value);
+                        onClicked:robotComm.setVisualEffect(effect.currentIndex, "#FF" + redSlider.hexStr + greenSlider.hexStr + blueSlider.hexStr, effectValue.value);
                     }
                 }
             }
@@ -370,7 +372,7 @@ ApplicationWindow {
                         spacing: 5
 
                         Text{
-                            text: "Battery State: " + CelluloBluetoothEnums.Deneme1 + robotComm.batteryState.toString()
+                            text: "Battery State: " + CelluloBluetoothEnums.BatteryStateString(robotComm.batteryState)
                         }
                         Text{
                             id: k0

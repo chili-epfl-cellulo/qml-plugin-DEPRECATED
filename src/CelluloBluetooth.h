@@ -34,6 +34,7 @@
 #include <QMetaEnum>
 #include <QVariantList>
 
+#include "CelluloBluetoothEnums.h"
 #include "CelluloBluetoothPacket.h"
 
 /**
@@ -43,10 +44,11 @@ class CelluloBluetooth : public QQuickItem {
 /* *INDENT-OFF* */
 Q_OBJECT
 /* *INDENT-ON* */
-    Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
-    Q_PROPERTY(ConnectionStatus connectionStatus READ getConnectionStatus NOTIFY connectionStatusChanged)
 
-    Q_PROPERTY(QVariant batteryState READ getBatteryState NOTIFY batteryStateChanged)
+    Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
+    Q_PROPERTY(CelluloBluetoothEnums::ConnectionStatus connectionStatus READ getConnectionStatus NOTIFY connectionStatusChanged)
+
+    Q_PROPERTY(CelluloBluetoothEnums::BatteryState batteryState READ getBatteryState NOTIFY batteryStateChanged)
 
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
@@ -60,63 +62,6 @@ Q_OBJECT
     Q_PROPERTY(float cameraImageProgress READ getCameraImageProgress NOTIFY cameraImageProgressChanged)
 
 public:
-
-    /**
-     * @brief Bluetooth connection status
-     */
-    enum ConnectionStatus {
-        ConnectionStatusDisconnected = 0, ///< Idle and not connected
-        ConnectionStatusConnecting,       ///< Actively trying to connect
-        ConnectionStatusConnected,        ///< Connected
-        ConnectionStatusNumElements
-    };
-    Q_ENUM(ConnectionStatus)
-    //CELLULO_ENUM_DECL(ConnectionStatus)
-
-    /**
-     * @brief Battery state of the robot
-     */
-    enum BatteryState {
-        BatteryStateDischarging = 0,    ///< No charger present, battery draining
-        BatteryStateLow = 1,            ///< No charger present, battery low, will shut down
-        BatteryStateCharging = 2,       ///< Charger present, battery charging
-        BatteryStateCharged = 3,        ///< Charger present, battery full
-        BatteryStateShutdown = 4,       ///< Charger charging disabled, voltage too low or battery not present
-        BatteryStateError = 5,          ///< Thermal fault or charge timeout
-        BatteryStateNumElements
-    };
-    Q_ENUM(BatteryState)
-    //CELLULO_ENUM_DECL(BatteryState)
-
-    /**
-     * @brief Visual state of the robot
-     */
-    enum VisualState {
-        VisualStateResponsive = 0,
-        VisualStateAbsolute = 1,
-        VisualStateNumElements
-    };
-    Q_ENUM(VisualState)
-    //CELLULO_ENUM_DECL(VisualState)
-
-    /**
-     * @brief List of possible visual effects
-     */
-    enum VisualEffect {
-        VisualEffectConstAll = 0,    ///< Set all LED colors (value unused)
-        VisualEffectConstSingle = 1, ///< Set one LED color (value is LED index)
-        VisualEffectAlertAll = 2,    ///< Alert animation for all LEDs (value unused)
-        VisualEffectAlertSingle = 3, ///< Alert animation for one LED (value is LED index)
-        VisualEffectProgress = 4,    ///< Static progress circularly (value 0-255 maps to 0-100%)
-        VisualEffectWaiting = 5,     ///< Circular waiting/processing animation (value unused)
-        VisualEffectDirection = 6,   ///< Point toward one direction (value 0-255 maps to 0-360 degrees)
-        VisualEffectBlink = 7,       ///< Alert forever (value*20 is LED on time in milliseconds)
-        VisualEffectBreathe = 8,     ///< Breathe animation (value unused)
-        VisualEffectPulse = 9,       ///< Slower breathe-like animation (value unused)
-        VisualEffectNumElements
-    };
-    Q_ENUM(VisualEffect)
-    //CELLULO_ENUM_DECL(VisualEffect)
 
     static const int BT_CONNECT_TIMEOUT_MILLIS     = 30000;  ///< Will try to reconnect after this much time
 
@@ -166,7 +111,7 @@ public:
      *
      * @return Current Bluetooth connection status
      */
-    ConnectionStatus getConnectionStatus(){
+    CelluloBluetoothEnums::ConnectionStatus getConnectionStatus(){
         return connectionStatus;
     }
 
@@ -184,7 +129,7 @@ public:
      *
      * @return Battery state
      */
-    BatteryState getBatteryState(){
+    CelluloBluetoothEnums::BatteryState getBatteryState(){
         return batteryState;
     }
 
@@ -385,7 +330,7 @@ public slots:
      *
      * @param state The visual state
      */
-    void setVisualState(VisualState state);
+    void setVisualState(CelluloBluetoothEnums::VisualState state);
 
     /**
      * @brief Sets the visual effect on the robot, changing LED illumination
@@ -394,7 +339,7 @@ public slots:
      * @param color Color
      * @param value A value possibly meaningful for the effect (between 0 and 255)
      */
-    void setVisualEffect(VisualEffect effect, QColor color, int value);
+    void setVisualEffect(CelluloBluetoothEnums::VisualEffect effect, QColor color, int value);
 
     /**
      * @brief Initiates a software reset on the robot
@@ -490,14 +435,14 @@ private:
     QTimer btConnectTimeoutTimer;                      ///< Timeout timer to reconnect if connection fails
     QBluetoothSocket* socket;                          ///< Bluetooth socket connected to the server
     QString macAddr;                                   ///< Bluetooth MAC address of the server
-    ConnectionStatus connectionStatus;                 ///< Bluetooth connection status
+    CelluloBluetoothEnums::ConnectionStatus connectionStatus;          ///< Bluetooth connection status
 
     bool timestampingEnabled;                          ///< Whether timestamping along with pose is enabled and idling disabled
     int lastTimestamp;                                 ///< Latest received onboard timestamp (in milliseconds)
     float framerate;                                   ///< Framerate calculated over time
     float cameraImageProgress;                         ///< Camera image streaming progress
 
-    BatteryState batteryState;                         ///< Current battery state
+    CelluloBluetoothEnums::BatteryState batteryState;                  ///< Current battery state
     float x;                                           ///< Current x position in grid coordinates
     float y;                                           ///< Current y position in grid coordinates
     float theta;                                       ///< Current orientation in degrees

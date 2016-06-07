@@ -81,7 +81,7 @@ ApplicationWindow {
     CelluloBluetooth{
         id: robotComm
         onConnectionStatusChanged:{
-            if(connectionStatus == CelluloBluetooth.ConnectionStatusConnected)
+            if(connectionStatus === CelluloBluetoothEnums.ConnectionStatusConnected)
                 setPoseBcastPeriod(0);
         }
     }

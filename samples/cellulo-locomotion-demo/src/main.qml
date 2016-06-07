@@ -132,9 +132,9 @@ ApplicationWindow {
     CelluloBluetooth{
         id: robotComm
         onConnectionStatusChanged: {
-            if(connectionStatus == CelluloBluetooth.ConnectionStatusConnected)
-                setVisualEffect(0, "#0F0F0F", 0);
+            if(connectionStatus === CelluloBluetoothEnums.ConnectionStatusConnected)
+                setVisualEffect(CelluloBluetoothEnums.VisualEffectConstAll, "#0F0F0F", 0);
         }
-        onBootCompleted: setVisualEffect(0, "#0F0F0F", 0);
+        onBootCompleted: setVisualEffect(CelluloBluetoothEnums.VisualEffectConstAll, "#0F0F0F", 0);
     }
 }

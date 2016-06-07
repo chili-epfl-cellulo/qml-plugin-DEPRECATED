@@ -30,7 +30,10 @@
 CameraFrameImageProvider::CameraFrameImageProvider():
     QQuickImageProvider(QQuickImageProvider::Image){ }
 
-QImage CameraFrameImageProvider::requestImage(QString const& id __attribute__((unused)), QSize* size, QSize const& requestedSize __attribute__((unused))){
+QImage CameraFrameImageProvider::requestImage(QString const& id, QSize* size, QSize const& requestedSize){
+    Q_UNUSED(id)
+    Q_UNUSED(requestedSize)
+    
     if(size != NULL)
         *size = QSize(CelluloBluetooth::IMG_WIDTH, CelluloBluetooth::IMG_HEIGHT);
 

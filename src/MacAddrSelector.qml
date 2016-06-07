@@ -52,14 +52,14 @@ Row {
     }
 
     Label{
-        text: connectionStatus
+        text: CelluloBluetoothEnums.ConnectionStatusString(connectionStatus)
         color: {
             switch(connectionStatus){
-            case CelluloBluetooth.ConnectionStatusDisconnected:
+            case CelluloBluetoothEnums.ConnectionStatusDisconnected:
                 return "red";
-            case CelluloBluetooth.ConnectionStatusConnecting:
+            case CelluloBluetoothEnums.ConnectionStatusConnecting:
                 return "yellow";
-            case CelluloBluetooth.ConnectionStatusConnected:
+            case CelluloBluetoothEnums.ConnectionStatusConnected:
                 return "green";
             }
         }
