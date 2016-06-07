@@ -31,6 +31,8 @@
 #include <QQuickItem>
 #include <QBluetoothSocket>
 #include <QColor>
+#include <QMetaEnum>
+#include <QVariantList>
 
 #include "CelluloBluetoothPacket.h"
 
@@ -42,15 +44,19 @@ class CelluloBluetooth : public QQuickItem {
 Q_OBJECT
 /* *INDENT-ON* */
     Q_PROPERTY(QString macAddr WRITE setMacAddr READ getMacAddr)
-    Q_PROPERTY(QVariant connectionStatus READ getConnectionStatus NOTIFY connectionStatusChanged)
+    Q_PROPERTY(ConnectionStatus connectionStatus READ getConnectionStatus NOTIFY connectionStatusChanged)
+
     Q_PROPERTY(QVariant batteryState READ getBatteryState NOTIFY batteryStateChanged)
-    Q_PROPERTY(bool timestampingEnabled WRITE setTimestampingEnabled READ getTimestampingEnabled)
+
     Q_PROPERTY(float x READ getX NOTIFY poseChanged)
     Q_PROPERTY(float y READ getY NOTIFY poseChanged)
     Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
     Q_PROPERTY(bool kidnapped READ getKidnapped NOTIFY kidnappedChanged)
+
+    Q_PROPERTY(bool timestampingEnabled WRITE setTimestampingEnabled READ getTimestampingEnabled)
     Q_PROPERTY(int lastTimestamp READ getLastTimestamp NOTIFY timestampChanged)
     Q_PROPERTY(float framerate READ getFramerate NOTIFY timestampChanged)
+
     Q_PROPERTY(float cameraImageProgress READ getCameraImageProgress NOTIFY cameraImageProgressChanged)
 
 public:
@@ -59,11 +65,13 @@ public:
      * @brief Bluetooth connection status
      */
     enum ConnectionStatus {
-        ConnectionStatusDisconnected,   ///< Idle and not connected
-        ConnectionStatusConnecting,     ///< Actively trying to connect
-        ConnectionStatusConnected       ///< Connected
+        ConnectionStatusDisconnected = 0, ///< Idle and not connected
+        ConnectionStatusConnecting,       ///< Actively trying to connect
+        ConnectionStatusConnected,        ///< Connected
+        ConnectionStatusNumElements
     };
     Q_ENUM(ConnectionStatus)
+    //CELLULO_ENUM_DECL(ConnectionStatus)
 
     /**
      * @brief Battery state of the robot
@@ -75,19 +83,40 @@ public:
         BatteryStateCharged = 3,        ///< Charger present, battery full
         BatteryStateShutdown = 4,       ///< Charger charging disabled, voltage too low or battery not present
         BatteryStateError = 5,          ///< Thermal fault or charge timeout
-        BatteryStateInvalid = -1
+        BatteryStateNumElements
     };
     Q_ENUM(BatteryState)
+    //CELLULO_ENUM_DECL(BatteryState)
 
     /**
      * @brief Visual state of the robot
      */
-    /*enum CelluloBluetoothVisualState {
+    enum VisualState {
         VisualStateResponsive = 0,
         VisualStateAbsolute = 1,
-        VisualStateInvalid = -1
-       };
-       Q_ENUM(CelluloBluetoothVisualState)*/
+        VisualStateNumElements
+    };
+    Q_ENUM(VisualState)
+    //CELLULO_ENUM_DECL(VisualState)
+
+    /**
+     * @brief List of possible visual effects
+     */
+    enum VisualEffect {
+        VisualEffectConstAll = 0,    ///< Set all LED colors (value unused)
+        VisualEffectConstSingle = 1, ///< Set one LED color (value is LED index)
+        VisualEffectAlertAll = 2,    ///< Alert animation for all LEDs (value unused)
+        VisualEffectAlertSingle = 3, ///< Alert animation for one LED (value is LED index)
+        VisualEffectProgress = 4,    ///< Static progress circularly (value 0-255 maps to 0-100%)
+        VisualEffectWaiting = 5,     ///< Circular waiting/processing animation (value unused)
+        VisualEffectDirection = 6,   ///< Point toward one direction (value 0-255 maps to 0-360 degrees)
+        VisualEffectBlink = 7,       ///< Alert forever (value*20 is LED on time in milliseconds)
+        VisualEffectBreathe = 8,     ///< Breathe animation (value unused)
+        VisualEffectPulse = 9,       ///< Slower breathe-like animation (value unused)
+        VisualEffectNumElements
+    };
+    Q_ENUM(VisualEffect)
+    //CELLULO_ENUM_DECL(VisualEffect)
 
     static const int BT_CONNECT_TIMEOUT_MILLIS     = 30000;  ///< Will try to reconnect after this much time
 
@@ -137,8 +166,8 @@ public:
      *
      * @return Current Bluetooth connection status
      */
-    QVariant getConnectionStatus(){
-        return QVariant::fromValue(connectionStatus);
+    ConnectionStatus getConnectionStatus(){
+        return connectionStatus;
     }
 
     /**
@@ -155,8 +184,8 @@ public:
      *
      * @return Battery state
      */
-    QVariant getBatteryState(){
-        return QVariant::fromValue(batteryState);
+    BatteryState getBatteryState(){
+        return batteryState;
     }
 
     /**
@@ -356,7 +385,7 @@ public slots:
      *
      * @param state The visual state
      */
-    void setVisualState(int state);
+    void setVisualState(VisualState state);
 
     /**
      * @brief Sets the visual effect on the robot, changing LED illumination
@@ -365,7 +394,7 @@ public slots:
      * @param color Color
      * @param value A value possibly meaningful for the effect (between 0 and 255)
      */
-    void setVisualEffect(int effect, QColor color, int value);
+    void setVisualEffect(VisualEffect effect, QColor color, int value);
 
     /**
      * @brief Initiates a software reset on the robot

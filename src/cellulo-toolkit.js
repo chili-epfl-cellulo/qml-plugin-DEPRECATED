@@ -1,24 +1,5 @@
 .pragma library
 
-var VisualStateEnum = {
-    RESPONSIVE: 0,    //LEDs respond to touches
-    ABSOLUTE: 1          //LEDs do not respond to touches
-}
-
-var VisualEffectEnum = {
-    CONST_ALL: 0,       ///< Constant color for all LEDS
-    CONST_SINGLE: 1,     ///< Constant color for single LED, doesn't modify other LEDs
-    ALERT_ALL: 2,        ///< Alert flashing in all LEDs, goes back to previous effect when done
-    ALERT_SINGLE: 3,    ///< Alert flashing in one LED, goes back to previous effect when done
-    PROGRESS: 4,         ///< Indicates a static percentage/progress circularly, needs 2 digit hex progress value (out of FF)
-    WAITING: 5,          ///< Circular waiting/processing animation
-    DIRECTION: 6,        ///< Point toward one direction; value is from 00 to FF where 00 is 0 degrees and FF is 358.59375 degrees
-    BLINK: 7,            ///< Alert flashing in all LEDs forever; value is from 00 to FF where 20*value is the LED on time in milliseconds
-    BREATHE: 8,          ///< Breathing animation, given brightness is used as the highest brightness
-    PULSE: 9            ///< A slower breathe-like animation
-}
-
-
 var commands = {"ack": /^A$/,
                 "rebootcomplete": /^O$/,
                 "wakeupcomplete": /^H$/,

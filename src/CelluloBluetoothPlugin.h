@@ -29,8 +29,6 @@
 #include <QQmlExtensionPlugin>
 #include <qqml.h>
 
-#include "CelluloBluetooth.h"
-
 /**
  * @brief Object that exposes Cellulo Bluetooth communicator as QML objects
  */

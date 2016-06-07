@@ -27,10 +27,13 @@
 
 #include<QQmlEngine>
 
+#include"CelluloBluetooth.h"
+#include"CelluloBluetoothEnums.h"
 #include"CameraFrameImageProvider.h"
 
 void CelluloBluetoothPlugin::registerTypes(const char *uri){
     qmlRegisterType<CelluloBluetooth>(uri, 1, 0, "CelluloBluetooth");
+    qmlRegisterSingletonType<CelluloBluetoothEnums>(uri, 1, 0, "CelluloBluetoothEnums", &CelluloBluetoothEnums::CelluloBluetoothEnumsSingletonTypeProvider);
 }
 
 void CelluloBluetoothPlugin::initializeEngine(QQmlEngine *engine, const char *uri __attribute__((unused))){

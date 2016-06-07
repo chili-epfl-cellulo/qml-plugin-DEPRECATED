@@ -66,18 +66,7 @@ ApplicationWindow {
 
                     ComboBox {
                         id: effect
-                        model: [
-                            "CONST_ALL",
-                            "CONST_SINGLE",
-                            "ALERT_ALL",
-                            "ALERT_SINGLE",
-                            "PROGRESS",
-                            "WAITING",
-                            "DIRECTION",
-                            "BLINK",
-                            "BREATHE",
-                            "PULSE"
-                        ]
+                        model: robotComm.VisualEffectEnumStrings()
                         currentIndex: 0
                     }
                     Column{
@@ -381,7 +370,7 @@ ApplicationWindow {
                         spacing: 5
 
                         Text{
-                            text: "Battery State: " + robotComm.batteryState.toString()
+                            text: "Battery State: " + CelluloBluetoothEnums.Deneme1 + robotComm.batteryState.toString()
                         }
                         Text{
                             id: k0

@@ -525,14 +525,14 @@ void CelluloBluetooth::setGoalPosition(float x, float y, float v){
     sendCommand();
 }
 
-void CelluloBluetooth::setVisualState(int state){
+void CelluloBluetooth::setVisualState(VisualState state){
     sendPacket.clear();
     sendPacket.setSendPacketType(SEND_PACKET_TYPE::SET_VISUAL_STATE);
     sendPacket.load((quint8)state);
     sendCommand();
 }
 
-void CelluloBluetooth::setVisualEffect(int effect, QColor color, int value){
+void CelluloBluetooth::setVisualEffect(VisualEffect effect, QColor color, int value){
     if(value > 0xFF)
         value = 0xFF;
     else if(value < 0)
