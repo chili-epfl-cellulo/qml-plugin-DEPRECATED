@@ -38,15 +38,16 @@
 #include <QVariantList>
 #include <QString>
 
-#define CELLULO_ENUM_DECL(E) \
-    QMetaEnum E ## _MetaEnum = QMetaEnum::fromType<E>(); \
-    Q_INVOKABLE QString E ## String(E value){ \
-        return E ## _MetaEnum.valueToKey(value); \
+#define CELLULO_ENUM_DECL(ENUMNAME) \
+    QMetaEnum ENUMNAME ## _MetaEnum = QMetaEnum::fromType<ENUMNAME>(); \
+    Q_INVOKABLE QString ENUMNAME ## String(ENUMNAME value){ \
+        return ENUMNAME ## _MetaEnum.valueToKey(value); \
     } \
-    Q_INVOKABLE QVariantList E ## Strings(){ \
+    Q_PROPERTY(QVariantList ENUMNAME ## Strings READ get ## ENUMNAME ## Strings() CONSTANT) \
+    QVariantList get ## ENUMNAME ## Strings(){ \
         QVariantList list; \
-        for(int i = 0; i < E ## NumElements; i++) \
-            list << E ## String((E)i); \
+        for(int i = 0; i < ENUMNAME ## NumElements; i++) \
+            list << ENUMNAME ## String((ENUMNAME)i); \
         return list; \
     }
 

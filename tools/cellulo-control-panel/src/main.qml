@@ -67,11 +67,11 @@ ApplicationWindow {
                     Column{
                         ComboBox {
                             id: effect
-                            model: CelluloBluetoothEnums.VisualEffectStrings()
+                            model: CelluloBluetoothEnums.VisualEffectStrings
                             currentIndex: 0
                         }
                         ComboBox {
-                            model: CelluloBluetoothEnums.VisualStateStrings()
+                            model: CelluloBluetoothEnums.VisualStateStrings
                             currentIndex: 0
                             onCurrentIndexChanged: {
                                 if(robotComm != null)
