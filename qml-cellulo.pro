@@ -16,6 +16,9 @@ SOURCES += \
     src/CelluloBluetoothPlugin.cpp \
     src/CelluloBluetoothPacket.cpp
 
+INCLUDEPATH += \
+    include/
+
 test{
     message(Configuring test build...)
 

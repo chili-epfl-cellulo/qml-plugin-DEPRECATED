@@ -33,16 +33,16 @@ CameraFrameImageProvider::CameraFrameImageProvider():
 QImage CameraFrameImageProvider::requestImage(QString const& id, QSize* size, QSize const& requestedSize){
     Q_UNUSED(id)
     Q_UNUSED(requestedSize)
-    
+
     if(size != NULL)
-        *size = QSize(CelluloBluetooth::IMG_WIDTH, CelluloBluetooth::IMG_HEIGHT);
+        *size = QSize(IMG_WIDTH_SHARED, IMG_HEIGHT_SHARED);
 
     int* frameCharBufferPtr = (int*)frameCharBuffer;
     unsigned char pixel;
-    for(int i=0;i<CelluloBluetooth::IMG_WIDTH*CelluloBluetooth::IMG_HEIGHT;i++){
+    for(int i=0;i<IMG_WIDTH_SHARED*IMG_HEIGHT_SHARED;i++){
         pixel = CelluloBluetooth::frameBuffer[i];
         frameCharBufferPtr[i] = (255 << 24) + (pixel << 16) + (pixel << 8) + pixel;
     }
 
-    return QImage(frameCharBuffer, CelluloBluetooth::IMG_WIDTH, CelluloBluetooth::IMG_HEIGHT, QImage::Format_ARGB32);
+    return QImage(frameCharBuffer, IMG_WIDTH_SHARED, IMG_HEIGHT_SHARED, QImage::Format_ARGB32);
 }

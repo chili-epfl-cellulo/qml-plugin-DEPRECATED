@@ -23,8 +23,6 @@
 
 #include "CelluloBluetoothPacket.h"
 
-#include "../include/CelluloBluetoothSharedDefs.h"
-
 #include <QMetaObject>
 #include <QMetaEnum>
 
@@ -160,7 +158,7 @@ void CelluloBluetoothPacket::load(qint8 num){
 QByteArray CelluloBluetoothPacket::getSendData(){
     QByteArray data;
 
-    data.append(PACKET_START_CHAR);
+    data.append(PACKET_START_CHAR_SHARED);
     data.append(sendPacketTypeStr[(int)sendPacketType]);
     data.append(payload);
 
@@ -170,7 +168,7 @@ QByteArray CelluloBluetoothPacket::getSendData(){
 bool CelluloBluetoothPacket::loadReceivedByte(char c){
     switch(receiveStatus){
         case RECEIVE_STATUS::NOT_RECEIVING:
-            if(c == PACKET_START_CHAR)
+            if(c == PACKET_START_CHAR_SHARED)
                 receiveStatus = RECEIVE_STATUS::WAITING_FOR_TYPE;
             return false;
 
@@ -214,7 +212,7 @@ bool CelluloBluetoothPacket::loadReceivedByte(char c){
                 return false;
 
         case RECEIVE_STATUS::END_OF_PACKET:
-            if(c == PACKET_START_CHAR){
+            if(c == PACKET_START_CHAR_SHARED){
                 clear();
                 receiveStatus = RECEIVE_STATUS::WAITING_FOR_TYPE;
             }

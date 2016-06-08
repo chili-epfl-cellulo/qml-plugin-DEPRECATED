@@ -26,6 +26,7 @@
 #ifndef CAMERAFRAMEIMAGEPROVIDER_H
 #define CAMERAFRAMEIMAGEPROVIDER_H
 
+#include"CelluloBluetoothSharedDefs.h"
 #include"CelluloBluetooth.h"
 
 #include<QQuickImageProvider>
@@ -43,7 +44,7 @@ public:
 
 private:
 
-    unsigned char frameCharBuffer[CelluloBluetooth::IMG_WIDTH*CelluloBluetooth::IMG_HEIGHT*4];
+    unsigned char frameCharBuffer[IMG_WIDTH_SHARED*IMG_HEIGHT_SHARED*4];
 
 };
 

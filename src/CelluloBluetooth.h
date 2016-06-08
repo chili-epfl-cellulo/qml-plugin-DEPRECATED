@@ -65,16 +65,7 @@ public:
 
     static const int BT_CONNECT_TIMEOUT_MILLIS     = 30000;  ///< Will try to reconnect after this much time
 
-    static const int FRAME_TIMEOUT_MILLIS          = 10000;  ///< Will wait this many millis for a camera frame to complete
-
-    static const int IMG_WIDTH                     = 752/4;  ///< Image width of the robot's camera
-    static const int IMG_HEIGHT                    = 480/4;  ///< Image height of the robot's camera
-
     static constexpr float FRAMERATE_SMOOTH_FACTOR = 0.99f;  ///< Smoothing factor for framerate, closer to 1.0 means less update
-
-    static constexpr float GOAL_POSE_FACTOR        = 100.0f; ///< Goal pose elements are multiplied by this before comm.
-    static constexpr float GOAL_VELOCITY_FACTOR    = 100.0f; ///< Goal velocities are multiplied by this before comm.
-    static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;      ///< Goal velocities are divided by this in the compact velocity command
 
     static QByteArray frameBuffer;                           ///< Container for the received camera frame data
 
@@ -426,24 +417,24 @@ signals:
 
 private:
 
-    CelluloBluetoothPacket sendPacket;                 ///< Outgoing packet
-    CelluloBluetoothPacket recvPacket;                 ///< Incoming packet
+    CelluloBluetoothPacket sendPacket;                        ///< Outgoing packet
+    CelluloBluetoothPacket recvPacket;                        ///< Incoming packet
 
-    QTimer btConnectTimeoutTimer;                      ///< Timeout timer to reconnect if connection fails
-    QBluetoothSocket* socket;                          ///< Bluetooth socket connected to the server
-    QString macAddr;                                   ///< Bluetooth MAC address of the server
-    CelluloBluetoothEnums::ConnectionStatus connectionStatus;          ///< Bluetooth connection status
+    QTimer btConnectTimeoutTimer;                             ///< Timeout timer to reconnect if connection fails
+    QBluetoothSocket* socket;                                 ///< Bluetooth socket connected to the server
+    QString macAddr;                                          ///< Bluetooth MAC address of the server
+    CelluloBluetoothEnums::ConnectionStatus connectionStatus; ///< Bluetooth connection status
 
-    bool timestampingEnabled;                          ///< Whether timestamping along with pose is enabled and idling disabled
-    int lastTimestamp;                                 ///< Latest received onboard timestamp (in milliseconds)
-    float framerate;                                   ///< Framerate calculated over time
-    float cameraImageProgress;                         ///< Camera image streaming progress
+    bool timestampingEnabled;                                 ///< Whether timestamping along with pose is enabled and idling disabled
+    int lastTimestamp;                                        ///< Latest received onboard timestamp (in milliseconds)
+    float framerate;                                          ///< Framerate calculated over time
+    float cameraImageProgress;                                ///< Camera image streaming progress
 
-    CelluloBluetoothEnums::BatteryState batteryState;                  ///< Current battery state
-    float x;                                           ///< Current x position in grid coordinates
-    float y;                                           ///< Current y position in grid coordinates
-    float theta;                                       ///< Current orientation in degrees
-    bool kidnapped;                                    ///< Whether currently kidnapped
+    CelluloBluetoothEnums::BatteryState batteryState;         ///< Current battery state
+    float x;                                                  ///< Current x position in grid coordinates
+    float y;                                                  ///< Current y position in grid coordinates
+    float theta;                                              ///< Current orientation in degrees
+    bool kidnapped;                                           ///< Whether currently kidnapped
 
     /**
      * @brief Resets properties of the robot to default

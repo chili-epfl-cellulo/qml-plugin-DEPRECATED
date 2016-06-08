@@ -26,10 +26,10 @@
 #ifndef CELLULOBLUETOOTHENUMS_H
 #define CELLULOBLUETOOTHENUMS_H
 
-#include<QObject>
+#include <QObject>
 
-#include"../include/CelluloBluetoothSharedDefs.h"
-#include"CelluloEnumDecl.h"
+#include "CelluloBluetoothSharedDefs.h"
+#include "CelluloEnumDecl.h"
 
 /**
  * @brief Wrapper containing all the enums of CelluloBluetooth

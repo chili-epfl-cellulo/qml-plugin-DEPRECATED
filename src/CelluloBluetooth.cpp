@@ -40,7 +40,7 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
 
     //TODO: CALL RESET PROPERTIES INSTEAD OF THE BELOW
 
-    frameBuffer.reserve(IMG_WIDTH*IMG_HEIGHT);
+    frameBuffer.reserve(IMG_WIDTH_SHARED*IMG_HEIGHT_SHARED);
 
     connectionStatus = CelluloBluetoothEnums::ConnectionStatusDisconnected;
 
@@ -82,7 +82,7 @@ QVariantList CelluloBluetooth::getFrame() const {
     QVariantList frame;
     for(int i=0; i<frameBuffer.length(); i++)
         frame.append((int)frameBuffer[i]);
-    while(frame.length() < IMG_WIDTH*IMG_HEIGHT)
+    while(frame.length() < IMG_WIDTH_SHARED*IMG_HEIGHT_SHARED)
         frame.append((int)0);
     return frame;
 }
@@ -229,9 +229,9 @@ void CelluloBluetooth::processResponse(){
         }
 
         case CelluloBluetoothPacket::EventPacketTypePoseChanged: {
-            x = recvPacket.unloadUInt32()/GOAL_POSE_FACTOR;
-            y = recvPacket.unloadUInt32()/GOAL_POSE_FACTOR;
-            theta = recvPacket.unloadUInt16()/GOAL_POSE_FACTOR;
+            x = recvPacket.unloadUInt32()/(float)GOAL_POSE_FACTOR_SHARED;
+            y = recvPacket.unloadUInt32()/(float)GOAL_POSE_FACTOR_SHARED;
+            theta = recvPacket.unloadUInt16()/(float)GOAL_POSE_FACTOR_SHARED;
             emit poseChanged();
 
             if(kidnapped){
@@ -243,9 +243,9 @@ void CelluloBluetooth::processResponse(){
         }
 
         case CelluloBluetoothPacket::EventPacketTypePoseChangedTimestamped: {
-            x = recvPacket.unloadUInt32()/GOAL_POSE_FACTOR;
-            y = recvPacket.unloadUInt32()/GOAL_POSE_FACTOR;
-            theta = recvPacket.unloadUInt16()/GOAL_POSE_FACTOR;
+            x = recvPacket.unloadUInt32()/(float)GOAL_POSE_FACTOR_SHARED;
+            y = recvPacket.unloadUInt32()/(float)GOAL_POSE_FACTOR_SHARED;
+            theta = recvPacket.unloadUInt16()/(float)GOAL_POSE_FACTOR_SHARED;
             emit poseChanged();
 
             unsigned int newTimestamp = recvPacket.unloadUInt32();
@@ -281,27 +281,27 @@ void CelluloBluetooth::processResponse(){
             quint16 line = recvPacket.unloadUInt16();
 
             //Drop previous incomplete frame
-            if(frameBuffer.length() > line*IMG_WIDTH){
+            if(frameBuffer.length() > line*IMG_WIDTH_SHARED){
                 qDebug() << "CelluloBluetooth::processResponse(): Dropping previously incomplete frame";
                 frameBuffer.clear();
             }
 
             //Append possibly empty lines
-            while(frameBuffer.length() < line*IMG_WIDTH){
+            while(frameBuffer.length() < line*IMG_WIDTH_SHARED){
                 qDebug() << "CelluloBluetooth::processResponse(): Camera image line dropped";
-                for(int i=0; i<IMG_WIDTH; i++)
+                for(int i=0; i<IMG_WIDTH_SHARED; i++)
                     frameBuffer.append('\0');
             }
 
             //Append line just received
-            for(int i=0; i<IMG_WIDTH; i++)
+            for(int i=0; i<IMG_WIDTH_SHARED; i++)
                 frameBuffer.append(recvPacket.unloadUInt8());
 
             //Update progress
-            cameraImageProgress = (float)(line + 1)/IMG_HEIGHT;
+            cameraImageProgress = (float)(line + 1)/IMG_HEIGHT_SHARED;
             emit cameraImageProgressChanged();
 
-            if(line >= IMG_HEIGHT - 1)
+            if(line >= IMG_HEIGHT_SHARED - 1)
                 emit frameReady();
 
             break;
@@ -422,9 +422,9 @@ void CelluloBluetooth::setAllMotorOutputs(int m1output, int m2output, int m3outp
 }
 
 void CelluloBluetooth::setGoalVelocity(float vx, float vy, float w){
-    int vx_ = (int)(vx*GOAL_VELOCITY_FACTOR);
-    int vy_ = (int)(vy*GOAL_VELOCITY_FACTOR);
-    int w_ = (int)(w*GOAL_VELOCITY_FACTOR);
+    int vx_ = (int)(vx*GOAL_VEL_FACTOR_SHARED);
+    int vy_ = (int)(vy*GOAL_VEL_FACTOR_SHARED);
+    int w_ = (int)(w*GOAL_VEL_FACTOR_SHARED);
 
     if(vx_ < -0x7FFF)
         vx_ = -0x7FFF;
@@ -450,11 +450,11 @@ void CelluloBluetooth::setGoalVelocity(float vx, float vy, float w){
 }
 
 void CelluloBluetooth::setGoalPose(float x, float y, float theta, float v, float w){
-    x *= GOAL_POSE_FACTOR;
-    y *= GOAL_POSE_FACTOR;
-    theta *= GOAL_POSE_FACTOR;
-    v *= GOAL_VELOCITY_FACTOR;
-    w *= GOAL_VELOCITY_FACTOR;
+    x *= GOAL_POSE_FACTOR_SHARED;
+    y *= GOAL_POSE_FACTOR_SHARED;
+    theta *= GOAL_POSE_FACTOR_SHARED;
+    v *= GOAL_VEL_FACTOR_SHARED;
+    w *= GOAL_VEL_FACTOR_SHARED;
 
     quint32 xi, yi;
     quint16 thetai, vi, wi;
@@ -495,9 +495,9 @@ void CelluloBluetooth::setGoalPose(float x, float y, float theta, float v, float
 }
 
 void CelluloBluetooth::setGoalPosition(float x, float y, float v){
-    x *= GOAL_POSE_FACTOR;
-    y *= GOAL_POSE_FACTOR;
-    v *= GOAL_VELOCITY_FACTOR;
+    x *= GOAL_POSE_FACTOR_SHARED;
+    y *= GOAL_POSE_FACTOR_SHARED;
+    v *= GOAL_VEL_FACTOR_SHARED;
 
     quint32 xi, yi;
     quint16 vi;

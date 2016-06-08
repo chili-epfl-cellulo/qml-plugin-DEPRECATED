@@ -26,6 +26,12 @@
 #ifndef CELLULOBLUETOOTHSHAREDDEFS_H
 #define CELLULOBLUETOOTHSHAREDDEFS_H
 
+#define PACKET_START_CHAR_SHARED 0x01 ///< First character of all packets
+#define IMG_WIDTH_SHARED (752/4)      ///< Width of localization camera image
+#define IMG_HEIGHT_SHARED (480/4)     ///< Height of localization camera image
+#define GOAL_POSE_FACTOR_SHARED 100   ///< Goal pose elements are multiplied by this before being sent over comm. channel
+#define GOAL_VEL_FACTOR_SHARED 100    ///< Goal velocity elements are multiplied by this before being sent over comm. channel
+
 /**
  * @brief Battery states
  */
@@ -172,19 +178,19 @@
  * @brief Robot to app message payload lengths
  */
 #define EVENT_PACKET_PAYLOAD_LEN_SHARED { \
-        0,             /** EventPacketTypeBootComplete */ \
-        0,             /** EventPacketTypeShuttingDown */ \
-        0,             /** EventPacketTypeLowBattery */ \
-        1,             /** EventPacketTypeBatteryStateChanged */ \
-        1,             /** EventPacketTypeTouchBegan */ \
-        1,             /** EventPacketTypeTouchLongPressed */ \
-        1,             /** EventPacketTypeTouchReleased */ \
-        4 + 4 + 2,     /** EventPacketTypePoseChanged */ \
-        4 + 4 + 2 + 4, /** EventPacketTypePoseChangedTimestamped */ \
-        1,             /** EventPacketTypeKidnapChanged */ \
-        0,             /** EventPacketTypeAcknowledged */ \
-        2 + IMG_WIDTH, /** EventPacketTypeFrameLine */ \
-        0              /** EventPacketTypeDebug */ \
+        0,                    /** EventPacketTypeBootComplete */ \
+        0,                    /** EventPacketTypeShuttingDown */ \
+        0,                    /** EventPacketTypeLowBattery */ \
+        1,                    /** EventPacketTypeBatteryStateChanged: uint8 batteryState */ \
+        1,                    /** EventPacketTypeTouchBegan: uint8 keyIndex */ \
+        1,                    /** EventPacketTypeTouchLongPressed: uint8 keyIndex */ \
+        1,                    /** EventPacketTypeTouchReleased: uint8 keyIndex */ \
+        4 + 4 + 2,            /** EventPacketTypePoseChanged: uint32 x, uint32 y, uint16 theta */ \
+        4 + 4 + 2 + 4,        /** EventPacketTypePoseChangedTimestamped uint32 x, uint32 y, uint16 theta, uint32 timestamp */ \
+        1,                    /** EventPacketTypeKidnapChanged: uint8 kidnappedBool */ \
+        0,                    /** EventPacketTypeAcknowledged */ \
+        2 + IMG_WIDTH_SHARED, /** EventPacketTypeFrameLine: uint16 currentLineIndex, IMG_WIDTH*uint8 grayscalePixel */ \
+        0                     /** EventPacketTypeDebug */ \
 }
 
 #endif // CELLULOBLUETOOTHSHAREDDEFS_H
