@@ -46,12 +46,12 @@ public:
     /**
      * @brief Describes the status of the packet while it's being received
      */
-    enum class RECEIVE_STATUS {
-        NOT_RECEIVING = 0,
-        WAITING_FOR_TYPE,
-        PAYLOAD_RECEIVING,
-        END_OF_PACKET,
-        NUM_RECEIVE_STATUS
+    enum class ReceiveStatus {
+        NotReceiving = 0,
+        WaitingForType,
+        PayloadReceiving,
+        EndOfPacket,
+        NumElements
     };
 
     static const char* sendPacketTypeStr[];                       ///< Strings sent over Bluetooth to give commands
@@ -234,7 +234,7 @@ private:
     CmdPacketType sendPacketType;           ///< Packet type if outgoing packet
     EventPacketType receivePacketType;      ///< Packet type if incoming packet
 
-    RECEIVE_STATUS receiveStatus;           ///< Current status if receiving packet
+    ReceiveStatus receiveStatus;           ///< Current status if receiving packet
     int receiveBytesRemaining;              ///< Number of bytes left to receive
 
     QByteArray payload;                     ///< Payload of the actual packet

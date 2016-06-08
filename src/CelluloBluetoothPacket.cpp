@@ -74,7 +74,7 @@ void CelluloBluetoothPacket::clear(){
     sendPacketType = CmdPacketTypeNumElements;
     receivePacketType = EventPacketTypeNumElements;
 
-    receiveStatus = RECEIVE_STATUS::NOT_RECEIVING;
+    receiveStatus = ReceiveStatus::NotReceiving;
     receiveBytesRemaining = -1;
 
     payload.clear();
@@ -167,12 +167,12 @@ QByteArray CelluloBluetoothPacket::getSendData(){
 
 bool CelluloBluetoothPacket::loadReceivedByte(char c){
     switch(receiveStatus){
-        case RECEIVE_STATUS::NOT_RECEIVING:
+        case ReceiveStatus::NotReceiving:
             if(c == PACKET_START_CHAR_SHARED)
-                receiveStatus = RECEIVE_STATUS::WAITING_FOR_TYPE;
+                receiveStatus = ReceiveStatus::WaitingForType;
             return false;
 
-        case RECEIVE_STATUS::WAITING_FOR_TYPE:
+        case ReceiveStatus::WaitingForType:
 
             //Determine type
             receivePacketType = EventPacketTypeNumElements;
@@ -186,11 +186,11 @@ bool CelluloBluetoothPacket::loadReceivedByte(char c){
             if(receivePacketType != EventPacketTypeNumElements){
                 receiveBytesRemaining = receivePacketPayloadLen[(int)receivePacketType];
                 if(receiveBytesRemaining <= 0){
-                    receiveStatus = RECEIVE_STATUS::END_OF_PACKET;
+                    receiveStatus = ReceiveStatus::EndOfPacket;
                     return true;
                 }
                 else{
-                    receiveStatus = RECEIVE_STATUS::PAYLOAD_RECEIVING;
+                    receiveStatus = ReceiveStatus::PayloadReceiving;
                     return false;
                 }
             }
@@ -201,20 +201,20 @@ bool CelluloBluetoothPacket::loadReceivedByte(char c){
                 return false;
             }
 
-        case RECEIVE_STATUS::PAYLOAD_RECEIVING:
+        case ReceiveStatus::PayloadReceiving:
             payload.append(c);
             receiveBytesRemaining--;
             if(receiveBytesRemaining <= 0){
-                receiveStatus = RECEIVE_STATUS::END_OF_PACKET;
+                receiveStatus = ReceiveStatus::EndOfPacket;
                 return true;
             }
             else
                 return false;
 
-        case RECEIVE_STATUS::END_OF_PACKET:
+        case ReceiveStatus::EndOfPacket:
             if(c == PACKET_START_CHAR_SHARED){
                 clear();
-                receiveStatus = RECEIVE_STATUS::WAITING_FOR_TYPE;
+                receiveStatus = ReceiveStatus::WaitingForType;
             }
             return false;
 
