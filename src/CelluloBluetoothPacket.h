@@ -29,6 +29,8 @@
 #include <QtGlobal>
 #include <QByteArray>
 
+#include "../include/CelluloBluetoothSharedDefs.h"
+
 /**
  * @brief Bluetooth communicator for a Cellulo robot
  */
@@ -36,55 +38,10 @@ class CelluloBluetoothPacket : public QObject {
 /* *INDENT-OFF* */
 Q_OBJECT
 /* *INDENT-ON* */
-    Q_ENUMS(SEND_PACKET_TYPE)
-    Q_ENUMS(RECEIVE_PACKET_TYPE)
-    Q_ENUMS(RECEIVE_STATUS)
 
 public:
-
-    /**
-     * @brief Possible types of outgoing packet
-     */
-    enum class SEND_PACKET_TYPE {
-        PING = 0,
-        SET_BCAST_PERIOD,
-        TIMESTAMP_ENABLE,
-        FRAME_REQUEST,
-        BATTERY_STATE_REQUEST,
-        SET_VISUAL_STATE,
-        SET_VISUAL_EFFECT,
-        SET_MOTOR_OUTPUT,
-        SET_ALL_MOTOR_OUTPUTS,
-        SET_GOAL_VELOCITY,
-        SET_GOAL_VELOCITY_COMPACT,
-        SET_GOAL_POSE,
-        SET_GOAL_POSITION,
-        RESET,
-        SHUTDOWN,
-        NUM_SEND_PACKET_TYPES,
-        INVALID_PACKET_TYPE = -1
-    };
-
-    /**
-     * @brief Possible types of incoming packet
-     */
-    enum class RECEIVE_PACKET_TYPE {
-        BOOT_COMPLETE = 0,
-        SHUTTING_DOWN,
-        LOW_BATTERY,
-        BATTERY_STATE_CHANGED,
-        TOUCH_BEGIN,
-        TOUCH_LONG_PRESSED,
-        TOUCH_RELEASED,
-        POSE_CHANGED,
-        POSE_CHANGED_TIMESTAMPED,
-        KIDNAP,
-        ACKNOWLEDGED,
-        CAMERA_IMAGE_LINE,
-        DEBUG,
-        NUM_RECEIVE_PACKET_TYPES,
-        INVALID_PACKET_TYPE = -1
-    };
+    COMMAND_PACKET_TYPE_ENUM_SHARED;
+    EVENT_PACKET_TYPE_ENUM_SHARED;
 
     /**
      * @brief Describes the status of the packet while it's being received
@@ -97,20 +54,20 @@ public:
         NUM_RECEIVE_STATUS
     };
 
-static const char* sendPacketTypeStr[];               ///< Strings sent over Bluetooth to give commands
-static const char* receivePacketTypeStr[];            ///< Strings received over Bluetooth as response or event
+    static const char* sendPacketTypeStr[];               ///< Strings sent over Bluetooth to give commands
+    static const char* receivePacketTypeStr[];            ///< Strings received over Bluetooth as response or event
 
-static const int sendPacketPayloadLen[];              ///< Total lengths of packets sent over Bluetooth
-static const int receivePacketPayloadLen[];           ///< Total lengths of packets received over Bluetooth
+    static const int sendPacketPayloadLen[];              ///< Total lengths of packets sent over Bluetooth
+    static const int receivePacketPayloadLen[];           ///< Total lengths of packets received over Bluetooth
 
-static const char PACKET_START_CHAR = 0x01;           ///< Put into the beginning of every Cellulo packet
+    static const char PACKET_START_CHAR = 0x01;           ///< Put into the beginning of every Cellulo packet
 
-static const int IMG_WIDTH = 752/4;                   ///< Image width of the robot's camera
-static const int IMG_HEIGHT = 480/4;                  ///< Image height of the robot's camera
+    static const int IMG_WIDTH = 752/4;                   ///< Image width of the robot's camera
+    static const int IMG_HEIGHT = 480/4;                  ///< Image height of the robot's camera
 
-static constexpr float GOAL_POSE_FACTOR = 100.0f;     ///< Goal pose elements are multiplied by this before comm.
-static constexpr float GOAL_VELOCITY_FACTOR = 100.0f; ///< Goal velocities are multiplied by this before comm.
-static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;   ///< Goal velocities are divided by this in the compact velocity command
+    static constexpr float GOAL_POSE_FACTOR = 100.0f;     ///< Goal pose elements are multiplied by this before comm.
+    static constexpr float GOAL_VELOCITY_FACTOR = 100.0f; ///< Goal velocities are multiplied by this before comm.
+    static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;   ///< Goal velocities are divided by this in the compact velocity command
 
     /**
      * @brief Creates a new Cellulo Bluetooth message
@@ -134,7 +91,7 @@ static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;   ///< Goal velocities are d
      *
      * @param type Outgoing message type
      */
-    void setSendPacketType(SEND_PACKET_TYPE type);
+    void setSendPacketType(CmdPacketType type);
 
     /**
      * @brief Clears the payload
@@ -221,7 +178,9 @@ static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;   ///< Goal velocities are d
      *
      * @return The received packet type
      */
-    RECEIVE_PACKET_TYPE getReceivePacketType(){ return receivePacketType; }
+    EventPacketType getReceivePacketType(){
+        return receivePacketType;
+    }
 
     /**
      * @brief Attempts to unload a 32-bit unsigned integer
@@ -281,14 +240,14 @@ static const int GOAL_VELOCITY_COMPACT_DIVISOR = 2;   ///< Goal velocities are d
 
 private:
 
-    SEND_PACKET_TYPE sendPacketType;            ///< Packet type if outgoing packet
-    RECEIVE_PACKET_TYPE receivePacketType;      ///< Packet type if incoming packet
+    CmdPacketType sendPacketType;           ///< Packet type if outgoing packet
+    EventPacketType receivePacketType;      ///< Packet type if incoming packet
 
-    RECEIVE_STATUS receiveStatus;               ///< Current status if receiving packet
-    int receiveBytesRemaining;                  ///< Number of bytes left to receive
+    RECEIVE_STATUS receiveStatus;           ///< Current status if receiving packet
+    int receiveBytesRemaining;              ///< Number of bytes left to receive
 
-    QByteArray payload;                         ///< Payload of the actual packet
-    int unloadIndex;                            ///< Current index to unload from the payload
+    QByteArray payload;                     ///< Payload of the actual packet
+    int unloadIndex;                        ///< Current index to unload from the payload
 };
 
 #endif // CELLULOBLUETOOTHPACKET_H

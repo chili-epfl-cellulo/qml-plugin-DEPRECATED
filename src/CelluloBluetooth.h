@@ -426,9 +426,6 @@ signals:
 
 private:
 
-    using SEND_PACKET_TYPE = CelluloBluetoothPacket::SEND_PACKET_TYPE;
-    using RECEIVE_PACKET_TYPE = CelluloBluetoothPacket::RECEIVE_PACKET_TYPE;
-
     CelluloBluetoothPacket sendPacket;                 ///< Outgoing packet
     CelluloBluetoothPacket recvPacket;                 ///< Incoming packet
 

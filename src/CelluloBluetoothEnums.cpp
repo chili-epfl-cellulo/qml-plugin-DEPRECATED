@@ -23,8 +23,10 @@
  * @date 2016-06-07
  */
 
-#include"CelluloBluetoothEnums.h"
+#include "CelluloBluetoothEnums.h"
 
- CelluloBluetoothEnums::CelluloBluetoothEnums(QObject* parent) : QObject(parent){};
+CelluloBluetoothEnums::CelluloBluetoothEnums(QObject* parent) : QObject(parent){
+}
 
- CelluloBluetoothEnums::~CelluloBluetoothEnums(){};
+CelluloBluetoothEnums::~CelluloBluetoothEnums(){
+}

@@ -28,7 +28,7 @@
 
 #include<QObject>
 
-#include"../include/CelluloBluetoothSharedEnums.h"
+#include"../include/CelluloBluetoothSharedDefs.h"
 #include"CelluloEnumDecl.h"
 
 /**
@@ -59,21 +59,21 @@ public:
     /**
      * @brief Battery state of the robot
      */
-    BATTERY_STATE_SHARED_ENUM;
+    BATTERY_STATE_ENUM_SHARED;
     Q_ENUM(BatteryState)
     CELLULO_ENUM_DECL(BatteryState)
 
     /**
      * @brief Visual state of the robot
      */
-    VISUAL_STATE_SHARED_ENUM;
+    VISUAL_STATE_ENUM_SHARED;
     Q_ENUM(VisualState)
     CELLULO_ENUM_DECL(VisualState)
 
     /**
      * @brief List of possible visual effects
      */
-    VISUAL_EFFECT_SHARED_ENUM;
+    VISUAL_EFFECT_ENUM_SHARED;
     Q_ENUM(VisualEffect)
     CELLULO_ENUM_DECL(VisualEffect)
 };
