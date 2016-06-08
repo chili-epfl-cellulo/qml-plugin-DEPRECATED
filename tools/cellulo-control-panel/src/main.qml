@@ -64,10 +64,20 @@ ApplicationWindow {
                     anchors.right: parent.right
                     spacing: 5
 
-                    ComboBox {
-                        id: effect
-                        model: CelluloBluetoothEnums.VisualEffectStrings()
-                        currentIndex: 0
+                    Column{
+                        ComboBox {
+                            id: effect
+                            model: CelluloBluetoothEnums.VisualEffectStrings()
+                            currentIndex: 0
+                        }
+                        ComboBox {
+                            model: CelluloBluetoothEnums.VisualStateStrings()
+                            currentIndex: 0
+                            onCurrentIndexChanged: {
+                                if(robotComm != null)
+                                    robotComm.setVisualState(currentIndex)
+                            }
+                        }
                     }
                     Column{
                         Layout.fillWidth: true
