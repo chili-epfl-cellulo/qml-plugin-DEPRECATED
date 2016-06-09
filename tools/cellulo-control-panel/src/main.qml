@@ -489,6 +489,8 @@ ApplicationWindow {
                             var oldSource = source;
                             source = "";
                             source = oldSource;
+                            if(grabCamFramesContinuously.checked)
+                                robotComm.requestFrame();
                         }
 
                         fillMode: Image.PreserveAspectFit
@@ -501,7 +503,17 @@ ApplicationWindow {
 
                         Button{
                             text: "Grab one frame"
-                            onClicked: robotComm.requestFrame();
+                            onClicked: robotComm.requestFrame()
+                        }
+
+                        CheckBox{
+                            id: grabCamFramesContinuously
+                            text: "Grab frames continuously"
+                            checked: false
+                            onCheckedChanged:{
+                                if(checked)
+                                    robotComm.requestFrame();
+                            }
                         }
 
                         ProgressBar{
