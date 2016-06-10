@@ -4,7 +4,6 @@ import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 import QtQuick.Controls.Styles 1.3
-import QtBluetooth 5.2
 import Cellulo 1.0
 
 ApplicationWindow {
@@ -473,6 +472,45 @@ ApplicationWindow {
                     }
                 }
             }
+
+            GroupBox{
+                id: cameraImageBox
+                title: "Camera image"
+                width: gWidth
+
+                Row{
+                    spacing: 5
+
+                    Image{
+                        id: cameraImage
+                        source: "image://cameraFrame/"
+                        cache: false
+                        function reload() {
+                            var oldSource = source;
+                            source = "";
+                            source = oldSource;
+                        }
+
+                        fillMode: Image.PreserveAspectFit
+                        width: gWidth*0.4 - 10
+                        height: width/188*120
+                    }
+
+                    Column{
+                        spacing: 5
+
+                        Button{
+                            text: "Grab one frame"
+                            onClicked: robotComm.requestFrame();
+                        }
+
+                        ProgressBar{
+                            value: robotComm.cameraImageProgress
+                            width: gWidth*0.6 - 10
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -509,5 +547,6 @@ ApplicationWindow {
             case 5: k5.color = "black"; break;
             }
         }
+        onFrameReady: cameraImage.reload()
     }
 }

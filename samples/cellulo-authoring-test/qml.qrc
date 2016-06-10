@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>src/main.qml</file>
+        <file>CelluloAuthoringZoneCircle.qml</file>
+        <file>CelluloAuthoringZoneRectangle.qml</file>
+        <file>CelluloAuthoringZoneIrregularPolygon.qml</file>
+        <file>CanvasPointHandle.qml</file>
+        <file>CelluloAuthoringZonePoint.qml</file>
+        <file>CelluloAuthoringZoneLine.qml</file>
+    </qresource>
+</RCC>

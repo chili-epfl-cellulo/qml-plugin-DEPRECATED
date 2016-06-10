@@ -25,12 +25,27 @@
 
 #include "CelluloBluetoothPlugin.h"
 
+
+
 #include<QQmlEngine>
 
 #include"CameraFrameImageProvider.h"
 
 void CelluloBluetoothPlugin::registerTypes(const char *uri){
     qmlRegisterType<CelluloBluetooth>(uri, 1, 0, "CelluloBluetooth");
+    qmlRegisterType<CelluloZonePointDistance>(uri, 1, 0, "CelluloZonePointDistance");
+    qmlRegisterType<CelluloZoneLineDistance>(uri, 1, 0, "CelluloZoneLineDistance");
+    qmlRegisterType<CelluloZoneCircleInner>(uri, 1, 0, "CelluloZoneCircleInner");
+    qmlRegisterType<CelluloZoneCircleBorder>(uri, 1, 0, "CelluloZoneCircleBorder");
+    qmlRegisterType<CelluloZoneCircleDistance>(uri, 1, 0, "CelluloZoneCircleDistance");
+    qmlRegisterType<CelluloZoneRectangleInner>(uri, 1, 0, "CelluloZoneRectangleInner");
+    qmlRegisterType<CelluloZoneRectangleBorder>(uri, 1, 0, "CelluloZoneRectangleBorder");
+    qmlRegisterType<CelluloZoneIrregularPolygonInner>(uri, 1, 0, "CelluloZoneIrregularPolygonInner");
+    qmlRegisterType<CelluloZoneRegularPolygonInner>(uri, 1, 0, "CelluloZoneRegularPolygonInner");
+    qmlRegisterType<CelluloZoneEngine>(uri, 1, 0, "CelluloZoneEngine");
+    qmlRegisterType<CelluloZoneJsonHandler>(uri, 1, 0, "CelluloZoneJsonHandler");
+    qmlRegisterType<CelluloZoneTypes>(uri, 1, 0, "CelluloZoneTypes");
+
 }
 
 void CelluloBluetoothPlugin::initializeEngine(QQmlEngine *engine, const char *uri){

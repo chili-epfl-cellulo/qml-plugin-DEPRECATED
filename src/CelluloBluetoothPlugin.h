@@ -30,6 +30,17 @@
 #include <qqml.h>
 
 #include "CelluloBluetooth.h"
+#include "zones/CelluloZone.h"
+#include "zones/CelluloZonePolygon.h"
+#include "zones/CelluloZonePoint.h"
+#include "zones/CelluloZoneLine.h"
+#include "zones/CelluloZoneCircle.h"
+#include "zones/CelluloZoneRectangle.h"
+#include "zones/CelluloZoneEngine.h"
+#include "authoring/CelluloZoneJsonHandler.h"
+#include "zones/CelluloZoneTypes.h"
+
+
 
 /**
  * @brief Object that exposes Cellulo Bluetooth communicator as QML objects
