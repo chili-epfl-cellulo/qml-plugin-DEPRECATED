@@ -152,6 +152,21 @@ ApplicationWindow {
             }
 
             GroupBox {
+                id: modesBox
+                title: "Robot Modes"
+                width: gWidth
+
+                ComboBox {
+                    model: CelluloBluetoothEnums.LocomotionInteractivityModeStrings
+                    currentIndex: 0
+                    onCurrentIndexChanged: {
+                        if(robotComm != null)
+                            robotComm.setLocomotionInteractivityMode(currentIndex)
+                    }
+                }
+            }
+
+            GroupBox {
                 id: powerBox
                 title: "Power"
                 width: gWidth

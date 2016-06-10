@@ -532,6 +532,13 @@ void CelluloBluetooth::setLEDResponseMode(CelluloBluetoothEnums::LEDResponseMode
     sendCommand();
 }
 
+void CelluloBluetooth::setLocomotionInteractivityMode(CelluloBluetoothEnums::LocomotionInteractivityMode mode){
+    sendPacket.clear();
+    sendPacket.setSendPacketType(CelluloBluetoothPacket::CmdPacketTypeSetLocomotionInteractivityMode);
+    sendPacket.load((quint8)mode);
+    sendCommand();
+}
+
 void CelluloBluetooth::setVisualEffect(CelluloBluetoothEnums::VisualEffect effect, QColor color, int value){
     if(value > 0xFF)
         value = 0xFF;

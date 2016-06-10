@@ -324,6 +324,13 @@ public slots:
     void setLEDResponseMode(CelluloBluetoothEnums::LEDResponseMode mode);
 
     /**
+     * @brief Sets the locomotion interactivity mode, i.e the dependance of locomotion to user input
+     *
+     * @param mode Locomotion interactivity mode
+     */
+    void setLocomotionInteractivityMode(CelluloBluetoothEnums::LocomotionInteractivityMode mode);
+
+    /**
      * @brief Sets the visual effect on the robot, changing LED illumination
      *
      * @param effect The effect ordinal

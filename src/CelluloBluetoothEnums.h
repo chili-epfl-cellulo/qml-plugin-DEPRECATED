@@ -71,6 +71,13 @@ public:
     CELLULO_ENUM_DECL(LEDResponseMode)
 
     /**
+     * @brief Locomotion interactivity mode of the robot
+     */
+    LOCOMOTION_INTERACTIVITY_MODE_ENUM_SHARED;
+    Q_ENUM(LocomotionInteractivityMode)
+    CELLULO_ENUM_DECL(LocomotionInteractivityMode)
+
+    /**
      * @brief List of possible visual effects
      */
     VISUAL_EFFECT_ENUM_SHARED;
@@ -81,6 +88,7 @@ public:
 Q_DECLARE_METATYPE(CelluloBluetoothEnums::ConnectionStatus)
 Q_DECLARE_METATYPE(CelluloBluetoothEnums::BatteryState)
 Q_DECLARE_METATYPE(CelluloBluetoothEnums::LEDResponseMode)
+Q_DECLARE_METATYPE(CelluloBluetoothEnums::LocomotionInteractivityMode)
 Q_DECLARE_METATYPE(CelluloBluetoothEnums::VisualEffect)
 
 #endif // CELLULOBLUETOOTHENUMS_H
