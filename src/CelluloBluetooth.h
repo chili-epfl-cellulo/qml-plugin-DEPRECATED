@@ -317,11 +317,11 @@ public slots:
     void queryBatteryState();
 
     /**
-     * @brief Sets the visual state, i.e the visual response of the robot to touches
+     * @brief Sets the LED response mode, i.e the LED visual response of the robot to touches
      *
-     * @param state The visual state
+     * @param mode LED resposne mode
      */
-    void setVisualState(CelluloBluetoothEnums::VisualState state);
+    void setLEDResponseMode(CelluloBluetoothEnums::LEDResponseMode mode);
 
     /**
      * @brief Sets the visual effect on the robot, changing LED illumination

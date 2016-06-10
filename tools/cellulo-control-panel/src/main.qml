@@ -71,11 +71,11 @@ ApplicationWindow {
                             currentIndex: 0
                         }
                         ComboBox {
-                            model: CelluloBluetoothEnums.VisualStateStrings
+                            model: CelluloBluetoothEnums.LEDResponseModeStrings
                             currentIndex: 0
                             onCurrentIndexChanged: {
                                 if(robotComm != null)
-                                    robotComm.setVisualState(currentIndex)
+                                    robotComm.setLEDResponseMode(currentIndex)
                             }
                         }
                     }

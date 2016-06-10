@@ -525,10 +525,10 @@ void CelluloBluetooth::setGoalPosition(float x, float y, float v){
     sendCommand();
 }
 
-void CelluloBluetooth::setVisualState(CelluloBluetoothEnums::VisualState state){
+void CelluloBluetooth::setLEDResponseMode(CelluloBluetoothEnums::LEDResponseMode mode){
     sendPacket.clear();
-    sendPacket.setSendPacketType(CelluloBluetoothPacket::CmdPacketTypeSetVisualState);
-    sendPacket.load((quint8)state);
+    sendPacket.setSendPacketType(CelluloBluetoothPacket::CmdPacketTypeSetLEDResponseMode);
+    sendPacket.load((quint8)mode);
     sendCommand();
 }
 

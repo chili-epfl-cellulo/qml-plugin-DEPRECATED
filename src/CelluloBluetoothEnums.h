@@ -64,11 +64,11 @@ public:
     CELLULO_ENUM_DECL(BatteryState)
 
     /**
-     * @brief Visual state of the robot
+     * @brief LED response mode of the robot
      */
-    VISUAL_STATE_ENUM_SHARED;
-    Q_ENUM(VisualState)
-    CELLULO_ENUM_DECL(VisualState)
+    LED_RESPONSE_MODE_ENUM_SHARED;
+    Q_ENUM(LEDResponseMode)
+    CELLULO_ENUM_DECL(LEDResponseMode)
 
     /**
      * @brief List of possible visual effects
@@ -80,7 +80,7 @@ public:
 
 Q_DECLARE_METATYPE(CelluloBluetoothEnums::ConnectionStatus)
 Q_DECLARE_METATYPE(CelluloBluetoothEnums::BatteryState)
-Q_DECLARE_METATYPE(CelluloBluetoothEnums::VisualState)
+Q_DECLARE_METATYPE(CelluloBluetoothEnums::LEDResponseMode)
 Q_DECLARE_METATYPE(CelluloBluetoothEnums::VisualEffect)
 
 #endif // CELLULOBLUETOOTHENUMS_H
