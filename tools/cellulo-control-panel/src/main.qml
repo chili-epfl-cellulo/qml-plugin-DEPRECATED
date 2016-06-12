@@ -156,12 +156,22 @@ ApplicationWindow {
                 title: "Robot Modes"
                 width: gWidth
 
-                ComboBox {
-                    model: CelluloBluetoothEnums.LocomotionInteractivityModeStrings
-                    currentIndex: 0
-                    onCurrentIndexChanged: {
-                        if(robotComm != null)
-                            robotComm.setLocomotionInteractivityMode(currentIndex)
+                Column{
+                    spacing: 5
+
+                    ComboBox {
+                        model: CelluloBluetoothEnums.LocomotionInteractivityModeStrings
+                        currentIndex: 0
+                        onCurrentIndexChanged: {
+                            if(robotComm != null)
+                                robotComm.setLocomotionInteractivityMode(currentIndex)
+                        }
+                    }
+
+                    CheckBox{
+                        checked: false
+                        text: "Raw touch enabled"
+                        onCheckedChanged: robotComm.setRawTouchEnabled(checked)
                     }
                 }
             }

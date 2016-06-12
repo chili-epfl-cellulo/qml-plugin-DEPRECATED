@@ -228,6 +228,34 @@ void CelluloBluetooth::processResponse(){
             break;
         }
 
+        case CelluloBluetoothPacket::EventPacketTypeTouchRaw: {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            short key0 = recvPacket.unloadInt16();
+            short key1 = recvPacket.unloadInt16();
+            short key2 = recvPacket.unloadInt16();
+            short key3 = recvPacket.unloadInt16();
+            short key4 = recvPacket.unloadInt16();
+            short key5 = recvPacket.unloadInt16();
+
+            qDebug() << key0 << " " << key1 << " " << key2 << " " << key3 << " " << key4 << " " << key5;
+
+            break;
+        }
+
         case CelluloBluetoothPacket::EventPacketTypePoseChanged: {
             x = recvPacket.unloadUInt32()/(float)GOAL_POSE_FACTOR_SHARED;
             y = recvPacket.unloadUInt32()/(float)GOAL_POSE_FACTOR_SHARED;
@@ -308,7 +336,8 @@ void CelluloBluetooth::processResponse(){
         }
 
         case CelluloBluetoothPacket::EventPacketTypeDebug:
-            qDebug() << "CelluloBluetooth::processResponse(): Debug message";
+            qDebug() << "CelluloBluetoothPacket::processResponse(): Debug event received";
+            //DO SOMETHING
             break;
 
         default:
@@ -536,6 +565,13 @@ void CelluloBluetooth::setLocomotionInteractivityMode(CelluloBluetoothEnums::Loc
     sendPacket.clear();
     sendPacket.setSendPacketType(CelluloBluetoothPacket::CmdPacketTypeSetLocomotionInteractivityMode);
     sendPacket.load((quint8)mode);
+    sendCommand();
+}
+
+void CelluloBluetooth::setRawTouchEnabled(bool enabled){
+    sendPacket.clear();
+    sendPacket.setSendPacketType(CelluloBluetoothPacket::CmdPacketTypeRawTouchEnable);
+    sendPacket.load((quint8)enabled);
     sendCommand();
 }
 
