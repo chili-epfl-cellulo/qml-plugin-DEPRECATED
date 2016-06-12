@@ -440,6 +440,15 @@ ApplicationWindow {
                             color: "black"
                         }
                     }
+                    Text{
+                        text: "Raw key values: " +
+                            robotComm.touchRawValues[0] +  " " +
+                            robotComm.touchRawValues[1] +  " " +
+                            robotComm.touchRawValues[2] +  " " +
+                            robotComm.touchRawValues[3] +  " " +
+                            robotComm.touchRawValues[4] +  " " +
+                            robotComm.touchRawValues[5]
+                    }
                     Row{
                         spacing: 5
 

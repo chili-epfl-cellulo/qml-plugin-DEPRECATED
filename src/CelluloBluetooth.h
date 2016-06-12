@@ -55,6 +55,8 @@ Q_OBJECT
     Q_PROPERTY(float theta READ getTheta NOTIFY poseChanged)
     Q_PROPERTY(bool kidnapped READ getKidnapped NOTIFY kidnappedChanged)
 
+    Q_PROPERTY(QList<int> touchRawValues READ getTouchRawValues NOTIFY touchRawValuesUpdated)
+
     Q_PROPERTY(bool timestampingEnabled WRITE setTimestampingEnabled READ getTimestampingEnabled)
     Q_PROPERTY(int lastTimestamp READ getLastTimestamp NOTIFY timestampChanged)
     Q_PROPERTY(float framerate READ getFramerate NOTIFY timestampChanged)
@@ -176,6 +178,10 @@ public:
      */
     bool getKidnapped(){
         return kidnapped;
+    }
+
+    QList<int> getTouchRawValues() const{
+        return touchRawValues;
     }
 
     /**
@@ -420,6 +426,11 @@ signals:
     void kidnappedChanged();
 
     /**
+     * @brief Emitted when raw touch signal offsets are updated
+     */
+    void touchRawValuesUpdated();
+
+    /**
      * @brief Emitted when a new camera image line is received
      */
     void cameraImageProgressChanged();
@@ -449,6 +460,8 @@ private:
     float y;                                                  ///< Current y position in grid coordinates
     float theta;                                              ///< Current orientation in degrees
     bool kidnapped;                                           ///< Whether currently kidnapped
+
+    QList<int> touchRawValues;                                ///< Touch key raw offsets
 
     /**
      * @brief Resets properties of the robot to default

@@ -52,6 +52,10 @@ CelluloBluetooth::CelluloBluetooth(QQuickItem* parent) :
     lastTimestamp = 0;
     framerate = 0.0;
     kidnapped = true;
+
+    touchRawValues.reserve(6);
+    for(int i=0;i<6;i++)
+        touchRawValues.append(0);
 }
 
 CelluloBluetooth::~CelluloBluetooth(){
@@ -229,30 +233,9 @@ void CelluloBluetooth::processResponse(){
         }
 
         case CelluloBluetoothPacket::EventPacketTypeTouchRaw: {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            short key0 = recvPacket.unloadInt16();
-            short key1 = recvPacket.unloadInt16();
-            short key2 = recvPacket.unloadInt16();
-            short key3 = recvPacket.unloadInt16();
-            short key4 = recvPacket.unloadInt16();
-            short key5 = recvPacket.unloadInt16();
-
-            qDebug() << key0 << " " << key1 << " " << key2 << " " << key3 << " " << key4 << " " << key5;
-
+            for(int i=0;i<6;i++)
+                touchRawValues[i] = recvPacket.unloadInt16();
+            emit touchRawValuesUpdated();
             break;
         }
 
