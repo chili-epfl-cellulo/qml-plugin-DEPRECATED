@@ -86,11 +86,12 @@
 #define COMMAND_PACKET_TYPE_ENUM_SHARED enum CmdPacketType { \
         CmdPacketTypePing = 0,                       /** Ping robot, which will send an acknowledge event */ \
         CmdPacketTypeSetBcastPeriod,                 /** Set pose broadcast period */ \
-        CmdPacketTypeTimestampEnable,                /** Enable sending timestamp along with pose */ \
+        CmdPacketTypeTimestampEnable,                /** Enable/disable sending timestamp along with pose */ \
         CmdPacketTypeFrameRequest,                   /** Request a camera image frame */ \
         CmdPacketTypeBatteryStateRequest,            /** Request battery state */ \
         CmdPacketTypeSetLEDResponseMode,             /** Set LED response mode */ \
         CmdPacketTypeSetLocomotionInteractivityMode, /** Set the locomotion interactivity mode */ \
+        CmdPacketTypeRawTouchEnable,                 /** Enable/disable querying and broadcasting raw touch signals */ \
         CmdPacketTypeSetVisualEffect,                /** Set visual effect */ \
         CmdPacketTypeSetMotorOutput,                 /** Set output of one motor */ \
         CmdPacketTypeSetAllMotorOutputs,             /** Set output of all motors */ \
@@ -114,6 +115,7 @@
         "B", /** CmdPacketTypeBatteryStateRequest */ \
         "L", /** CmdPacketTypeSetLEDResponseMode */ \
         "I", /** CmdPacketTypeSetLocomotionInteractivityMode */ \
+        "H", /** CmdPacketTypeRawTouchEnable */ \
         "E", /** CmdPacketTypeSetVisualEffect */ \
         "M", /** CmdPacketTypeSetMotorOutput */ \
         "A", /** CmdPacketTypeSetAllMotorOutputs */ \
@@ -136,6 +138,7 @@
         0,                 /** CmdPacketTypeBatteryStateRequest */ \
         1,                 /** CmdPacketTypeSetLEDResponseMode: uint8 mode */ \
         1,                 /** CmdPacketTypeSetLocomotionInteractivityMode: uint8 mode */ \
+        1,                 /** CmdPacketTypeRawTouchEnable: uint8 bool */ \
         1 + 1 + 1 + 1 + 1, /** CmdPacketTypeSetVisualEffect: uint8 effect, uint8 red, uint8 green, uint8 blue, uint8 value */ \
         1 + 2,             /** CmdPacketTypeSetMotorOutput: uint8 motorIndex, int16 output (-0xFFF to 0xFFF) */ \
         2 + 2 + 2,         /** CmdPacketTypeSetAllMotorOutputs: int16 m1Output, int16 m2Output, int16 m3Output (-0xFFF to 0xFFF) */ \
@@ -158,6 +161,7 @@
         EventPacketTypeTouchBegan,             /** Key was touched */ \
         EventPacketTypeTouchLongPressed,       /** Key was touched for a time */ \
         EventPacketTypeTouchReleased,          /** Key was released */ \
+        EventPacketTypeTouchRaw,               /** Raw key signal offsets broadcast */ \
         EventPacketTypePoseChanged,            /** Pose changed */ \
         EventPacketTypePoseChangedTimestamped, /** Pose changed, timestamp attached to message */ \
         EventPacketTypeKidnapChanged,          /** Kidnap state changed */ \
@@ -178,6 +182,7 @@
         "T", /** EventPacketTypeTouchBegan */ \
         "L", /** EventPacketTypeTouchLongPressed */ \
         "R", /** EventPacketTypeTouchReleased */ \
+        "H", /** EventPacketTypeTouchRaw */ \
         "P", /** EventPacketTypePoseChanged */ \
         "S", /** EventPacketTypePoseChangedTimestamped */ \
         "K", /** EventPacketTypeKidnapChanged */ \
@@ -197,6 +202,7 @@
         1,                    /** EventPacketTypeTouchBegan: uint8 keyIndex */ \
         1,                    /** EventPacketTypeTouchLongPressed: uint8 keyIndex */ \
         1,                    /** EventPacketTypeTouchReleased: uint8 keyIndex */ \
+        2*6,                  /** EventPacketTypeTouchRaw: int16 key0, int16 key1, int16 key2, int16 key3, int16 key4, int16 key5 */ \
         4 + 4 + 2,            /** EventPacketTypePoseChanged: uint32 x, uint32 y, uint16 theta */ \
         4 + 4 + 2 + 4,        /** EventPacketTypePoseChangedTimestamped uint32 x, uint32 y, uint16 theta, uint32 timestamp */ \
         1,                    /** EventPacketTypeKidnapChanged: uint8 kidnappedBool */ \
